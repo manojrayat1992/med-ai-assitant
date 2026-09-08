@@ -86,7 +86,7 @@ export function NotificationCenter({ onUnreadChange }: Props) {
 
   // ── Render ───────────────────────────────────────────────
   return (
-    <div style={{ position: 'relative' }} ref={panelRef}>
+    <div style={{ position: 'relative', zIndex: 60 }} ref={panelRef}>
       {/* Bell button */}
       <button
         id="notification-bell-btn"
@@ -122,12 +122,12 @@ export function NotificationCenter({ onUnreadChange }: Props) {
         <div
           id="notification-panel"
           style={{
-            position: 'absolute', top: 'calc(100% + 8px)', right: 0, zIndex: 999,
-            width: 360, maxHeight: 520,
+            position: 'absolute', top: 'calc(100% + 8px)', right: 0, zIndex: 1000,
+            width: 380, maxHeight: 520,
             background: 'var(--surface-1, #111827)',
             border: '1px solid var(--clr-border, #1e2d45)',
             borderRadius: 12, overflow: 'hidden',
-            boxShadow: '0 20px 60px rgba(0,0,0,0.5)',
+            boxShadow: '0 25px 60px rgba(0,0,0,0.7)',
             display: 'flex', flexDirection: 'column',
           }}
         >
@@ -139,7 +139,7 @@ export function NotificationCenter({ onUnreadChange }: Props) {
           }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
               <Bell size={14} style={{ color: '#3b82f6' }} />
-              <span style={{ fontWeight: 600, fontSize: 14, color: '#f1f5f9' }}>Notifications</span>
+              <span style={{ fontWeight: 600, fontSize: 14, color: 'var(--clr-text)' }}>Notifications</span>
               {unread > 0 && (
                 <span style={{
                   fontSize: 11, fontWeight: 700, color: '#ef4444',

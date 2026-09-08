@@ -7,7 +7,8 @@ import {
   Shield, Bell, Database, User, Building2,
   Moon, Sun, Key, Globe2, Mail, Zap, Save, RefreshCw, RotateCcw, AlertTriangle, Wifi,
 } from 'lucide-react';
-import { FormEvent, useEffect, useMemo, useState } from 'react';
+import { useThemeStore } from '@/stores/themeStore';
+import { FormEvent, useEffect, useMemo, useState } from 'react'; // useState kept for AI settings form state
 
 const providerDefaults: Record<AiProvider, { baseUrl: string; chatModel: string }> = {
   OPENAI: { baseUrl: 'https://api.openai.com', chatModel: 'gpt-4o' },
@@ -35,7 +36,7 @@ const initialAiForm: AiSettingsForm = {
 
 export function SettingsPage() {
   const { tenantName, role, email, fullName } = useAuthStore();
-  const [darkMode, setDarkMode] = useState(true);
+  const { isDark, toggleTheme } = useThemeStore();
   const [aiSettings, setAiSettings] = useState<AiSettingsView | null>(null);
   const [aiForm, setAiForm] = useState<AiSettingsForm>(initialAiForm);
   const [aiLoading, setAiLoading] = useState(false);
@@ -53,13 +54,7 @@ export function SettingsPage() {
     return aiSettings.usingTenantSettings ? 'Hospital managed' : 'Server default';
   }, [aiSettings]);
 
-  const toggleDarkMode = () => {
-    setDarkMode((prev) => {
-      const next = !prev;
-      document.documentElement.classList.toggle('light', !next);
-      return next;
-    });
-  };
+  // Theme toggle is handled entirely by the Zustand themeStore (persisted in localStorage)
 
   const infoRows = [
     { icon: User,      label: 'Full Name', value: fullName ?? '—' },
@@ -223,7 +218,7 @@ export function SettingsPage() {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-base">
-              {darkMode ? <Moon className="h-4 w-4" style={{ color: '#8b5cf6' }} /> : <Sun className="h-4 w-4" style={{ color: '#f59e0b' }} />}
+              {isDark ? <Moon className="h-4 w-4" style={{ color: '#8b5cf6' }} /> : <Sun className="h-4 w-4" style={{ color: '#f59e0b' }} />}
               Appearance
             </CardTitle>
             <CardDescription>Choose how Med-AI looks to you</CardDescription>
@@ -234,17 +229,17 @@ export function SettingsPage() {
               <div>
                 <p className="text-sm font-medium text-white">Dark mode</p>
                 <p className="text-xs mt-0.5" style={{ color: 'var(--clr-text-3)' }}>
-                  {darkMode ? 'Navy dark theme (default)' : 'Light clinical theme'}
+                  {isDark ? 'Navy dark theme (default)' : 'Light clinical theme'}
                 </p>
               </div>
               <button
-                onClick={toggleDarkMode}
+                onClick={toggleTheme}
                 className="relative inline-flex h-6 w-11 items-center rounded-full transition-colors"
-                style={{ background: darkMode ? '#3b82f6' : '#475569' }}
+                style={{ background: isDark ? '#3b82f6' : '#475569' }}
               >
                 <span
                   className="inline-block h-4 w-4 rounded-full bg-white shadow transition-transform"
-                  style={{ transform: darkMode ? 'translateX(24px)' : 'translateX(4px)' }}
+                  style={{ transform: isDark ? 'translateX(24px)' : 'translateX(4px)' }}
                 />
               </button>
             </div>

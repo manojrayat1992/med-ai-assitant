@@ -272,7 +272,7 @@ export function DashboardPage() {
               </div>
               <div className="flex items-center gap-4 text-xs">
                 <span style={{ color: '#64748b' }}>
-                  Total: <strong style={{ color: '#f1f5f9' }}>{analytics.analysesPerDay.reduce((s, d) => s + d.count, 0)}</strong>
+                  Total: <strong style={{ color: 'var(--clr-text)' }}>{analytics.analysesPerDay.reduce((s, d) => s + d.count, 0)}</strong>
                 </span>
                 <span style={{ color: '#64748b' }}>
                   Success: <strong style={{ color: '#10b981' }}>{analytics.analysesPerDay.reduce((s, d) => s + d.completed, 0)}</strong>
@@ -309,7 +309,7 @@ export function DashboardPage() {
                     <span className="text-[11px] truncate" style={{ color: '#94a3b8' }}>
                       {d.analysisType.replace(/_/g, ' ')}
                     </span>
-                    <span className="text-[11px] font-bold ml-auto" style={{ color: '#f1f5f9', flexShrink: 0 }}>
+                    <span className="text-[11px] font-bold ml-auto" style={{ color: 'var(--clr-text)', flexShrink: 0 }}>
                       {d.percentage}%
                     </span>
                   </div>
@@ -334,7 +334,7 @@ export function DashboardPage() {
                   <span className="text-[11px] truncate" style={{ color: '#94a3b8', maxWidth: 120 }}>
                     {m.modelName.split('/').pop()}
                   </span>
-                  <span className="text-[11px] font-bold" style={{ color: '#f1f5f9' }}>
+                  <span className="text-[11px] font-bold" style={{ color: 'var(--clr-text)' }}>
                     {m.analysisCount}x
                   </span>
                 </div>

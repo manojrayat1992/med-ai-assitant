@@ -187,7 +187,7 @@
     transition: background 150ms ease, color 150ms ease;
   }
   .nav-item:hover {
-    background: rgba(255,255,255,0.04);
+    background: var(--surface-2, rgba(255,255,255,0.04));
     color: var(--clr-text, #f1f5f9);
   }
   .nav-item.active {
@@ -225,6 +225,16 @@
     color: #0f172a;
   }
 
+  /* Light mode nav overrides */
+  .light .nav-item:hover {
+    background: rgba(59,130,246,0.06);
+    color: var(--clr-text);
+  }
+  .light .nav-item.active {
+    background: rgba(59,130,246,0.10);
+    color: #2563eb;
+  }
+
   /* Badge pills */
   .badge {
     @apply inline-flex items-center gap-1 text-xs font-semibold px-2 py-0.5 rounded-full;
@@ -250,4 +260,80 @@
     @apply text-xs font-bold uppercase tracking-widest px-3 mb-1;
     color: var(--clr-text-3, #64748b);
   }
+}
+
+/* ─── Light Mode Global Overrides ───────────────────────────
+   These rules fix every dark-hardcoded Tailwind utility class
+   and inline style that doesn't respond to CSS variables.
+   They are scoped to .light so dark mode is unaffected.
+──────────────────────────────────────────────────────────── */
+@layer utilities {
+
+  /* ── Text color overrides ── */
+  /* text-white → dark navy in light mode */
+  .light .text-white            { color: #0f172a !important; }
+
+  /* Slate shades that are too light against white bg */
+  .light .text-slate-50,
+  .light .text-slate-100,
+  .light .text-slate-200,
+  .light .text-slate-300        { color: #334155 !important; }
+  .light .text-slate-400        { color: #475569 !important; }
+  .light .text-slate-500        { color: #64748b !important; }
+
+  /* Gray shades */
+  .light .text-gray-100,
+  .light .text-gray-200,
+  .light .text-gray-300         { color: #374151 !important; }
+
+  /* ── Background overrides ── */
+  /* Surfaces used as elevated panels */
+  .light .bg-\[rgba\(255\,255\,255\,0\.05\)\],
+  .light .bg-white\/5           { background: rgba(0,0,0,0.04) !important; }
+  .light .bg-white\/10          { background: rgba(0,0,0,0.07) !important; }
+  .light .hover\:bg-white\/5:hover  { background: rgba(0,0,0,0.04) !important; }
+  .light .hover\:bg-white\/10:hover { background: rgba(0,0,0,0.07) !important; }
+
+  /* Cards / panel backgrounds */
+  .light .bg-slate-800,
+  .light .bg-slate-900,
+  .light .bg-gray-800,
+  .light .bg-gray-900           { background: #f8fafc !important; }
+  .light .bg-slate-700,
+  .light .bg-gray-700           { background: #f1f5f9 !important; }
+
+  /* ── Border overrides ── */
+  .light .border-slate-700,
+  .light .border-slate-800,
+  .light .border-gray-700,
+  .light .border-gray-800       { border-color: #e2e8f0 !important; }
+  .light .border-white\/10      { border-color: rgba(0,0,0,0.08) !important; }
+
+  /* ── Placeholder overrides ── */
+  .light input::placeholder,
+  .light textarea::placeholder  { color: #94a3b8 !important; }
+
+  /* ── Card glass hover in light mode ── */
+  .light .card-glass:hover {
+    border-color: #cbd5e1 !important;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.08) !important;
+  }
+
+  /* ── Badge contrast in light mode ── */
+  .light .badge-blue   { background: rgba(59,130,246,0.12); color: #1d4ed8; }
+  .light .badge-teal   { background: rgba(6,182,212,0.12);  color: #0e7490; }
+  .light .badge-green  { background: rgba(16,185,129,0.12); color: #047857; }
+  .light .badge-amber  { background: rgba(245,158,11,0.12); color: #b45309; }
+  .light .badge-red    { background: rgba(239,68,68,0.12);  color: #b91c1c; }
+  .light .badge-purple { background: rgba(139,92,246,0.12); color: #6d28d9; }
+  .light .badge-slate  { background: rgba(100,116,139,0.12);color: #475569; }
+
+  /* ── Skeleton shimmer in light mode ── */
+  .light .skeleton {
+    background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%) !important;
+  }
+
+  /* ── Scrollbar in light mode ── */
+  .light ::-webkit-scrollbar-thumb { background: #cbd5e1; }
+  .light ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
 }

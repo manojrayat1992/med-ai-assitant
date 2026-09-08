@@ -11,13 +11,13 @@ const buttonVariants = cva(
         default:
           'text-white shadow-sm active:scale-[0.97]',
         outline:
-          'border text-slate-300 hover:text-white active:scale-[0.97]',
+          'border active:scale-[0.97]',
         ghost:
-          'hover:text-white active:scale-[0.97]',
+          'active:scale-[0.97]',
         destructive:
           'bg-red-600/90 text-white hover:bg-red-500 shadow-sm shadow-red-900/30 active:scale-[0.97]',
         secondary:
-          'text-slate-200 hover:text-white active:scale-[0.97]',
+          'active:scale-[0.97]',
         link:
           'underline-offset-4 hover:underline text-blue-400 p-0 h-auto',
       },
@@ -51,24 +51,28 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       variant === 'default' || !variant
         ? {
             background: 'linear-gradient(135deg, #3b82f6, #2563eb)',
+            color: '#ffffff',
             boxShadow: '0 0 0 0 rgba(59,130,246,0)',
             transition: 'all 150ms ease',
           }
         : variant === 'outline'
         ? {
-            background: 'rgba(255,255,255,0.03)',
+            background: 'var(--surface-2, #1a2235)',
             borderColor: 'var(--clr-border-2, #243250)',
+            color: 'var(--clr-text-2)',
             transition: 'all 150ms ease',
           }
         : variant === 'ghost'
         ? {
             background: 'transparent',
+            color: 'var(--clr-text-2)',
             transition: 'all 150ms ease',
           }
         : variant === 'secondary'
         ? {
             background: 'var(--surface-2, #1a2235)',
             border: '1px solid var(--clr-border, #1e2d45)',
+            color: 'var(--clr-text-2)',
             transition: 'all 150ms ease',
           }
         : {};
@@ -84,12 +88,15 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
             el.style.background = 'linear-gradient(135deg, #60a5fa, #3b82f6)';
             el.style.boxShadow = '0 0 20px rgba(59,130,246,0.4)';
           } else if (variant === 'outline') {
-            el.style.background = 'rgba(255,255,255,0.06)';
+            el.style.background = 'var(--surface-3, #1e2a40)';
             el.style.borderColor = '#3b82f6';
+            el.style.color = 'var(--clr-text)';
           } else if (variant === 'ghost') {
-            el.style.background = 'rgba(255,255,255,0.06)';
+            el.style.background = 'var(--surface-2, #1a2235)';
+            el.style.color = 'var(--clr-text)';
           } else if (variant === 'secondary') {
             el.style.background = 'var(--surface-3, #1e2a40)';
+            el.style.color = 'var(--clr-text)';
           }
           props.onMouseEnter?.(e);
         }}

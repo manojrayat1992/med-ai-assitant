@@ -88,7 +88,7 @@ export function Sidebar() {
           <Brain className="h-5 w-5 text-white" />
         </div>
         <div className="overflow-hidden min-w-0">
-          <p className="text-sm font-bold text-white truncate" style={{ fontFamily: 'Plus Jakarta Sans' }}>
+          <p className="text-sm font-bold truncate" style={{ fontFamily: 'Plus Jakarta Sans', color: 'var(--clr-text)' }}>
             Med-AI
           </p>
           <p className="text-xs truncate" style={{ color: 'var(--clr-text-3, #64748b)' }}>
@@ -128,7 +128,7 @@ export function Sidebar() {
       <div className="px-3 pb-2">
         <div
           className="rounded-xl px-3 py-2.5 flex items-center justify-between"
-          style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid var(--clr-border, #1e2d45)' }}
+          style={{ background: 'var(--surface-2, #1a2235)', border: '1px solid var(--clr-border, #1e2d45)' }}
         >
           <div className="flex items-center gap-2">
             <span className="dot-online" />
@@ -163,7 +163,7 @@ export function Sidebar() {
             {initials}
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-xs font-semibold text-white truncate">{fullName || 'Clinical User'}</p>
+            <p className="text-xs font-semibold truncate" style={{ color: 'var(--clr-text)' }}>{fullName || 'Clinical User'}</p>
             <p className="text-[10px] capitalize truncate" style={{ color: 'var(--clr-text-3, #64748b)' }}>
               {tenantName ? `${tenantName} · ` : ''}{role ? role.replace(/_/g, ' ').toLowerCase() : 'Practitioner'}
             </p>
