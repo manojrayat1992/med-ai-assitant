@@ -153,6 +153,14 @@ export const reportService = {
     return res.data.data;
   },
 
+  async signedWorklist(page = 0, size = 20): Promise<PagedResponse<ReportReview>> {
+    const res = await api.get<ApiResponse<PagedResponse<ReportReview>>>('/reports/signed', {
+      params: { page, size },
+    });
+    return res.data.data;
+  },
+
+
   async summary(): Promise<WorklistSummary> {
     const res = await api.get<ApiResponse<WorklistSummary>>('/reports/summary');
     return res.data.data;
@@ -160,6 +168,11 @@ export const reportService = {
 
   async get(reviewId: string): Promise<ReportReview> {
     const res = await api.get<ApiResponse<ReportReview>>(`/reports/${reviewId}`);
+    return res.data.data;
+  },
+
+  async getForAnalysis(analysisId: string): Promise<ReportReview> {
+    const res = await api.get<ApiResponse<ReportReview>>(`/reports/analysis/${analysisId}`);
     return res.data.data;
   },
 
@@ -178,6 +191,11 @@ export const reportService = {
 
   async claim(reviewId: string): Promise<ReportReview> {
     const res = await api.post<ApiResponse<ReportReview>>(`/reports/${reviewId}/claim`);
+    return res.data.data;
+  },
+
+  async updateDraft(reviewId: string, draftContent: string): Promise<ReportReview> {
+    const res = await api.put<ApiResponse<ReportReview>>(`/reports/${reviewId}/draft`, { draftContent });
     return res.data.data;
   },
 

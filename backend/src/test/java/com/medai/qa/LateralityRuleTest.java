@@ -87,4 +87,32 @@ class LateralityRuleTest {
                 "Large renal lesion.",
                 "Renal lesion.")).isEmpty();
     }
+
+    @Test
+    @DisplayName("flags laterality conflict for lung bulla / lucency")
+    void flagsBullaLateralityMismatch() {
+        List<QaIssue> issues = rule.evaluate(
+                "Large, well-defined ovoid lucency in the right lung consistent with a bulla.",
+                "Presence of a large bulla in the left lung.");
+        assertThat(issues).hasSize(1);
+        assertThat(issues.getFirst().message()).contains("RIGHT").contains("LEFT").contains("lung");
+    }
+
+    @Test
+    @DisplayName("flags laterality conflict for novel uncatalogued pathology (cerebellar stroke)")
+    void flagsUncataloguedPathologyConflict() {
+        List<QaIssue> issues = rule.evaluate(
+                "Acute ischemic infarct in the right cerebellum.",
+                "Subacute left cerebellar infarct.");
+        assertThat(issues).hasSize(1);
+    }
+
+    @Test
+    @DisplayName("does not flag conflict if only generic positional modifiers are shared")
+    void ignoresPositionalOnlyOverlap() {
+        assertThat(rule.evaluate(
+                "Proximal right humerus.",
+                "Proximal left femur.")).isEmpty();
+    }
 }
+

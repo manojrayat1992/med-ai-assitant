@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.medai.agent.tool.ClinicalTool;
 import com.medai.agent.tool.ToolRegistry;
+import com.medai.config.TenantAiSettingsService;
 import com.medai.patient.entity.Patient;
 import com.medai.patient.repository.PatientRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -12,7 +13,6 @@ import org.bsc.langgraph4j.CompiledGraph;
 import org.bsc.langgraph4j.StateGraph;
 import org.bsc.langgraph4j.action.EdgeAction;
 import org.springframework.ai.chat.client.ChatClient;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
@@ -28,23 +28,20 @@ public class ClinicalWorkflowGraph {
 
     private final ToolRegistry toolRegistry;
     private final PatientRepository patientRepository;
-    private final ChatClient chatClient;
+    private final TenantAiSettingsService aiSettingsService;
     private final ObjectMapper objectMapper;
-
-    @Value("${spring.ai.openai.chat.options.model:qwen/qwen3.6-27b}")
-    private String modelName;
 
     private CompiledGraph<ClinicalAgentState> compiledGraph;
 
     public ClinicalWorkflowGraph(
             ToolRegistry toolRegistry,
             PatientRepository patientRepository,
-            ChatClient chatClient,
+            TenantAiSettingsService aiSettingsService,
             ObjectMapper objectMapper
     ) {
         this.toolRegistry = toolRegistry;
         this.patientRepository = patientRepository;
-        this.chatClient = chatClient;
+        this.aiSettingsService = aiSettingsService;
         this.objectMapper = objectMapper;
         this.initGraph();
     }
@@ -105,6 +102,9 @@ public class ClinicalWorkflowGraph {
 
         try {
             UUID tenantId = state.getTenantId();
+            if (tenantId == null) {
+                throw new IllegalStateException("Tenant ID is required for clinical agent planning");
+            }
             UUID patientId = state.getPatientId();
             Patient patient = (patientId != null && tenantId != null)
                     ? patientRepository.findByTenantIdAndId(tenantId, patientId).orElse(null)
@@ -141,6 +141,8 @@ public class ClinicalWorkflowGraph {
                     Do NOT wrap with markdown quotes other than standard JSON.
                     """, patientContext, toolsPrompt, String.join(", ", toolRegistry.getAllTools().stream().map(ClinicalTool::getName).toList()));
 
+            ChatClient chatClient = aiSettingsService.createChatClient(
+                    aiSettingsService.resolveRuntimeConfig(tenantId));
             String response = chatClient.prompt()
                     .system(systemPrompt)
                     .user("Clinical Goal: " + state.getGoal())

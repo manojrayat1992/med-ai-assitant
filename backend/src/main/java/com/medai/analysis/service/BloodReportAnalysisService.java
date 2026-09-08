@@ -9,7 +9,10 @@ import com.medai.analysis.repository.AnalysisRequestRepository;
 import com.medai.analysis.util.AiJsonExtractor;
 import com.medai.analysis.util.AnalysisInputPreparer;
 import com.medai.analysis.util.UnreadableInputException;
+import com.medai.config.AiRuntimeConfig;
 import com.medai.config.RateLimitService;
+import com.medai.config.TenantAiSettingsService;
+import com.medai.notification.event.AnalysisCompletedEvent;
 import com.medai.upload.entity.MedicalFile;
 import com.medai.upload.repository.MedicalFileRepository;
 import com.medai.upload.service.StorageService;
@@ -20,6 +23,7 @@ import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.model.Media;
 import org.springframework.ai.openai.OpenAiChatOptions;
 import org.springframework.ai.openai.api.ResponseFormat;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.util.MimeType;
@@ -33,16 +37,14 @@ import java.util.UUID;
 @Slf4j
 public class BloodReportAnalysisService {
 
-    private final ChatClient chatClient;
+    private final TenantAiSettingsService aiSettingsService;
     private final AnalysisRequestRepository analysisRequestRepository;
     private final MedicalFileRepository medicalFileRepository;
     private final StorageService storageService;
     private final RateLimitService rateLimitService;
     private final AnalysisFailureRecorder failureRecorder;
     private final ObjectMapper objectMapper;
-
-    @org.springframework.beans.factory.annotation.Value("${spring.ai.openai.chat.options.model:qwen/qwen3.6-27b}")
-    private String modelName;
+    private final ApplicationEventPublisher eventPublisher;
 
     @org.springframework.beans.factory.annotation.Value("${spring.ai.openai.chat.options.max-tokens:4096}")
     private Integer maxTokens;
@@ -127,12 +129,16 @@ public class BloodReportAnalysisService {
             String clinicalNotes = request.getClinicalNotes() != null
                     ? request.getClinicalNotes() : "No additional clinical notes provided.";
 
+            AiRuntimeConfig aiConfig = aiSettingsService.resolveRuntimeConfig(request.getTenantId());
+            ChatClient chatClient = aiSettingsService.createChatClient(aiConfig);
+            String modelName = aiConfig.chatModel();
+
             StringBuilder prompt = new StringBuilder(String.format(BLOOD_REPORT_PROMPT, clinicalNotes));
             if (!prepared.isVision()) {
                 prompt.append(String.format(EXTRACTED_TEXT_SECTION,
                         medicalFile.getOriginalFileName(), prepared.text()));
             }
-            prompt.append("\n\n/no_think");
+            prompt.append(reasoningSuppressionDirective(modelName));
 
             OpenAiChatOptions jsonOptions = OpenAiChatOptions.builder()
                     .withModel(modelName)
@@ -207,6 +213,7 @@ public class BloodReportAnalysisService {
             analysisRequestRepository.save(request);
 
             rateLimitService.recordUsage(request.getTenantId(), modelName, promptTokens, completionTokens);
+            eventPublisher.publishEvent(new AnalysisCompletedEvent(this, request, request.getRequestedBy(), true));
 
             long abnormalCount = result.getParameters() != null
                     ? result.getParameters().stream().filter(p -> !"NORMAL".equals(p.getFlag())).count() : 0;
@@ -233,5 +240,13 @@ public class BloodReportAnalysisService {
         return (message != null && !message.isBlank())
                 ? message
                 : e.getClass().getSimpleName() + " during blood report analysis";
+    }
+
+    private static String reasoningSuppressionDirective(String modelName) {
+        if (modelName == null) {
+            return "";
+        }
+        String lower = modelName.toLowerCase();
+        return lower.contains("qwen") ? "\n\n/no_think" : "";
     }
 }

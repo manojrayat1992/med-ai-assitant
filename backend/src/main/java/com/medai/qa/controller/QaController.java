@@ -10,9 +10,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -27,7 +29,10 @@ public class QaController {
     @PreAuthorize("isAuthenticated()")
     @Operation(summary = "Run deterministic QA checks for a report review",
                description = "Returns potential issues and supporting evidence. The report is not modified.")
-    public ResponseEntity<ApiResponse<QaResult>> evaluateReport(@PathVariable UUID reviewId) {
-        return ResponseEntity.ok(ApiResponse.success(qaService.evaluateReport(reviewId)));
+    public ResponseEntity<ApiResponse<QaResult>> evaluateReport(
+            @PathVariable UUID reviewId,
+            @RequestBody(required = false) Map<String, String> body) {
+        String customText = body != null ? body.get("reportText") : null;
+        return ResponseEntity.ok(ApiResponse.success(qaService.evaluateReport(reviewId, customText)));
     }
 }

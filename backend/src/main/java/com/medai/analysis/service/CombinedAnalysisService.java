@@ -10,7 +10,10 @@ import com.medai.analysis.repository.AnalysisRequestRepository;
 import com.medai.analysis.util.AiJsonExtractor;
 import com.medai.analysis.util.AnalysisInputPreparer;
 import com.medai.analysis.util.UnreadableInputException;
+import com.medai.config.AiRuntimeConfig;
 import com.medai.config.RateLimitService;
+import com.medai.config.TenantAiSettingsService;
+import com.medai.notification.event.AnalysisCompletedEvent;
 import com.medai.patient.entity.Patient;
 import com.medai.patient.repository.PatientRepository;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +22,7 @@ import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.openai.OpenAiChatOptions;
 import org.springframework.ai.openai.api.ResponseFormat;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
@@ -32,18 +36,16 @@ import java.util.UUID;
 @Slf4j
 public class CombinedAnalysisService {
 
-    private final ChatClient chatClient;
+    private final TenantAiSettingsService aiSettingsService;
     private final AnalysisRequestRepository analysisRequestRepository;
     private final PatientRepository patientRepository;
     private final RateLimitService rateLimitService;
     private final AnalysisFailureRecorder failureRecorder;
     private final ObjectMapper objectMapper;
+    private final ApplicationEventPublisher eventPublisher;
 
     /** How many of the patient's most recent completed analyses to correlate. */
     private static final int SOURCE_ANALYSIS_LIMIT = 20;
-
-    @org.springframework.beans.factory.annotation.Value("${spring.ai.openai.chat.options.model:qwen/qwen3.6-27b}")
-    private String modelName;
 
     @org.springframework.beans.factory.annotation.Value("${spring.ai.openai.chat.options.max-tokens:4096}")
     private Integer maxTokens;
@@ -154,8 +156,12 @@ public class CombinedAnalysisService {
             String clinicalNotes = request.getClinicalNotes() != null
                     ? request.getClinicalNotes() : "No additional clinical notes.";
 
+            AiRuntimeConfig aiConfig = aiSettingsService.resolveRuntimeConfig(request.getTenantId());
+            ChatClient chatClient = aiSettingsService.createChatClient(aiConfig);
+            String modelName = aiConfig.chatModel();
+
             String prompt = String.format(COMBINED_ANALYSIS_PROMPT, patientInfo, clinicalNotes, imageResults, bloodResults)
-                    + "\n\n/no_think";
+                    + reasoningSuppressionDirective(modelName);
 
             OpenAiChatOptions jsonOptions = OpenAiChatOptions.builder()
                     .withModel(modelName)
@@ -211,6 +217,7 @@ public class CombinedAnalysisService {
             analysisRequestRepository.save(request);
 
             rateLimitService.recordUsage(request.getTenantId(), modelName, promptTokens, completionTokens);
+            eventPublisher.publishEvent(new AnalysisCompletedEvent(this, request, request.getRequestedBy(), true));
 
             log.info("Combined analysis completed for request {} — urgency={}, diagnoses={}, confidence={}, tokens={}",
                     analysisRequestId, result.getUrgency(),
@@ -260,5 +267,13 @@ public class CombinedAnalysisService {
         return (message != null && !message.isBlank())
                 ? message
                 : e.getClass().getSimpleName() + " during combined analysis";
+    }
+
+    private static String reasoningSuppressionDirective(String modelName) {
+        if (modelName == null) {
+            return "";
+        }
+        String lower = modelName.toLowerCase();
+        return lower.contains("qwen") ? "\n\n/no_think" : "";
     }
 }

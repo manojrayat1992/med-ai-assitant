@@ -99,6 +99,43 @@ public class ReportSignOffService {
     }
 
     /**
+     * Gets an existing review for the analysis, or opens one immediately if the analysis has completed.
+     */
+    @Transactional
+    public ReviewView getOrOpenForAnalysis(UUID analysisId) {
+        UUID tenantId = TenantContext.requireTenantId();
+        ReportReview review = openReview(tenantId, analysisId)
+                .or(() -> reviewRepository.findOpenByAnalysis(tenantId, analysisId))
+                .or(() -> reviewRepository.findByTenantIdAndAnalysisIdAndStatusOrderBySignedAtDesc(tenantId, analysisId, "SIGNED").stream().findFirst())
+                .orElseThrow(() -> new ResourceNotFoundException("ReportReview", "analysisId", analysisId.toString()));
+        return toViewOf(review, tenantId);
+    }
+
+    /**
+     * Updates the draft content of a report review before sign-off.
+     */
+    @Transactional
+    public ReviewView updateDraft(UUID reviewId, String draftContent, UserPrincipal principal) {
+        UUID tenantId = TenantContext.requireTenantId();
+        ReportReview review = reviewRepository.findByIdAndTenantId(reviewId, tenantId)
+                .orElseThrow(() -> new ResourceNotFoundException("ReportReview", "id", reviewId.toString()));
+        if ("SIGNED".equals(review.getStatus())) {
+            throw new BadRequestException("Signed reports cannot be modified. Use amend instead.");
+        }
+        review.setDraftContent(draftContent);
+        if (principal != null) {
+            review.setClaimedBy(principal.userId());
+            review.setClaimedAt(Instant.now());
+        }
+        if ("DRAFT".equals(review.getStatus())) {
+            review.setStatus("IN_REVIEW");
+        }
+        ReportReview saved = reviewRepository.save(review);
+        log.info("Draft content updated for review {}", reviewId);
+        return toViewOf(saved, tenantId);
+    }
+
+    /**
      * Creates the same review object used by generated reports, but from report text a clinician
      * pastes into the ingestion screen. No QA runs here; the workspace decides when to evaluate.
      */
@@ -193,6 +230,18 @@ public class ReportSignOffService {
                 tenantId, OPEN_STATUSES, PageRequest.of(page, size));
         return toPagedResponse(tenantId, reviews);
     }
+
+    /**
+     * Reports signed by a clinician, newest first.
+     */
+    @Transactional(readOnly = true)
+    public PagedResponse<ReviewView> signedReports(int page, int size) {
+        UUID tenantId = TenantContext.requireTenantId();
+        Page<ReportReview> reviews = reviewRepository.findByTenantIdAndStatusOrderBySignedAtDesc(
+                tenantId, "SIGNED", PageRequest.of(page, size));
+        return toPagedResponse(tenantId, reviews);
+    }
+
 
     @Transactional(readOnly = true)
     public PagedResponse<ReviewView> forPatient(UUID patientId, int page, int size) {

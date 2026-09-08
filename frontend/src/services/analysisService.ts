@@ -69,6 +69,8 @@ export interface AnalysisResponse {
   result?: string | null;
   errorMessage: string | null;
   modelUsed: string | null;
+  abstained?: boolean | null;
+  abstentionReason?: string | null;
   promptTokens: number | null;
   completionTokens: number | null;
   totalTokens: number | null;

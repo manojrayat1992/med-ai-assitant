@@ -8,6 +8,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.event.TransactionPhase;
+import org.springframework.transaction.event.TransactionalEventListener;
 
 @Component
 @RequiredArgsConstructor
@@ -21,7 +23,7 @@ public class NotificationEventListener {
      * does not extend the analysis transaction's critical path.
      */
     @Async
-    @EventListener
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT, fallbackExecution = true)
     public void onAnalysisCompleted(AnalysisCompletedEvent event) {
         AnalysisRequest req  = event.getAnalysisRequest();
         if (req == null || event.getRequestedByUserId() == null) return;

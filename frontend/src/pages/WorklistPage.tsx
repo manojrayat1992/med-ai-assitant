@@ -55,6 +55,8 @@ export function WorklistPage() {
   const canSign = role === 'DOCTOR' || role === 'HOSPITAL_ADMIN';
 
   const [reviews, setReviews] = useState<ReportReview[]>([]);
+  const [signedReports, setSignedReports] = useState<ReportReview[]>([]);
+  const [activeTab, setActiveTab] = useState<'pending' | 'signed'>('pending');
   const [summary, setSummary] = useState<WorklistSummary | null>(null);
   const [escalations, setEscalations] = useState<CriticalEscalation[]>([]);
   const [selected, setSelected] = useState<ReportReview | null>(null);
@@ -72,31 +74,38 @@ export function WorklistPage() {
   const load = useCallback(async () => {
     setError('');
     try {
-      const [list, counts, critical] = await Promise.all([
+      const [list, signedList, counts, critical] = await Promise.all([
         reportService.worklist(0, 50),
+        reportService.signedWorklist(0, 50),
         reportService.summary(),
         reportService.criticalResults(),
       ]);
       setReviews(list.content);
+      setSignedReports(signedList.content);
       setSummary(counts);
       setEscalations(critical);
 
-      // Keep the open report selected across a refresh; drop it once it leaves the worklist.
-      setSelected((current) =>
-        current ? list.content.find((r) => r.id === current.id) ?? null : null
-      );
+      // Keep open report selected across refresh if still in list
+      setSelected((current) => {
+        if (!current) {
+          return activeTab === 'pending' ? list.content[0] ?? null : signedList.content[0] ?? null;
+        }
+        const found = (activeTab === 'pending' ? list.content : signedList.content).find((r) => r.id === current.id);
+        return found ?? (activeTab === 'pending' ? list.content[0] ?? null : signedList.content[0] ?? null);
+      });
     } catch {
       setError('Could not load the worklist. Please try again.');
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [activeTab]);
 
   useEffect(() => {
     void load();
   }, [load]);
 
   const draft = useMemo(() => parseDraft(selected?.draftContent ?? null), [selected]);
+
 
   function openReport(review: ReportReview) {
     setSelected(review);
@@ -199,20 +208,51 @@ export function WorklistPage() {
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-5">
         {/* Queue */}
         <div className="lg:col-span-2 rounded-xl border" style={{ borderColor: 'var(--clr-border, #1e2d45)', background: 'var(--surface, #111827)' }}>
-          <div className="px-4 py-3 border-b flex items-center justify-between" style={{ borderColor: 'var(--clr-border, #1e2d45)' }}>
-            <h2 className="text-sm font-semibold text-white">Reading worklist</h2>
-            <button onClick={() => void load()} className="text-slate-500 hover:text-slate-300" title="Refresh">
+          <div className="flex border-b" style={{ borderColor: 'var(--clr-border, #1e2d45)' }}>
+            <button
+              onClick={() => {
+                setActiveTab('pending');
+                setSelected(reviews[0] ?? null);
+                setMode('view');
+              }}
+              className={`flex-1 px-3 py-2.5 text-xs font-semibold flex items-center justify-center gap-1.5 border-b-2 transition-colors ${
+                activeTab === 'pending'
+                  ? 'border-blue-500 text-white bg-blue-500/10'
+                  : 'border-transparent text-slate-400 hover:text-slate-200'
+              }`}
+            >
+              <Inbox className="h-3.5 w-3.5" />
+              Awaiting Review ({reviews.length})
+            </button>
+            <button
+              onClick={() => {
+                setActiveTab('signed');
+                setSelected(signedReports[0] ?? null);
+                setMode('view');
+              }}
+              className={`flex-1 px-3 py-2.5 text-xs font-semibold flex items-center justify-center gap-1.5 border-b-2 transition-colors ${
+                activeTab === 'signed'
+                  ? 'border-emerald-500 text-white bg-emerald-500/10'
+                  : 'border-transparent text-slate-400 hover:text-slate-200'
+              }`}
+            >
+              <CheckCircle2 className="h-3.5 w-3.5 text-emerald-400" />
+              Signed Reports ({signedReports.length})
+            </button>
+            <button onClick={() => void load()} className="px-3 text-slate-500 hover:text-slate-300" title="Refresh">
               <RotateCcw className="h-3.5 w-3.5" />
             </button>
           </div>
 
-          {reviews.length === 0 ? (
+          {(activeTab === 'pending' ? reviews : signedReports).length === 0 ? (
             <p className="px-4 py-10 text-center text-sm text-slate-500">
-              Nothing waiting. Completed analyses appear here for sign-off.
+              {activeTab === 'pending'
+                ? 'Nothing waiting. Completed analyses appear here for sign-off.'
+                : 'No signed reports yet. Reports will appear here once signed off.'}
             </p>
           ) : (
             <ul className="divide-y" style={{ borderColor: 'var(--clr-border, #1e2d45)' }}>
-              {reviews.map((review) => {
+              {(activeTab === 'pending' ? reviews : signedReports).map((review) => {
                 const urgency = parseDraft(review.draftContent)?.urgency ?? 'ROUTINE';
                 const isSelected = selected?.id === review.id;
                 return (
@@ -233,18 +273,26 @@ export function WorklistPage() {
                           </p>
                         </div>
                         <div className="flex flex-col items-end gap-1 shrink-0">
-                          <span className={`px-1.5 py-0.5 rounded text-[10px] border ${URGENCY_BADGE[urgency]}`}>
-                            {urgency}
+                          <span className={`px-1.5 py-0.5 rounded text-[10px] border ${STATUS_BADGE[review.status]}`}>
+                            {review.status}
                           </span>
                           <span className="text-[11px] text-slate-500 tabular-nums flex items-center gap-1">
                             <Clock className="h-3 w-3" />
-                            {waitedFor(review.createdAt)}
+                            {review.signedAt
+                              ? new Date(review.signedAt).toLocaleDateString()
+                              : waitedFor(review.createdAt)}
                           </span>
                         </div>
                       </div>
-                      {review.claimedBy && (
+                      {review.claimedBy && review.status !== 'SIGNED' && (
                         <p className="mt-1.5 text-[11px] text-amber-400/80">
                           {review.claimedBy === userId ? 'Claimed by you' : 'Claimed by another clinician'}
+                        </p>
+                      )}
+                      {review.status === 'SIGNED' && (
+                        <p className="mt-1.5 text-[11px] text-emerald-400/80 flex items-center gap-1">
+                          <CheckCircle2 className="h-3 w-3" />
+                          Signed ({review.reviewAction ?? 'COMPLETED'})
                         </p>
                       )}
                     </button>
@@ -261,6 +309,66 @@ export function WorklistPage() {
             <div className="flex flex-col items-center justify-center py-24 text-slate-500">
               <FileText className="h-8 w-8 mb-2 opacity-40" />
               <p className="text-sm">Select a report to review</p>
+            </div>
+          ) : selected.status === 'SIGNED' ? (
+            <div className="p-5 space-y-4">
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <h2 className="text-base font-semibold text-white">{selected.patientName ?? 'Patient'}</h2>
+                  <p className="text-xs text-slate-500 mt-0.5">
+                    {selected.analysisType?.replace(/_/g, ' ').toLowerCase()} · Signed{' '}
+                    {selected.signedAt ? new Date(selected.signedAt).toLocaleString() : 'recently'}
+                  </p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="px-2 py-0.5 rounded text-[10px] border bg-emerald-500/10 text-emerald-400 border-emerald-500/20 font-semibold">
+                    SIGNED REPORT
+                  </span>
+                  {selected.reviewAction && (
+                    <span className="px-2 py-0.5 rounded text-[10px] border bg-blue-500/10 text-blue-400 border-blue-500/20">
+                      {selected.reviewAction}
+                    </span>
+                  )}
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2 rounded-lg border border-emerald-500/20 bg-emerald-950/20 px-3 py-2 text-emerald-300 text-xs">
+                <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-400" />
+                <span>
+                  Official signed diagnostic report. Clinician sign-off complete.
+                </span>
+              </div>
+
+              <div className="space-y-3">
+                <h3 className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
+                  Final Signed Narrative
+                </h3>
+                <div
+                  className="rounded-lg border bg-slate-950/70 p-4 text-sm text-slate-200 font-mono whitespace-pre-wrap leading-relaxed"
+                  style={{ borderColor: 'var(--clr-border, #1e2d45)' }}
+                >
+                  {selected.finalContent || selected.draftContent}
+                </div>
+              </div>
+
+              <div className="flex flex-wrap gap-2 border-t pt-4" style={{ borderColor: 'var(--clr-border, #1e2d45)' }}>
+                <Button asChild variant="secondary" size="sm">
+                  <Link to={`/clinical-workspace/${selected.id}`}>
+                    <ShieldAlert className="h-3.5 w-3.5" />
+                    Open in Clinical Workspace
+                  </Link>
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    void navigator.clipboard.writeText(selected.finalContent || selected.draftContent || '');
+                  }}
+                >
+                  <FileText className="h-3.5 w-3.5" />
+                  Copy Report Text
+                </Button>
+              </div>
             </div>
           ) : (
             <div className="p-5 space-y-4">
@@ -360,11 +468,24 @@ export function WorklistPage() {
                         {busy ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <CheckCircle2 className="h-3.5 w-3.5" />}
                         Accept &amp; sign
                       </Button>
-                      <Button variant="outline" size="sm" disabled={busy} onClick={() => setMode('edit')}>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        disabled={busy}
+                        onClick={() => {
+                          setMode('edit');
+                          setNarrative(draftAsNarrative(draft, selected.draftContent));
+                        }}
+                      >
                         <PenLine className="h-3.5 w-3.5" />
-                        Correct &amp; sign
+                        Edit &amp; sign
                       </Button>
-                      <Button variant="destructive" size="sm" disabled={busy} onClick={() => setMode('reject')}>
+                      <Button
+                        variant="destructive"
+                        size="sm"
+                        disabled={busy}
+                        onClick={() => setMode('reject')}
+                      >
                         <XCircle className="h-3.5 w-3.5" />
                         Reject
                       </Button>
@@ -380,7 +501,7 @@ export function WorklistPage() {
                         onClick={() => sign('EDITED')}
                       >
                         {busy ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <CheckCircle2 className="h-3.5 w-3.5" />}
-                        Sign correction
+                        Sign corrected report
                       </Button>
                       <Button variant="ghost" size="sm" disabled={busy} onClick={() => setMode('view')}>
                         Cancel

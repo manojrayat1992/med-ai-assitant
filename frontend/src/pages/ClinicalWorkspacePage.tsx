@@ -29,6 +29,7 @@ import type {
   QaRequestStatus,
   ReportQaEvidence,
   ReportQaIssue,
+  ReportSection,
 } from '@/types/clinicalWorkspace';
 
 export function ClinicalWorkspacePage() {
@@ -113,7 +114,14 @@ export function ClinicalWorkspacePage() {
     },
     [isDemoMode, review, reviewId]
   );
-  const currentReport = useMemo(
+  const [editedSections, setEditedSections] = useState<ReportSection[] | null>(null);
+  const [savingDraft, setSavingDraft] = useState(false);
+
+  useEffect(() => {
+    setEditedSections(null);
+  }, [reviewId]);
+
+  const baseReport = useMemo(
     () => {
       if (review) return reportFromReview(review);
       if (isDemoMode) return demoClinicalWorkspace.report;
@@ -121,6 +129,33 @@ export function ClinicalWorkspacePage() {
     },
     [isDemoMode, review, reviewId]
   );
+  const currentReport = useMemo(() => {
+    if (!editedSections) return baseReport;
+    return {
+      ...baseReport,
+      sections: editedSections,
+    };
+  }, [baseReport, editedSections]);
+
+  async function handleSaveReport(newSections: ReportSection[]) {
+    setEditedSections(newSections);
+    if (!reviewId) {
+      setActionNotice('Report updated locally in demo mode.');
+      return;
+    }
+
+    setSavingDraft(true);
+    try {
+      const narrative = sectionsToNarrative(newSections);
+      const updated = await reportService.updateDraft(reviewId, narrative);
+      setReview(updated);
+      setActionNotice('Draft report saved successfully.');
+    } catch (e: any) {
+      setActionNotice(e?.response?.data?.message || e?.message || 'Failed to save draft.');
+    } finally {
+      setSavingDraft(false);
+    }
+  }
   const selectedIssue = useMemo(
     () => qaIssues.find((issue) => issue.id === selectedQaIssueId) ?? null,
     [qaIssues, selectedQaIssueId]
@@ -193,7 +228,8 @@ export function ClinicalWorkspacePage() {
     setActionNotice(null);
 
     try {
-      const result = await reportQaApi.runReportQa(reviewId);
+      const narrative = sectionsToNarrative(currentReport.sections);
+      const result = await reportQaApi.runReportQa(reviewId, narrative);
       const mappedIssues = result.issues.map(mapReportQaIssue);
       const defaultIssue = mappedIssues[0] ?? null;
       setQaIssues(mappedIssues);
@@ -213,8 +249,12 @@ export function ClinicalWorkspacePage() {
     }
   }
 
-  function saveDraft() {
-    setActionNotice('Draft state noted locally for this frontend shell. No backend save was performed.');
+  async function saveDraft() {
+    if (!reviewId) {
+      setActionNotice('Draft state noted locally for this frontend shell.');
+      return;
+    }
+    await handleSaveReport(currentReport.sections);
   }
 
   function markReadyToSign() {
@@ -273,7 +313,12 @@ export function ClinicalWorkspacePage() {
       */}
       <div className={activeContextTab === 'clinical-workspace' ? undefined : 'hidden'}>
         <div className="grid gap-5 xl:grid-cols-[minmax(0,0.65fr)_minmax(36rem,1.9fr)_minmax(20rem,0.8fr)]">
-          <ReportPanel report={currentReport} selectedIssue={selectedIssue} />
+          <ReportPanel
+            report={currentReport}
+            selectedIssue={selectedIssue}
+            onSaveReport={handleSaveReport}
+            saving={savingDraft}
+          />
           <AnatomyPreview
             selection={selectedAnatomy}
             linkedIssueType={selectedAnatomy && isQaAnatomySelection && selectedIssue?.anatomySelection ? selectedIssue.type : null}
@@ -316,6 +361,12 @@ export function ClinicalWorkspacePage() {
       </div>
     </div>
   );
+}
+
+function sectionsToNarrative(sections: ReportSection[]): string {
+  return sections
+    .map((s) => `${s.title.toUpperCase()}:\n${s.body.join('\n')}`)
+    .join('\n\n');
 }
 
 function mapReviewStatus(status: ReviewStatus): ClinicalReportStatus {
@@ -528,6 +579,45 @@ function qaPreviewSelection(issue: QaIssue | null): AnatomySelection | null {
   return { ...issue.anatomySelection, sourceKind: 'QA' };
 }
 
+function resolveViewerKeyForStructure(structure?: string | null, side?: string | null): string | null {
+  if (!structure) return null;
+  const s = structure.toUpperCase().trim();
+  const normalizedSide = side ? side.toLowerCase().trim() : '';
+
+  if (s.includes('LUNG') || s.includes('PULMONARY')) {
+    if (normalizedSide.includes('right') || normalizedSide === 'r') return 'respiratory.lung.right';
+    if (normalizedSide.includes('left') || normalizedSide === 'l') return 'respiratory.lung.left';
+  }
+  if (s.includes('HUMERUS')) {
+    if (normalizedSide.includes('right') || normalizedSide === 'r') return 'skeleton.humerus.right';
+    if (normalizedSide.includes('left') || normalizedSide === 'l') return 'skeleton.humerus.left';
+  }
+  if (s.includes('FEMUR')) {
+    if (normalizedSide.includes('right') || normalizedSide === 'r') return 'skeleton.femur.right';
+    if (normalizedSide.includes('left') || normalizedSide === 'l') return 'skeleton.femur.left';
+  }
+  if (s.includes('KIDNEY') || s.includes('RENAL')) {
+    if (normalizedSide.includes('right') || normalizedSide === 'r') return 'urinary.kidney.right';
+    if (normalizedSide.includes('left') || normalizedSide === 'l') return 'urinary.kidney.left';
+  }
+  if (s.includes('BRAIN')) {
+    return 'nervous.brain';
+  }
+  if (s.includes('SHOULDER') || s.includes('SCAPULA') || s.includes('CLAVICLE')) {
+    if (normalizedSide.includes('right') || normalizedSide === 'r') return 'skeleton.shoulder.right';
+    if (normalizedSide.includes('left') || normalizedSide === 'l') return 'skeleton.shoulder.left';
+  }
+  if (s.includes('KNEE') || s.includes('PATELLA')) {
+    if (normalizedSide.includes('right') || normalizedSide === 'r') return 'skeleton.knee.right';
+    if (normalizedSide.includes('left') || normalizedSide === 'l') return 'skeleton.knee.left';
+  }
+  if (s.includes('ANKLE') || s.includes('TIBIA') || s.includes('FIBULA')) {
+    if (normalizedSide.includes('right') || normalizedSide === 'r') return 'skeleton.ankle.right';
+    if (normalizedSide.includes('left') || normalizedSide === 'l') return 'skeleton.ankle.left';
+  }
+  return null;
+}
+
 function anatomySelectionFromEvidence(evidence: ReportQaEvidence): AnatomySelection | null {
   const target = evidence.anatomyTarget;
   if (!target) return null;
@@ -538,7 +628,7 @@ function anatomySelectionFromEvidence(evidence: ReportQaEvidence): AnatomySelect
     side: target.side,
     region: target.region,
     system: readableLabel(target.system),
-    viewerKey: target.viewerKey ?? null,
+    viewerKey: target.viewerKey || resolveViewerKeyForStructure(target.structureCode, target.side),
     sourceLabel: readableLabel(evidence.sourceSection),
     sourceText: evidence.sourceText,
   };
@@ -592,7 +682,7 @@ function anatomySelectionFromIssue(issue: ReportQaIssue): AnatomySelection | und
     side,
     region,
     system: 'Reported anatomy',
-    viewerKey: null,
+    viewerKey: resolveViewerKeyForStructure(structure, side),
     sourceLabel: readableLabel(issue.sectionA ?? 'Findings'),
     sourceText: issue.findingText ?? null,
   };

@@ -31,16 +31,21 @@ public class QaService {
 
     @Transactional(readOnly = true)
     public QaResult evaluateReport(UUID reviewId) {
+        return evaluateReport(reviewId, null);
+    }
+
+    @Transactional(readOnly = true)
+    public QaResult evaluateReport(UUID reviewId, String customText) {
         UUID tenantId = TenantContext.requireTenantId();
         ReportReview review = reviewRepository.findByIdAndTenantId(reviewId, tenantId)
                 .orElseThrow(() -> new ResourceNotFoundException("ReportReview", "id", reviewId.toString()));
 
-        QaResult result = qaEngine.evaluate(review.getId(), extractReportText(review));
+        QaResult result = qaEngine.evaluate(review.getId(), extractReportText(review, customText));
         return evidenceEnricher.enrich(result, findingExtractionService.extract(review));
     }
 
-    private QaReportText extractReportText(ReportReview review) {
-        String source = sourceText(review);
+    private QaReportText extractReportText(ReportReview review, String customText) {
+        String source = hasText(customText) ? customText : sourceText(review);
         if (source.isBlank()) {
             return new QaReportText(List.of(), "");
         }

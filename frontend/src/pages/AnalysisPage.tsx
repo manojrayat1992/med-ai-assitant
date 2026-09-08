@@ -431,6 +431,8 @@ export function AnalysisPage() {
                 const StatusIcon = statusCfg.icon;
                 const urgencyCfg = a.urgency ? URGENCY_CONFIG[a.urgency] : null;
                 const parsed: ImageAnalysisResult | null = parseImageResult(a);
+                const isAbstained = Boolean(a.abstained) || Boolean(a.rawResult && (() => { try { return JSON.parse(a.rawResult!).abstained; } catch { return false; } })());
+                const abstentionReason = a.abstentionReason || (a.rawResult && (() => { try { return JSON.parse(a.rawResult!).abstentionReason; } catch { return null; } })());
 
                 return (
                   <div
@@ -468,6 +470,12 @@ export function AnalysisPage() {
                       </div>
 
                       <div className="flex items-center gap-2 shrink-0">
+                        {isAbstained && (
+                          <span className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-medium border bg-amber-500/10 text-amber-400 border-amber-500/20">
+                            <AlertCircle className="h-3 w-3" />
+                            Abstained
+                          </span>
+                        )}
                         <span className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-medium border ${statusCfg.badge}`}>
                           <StatusIcon className={`h-3 w-3 ${a.status === 'PROCESSING' ? 'animate-spin' : ''}`} />
                           {statusCfg.label}
@@ -479,6 +487,18 @@ export function AnalysisPage() {
                     {/* Detailed Findings Body */}
                     {isExpanded && (
                       <div className="border-t border-slate-800/80 p-4 space-y-4 bg-slate-950/60 text-xs">
+                        {/* Abstained Notice */}
+                        {a.status === 'COMPLETED' && isAbstained && (
+                          <div className="rounded-lg border border-amber-500/30 bg-amber-950/40 p-3.5 space-y-2 text-amber-200">
+                            <div className="flex items-center gap-2 font-bold text-xs text-amber-400">
+                              <AlertCircle className="h-4 w-4 shrink-0" />
+                              <span>AI Interpretation Declined (Abstained)</span>
+                            </div>
+                            <p className="text-xs text-amber-300/90 leading-relaxed">
+                              {abstentionReason || 'The AI model determined that it could not safely interpret this study without specialized input or clearer imaging.'}
+                            </p>
+                          </div>
+                        )}
                         {/* Error & Retry */}
                         {a.status === 'FAILED' && (
                           <div className="flex items-center justify-between rounded-lg border border-red-500/30 bg-red-950/40 p-3 text-red-300">

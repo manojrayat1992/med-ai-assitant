@@ -82,7 +82,7 @@ public class FileUploadController {
     }
 
     @DeleteMapping("/{fileId}")
-    @PreAuthorize("hasAnyRole('HOSPITAL_ADMIN', 'DOCTOR')")
+    @PreAuthorize("hasRole('HOSPITAL_ADMIN')")
     public ResponseEntity<ApiResponse<Void>> deleteFile(
             @PathVariable UUID patientId,
             @PathVariable UUID fileId) {
@@ -123,4 +123,3 @@ public class FileUploadController {
                 .body(ApiResponse.success(successCount + "/" + files.size() + " files uploaded", results));
     }
 }
-

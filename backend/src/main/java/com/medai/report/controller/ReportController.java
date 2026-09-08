@@ -49,6 +49,16 @@ public class ReportController {
         return ResponseEntity.ok(ApiResponse.success(signOffService.worklist(page, size)));
     }
 
+    @GetMapping("/signed")
+    @PreAuthorize("isAuthenticated()")
+    @Operation(summary = "Reports signed by a clinician, newest first")
+    public ResponseEntity<ApiResponse<PagedResponse<ReviewView>>> signedReports(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size) {
+        return ResponseEntity.ok(ApiResponse.success(signOffService.signedReports(page, size)));
+    }
+
+
     @GetMapping("/summary")
     @PreAuthorize("isAuthenticated()")
     @Operation(summary = "Worklist counts and review outcomes",
@@ -65,6 +75,13 @@ public class ReportController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size) {
         return ResponseEntity.ok(ApiResponse.success(signOffService.forPatient(patientId, page, size)));
+    }
+
+    @GetMapping("/analysis/{analysisId}")
+    @PreAuthorize("isAuthenticated()")
+    @Operation(summary = "Get or open a review for an analysis")
+    public ResponseEntity<ApiResponse<ReviewView>> getOrOpenForAnalysis(@PathVariable UUID analysisId) {
+        return ResponseEntity.ok(ApiResponse.success(signOffService.getOrOpenForAnalysis(analysisId)));
     }
 
     @PostMapping("/text-draft")
@@ -94,6 +111,17 @@ public class ReportController {
     public ResponseEntity<ApiResponse<ReviewView>> claim(@PathVariable UUID reviewId,
                                             @AuthenticationPrincipal UserPrincipal principal) {
         return ResponseEntity.ok(ApiResponse.success(signOffService.claim(reviewId, principal)));
+    }
+
+    @PutMapping("/{reviewId}/draft")
+    @PreAuthorize("hasAnyRole('DOCTOR', 'HOSPITAL_ADMIN', 'LAB_TECH')")
+    @Operation(summary = "Update the draft report text before sign-off")
+    public ResponseEntity<ApiResponse<ReviewView>> updateDraft(
+            @PathVariable UUID reviewId,
+            @RequestBody Map<String, String> body,
+            @AuthenticationPrincipal UserPrincipal principal) {
+        return ResponseEntity.ok(ApiResponse.success(
+                signOffService.updateDraft(reviewId, body.get("draftContent"), principal)));
     }
 
     @PostMapping("/{reviewId}/sign")

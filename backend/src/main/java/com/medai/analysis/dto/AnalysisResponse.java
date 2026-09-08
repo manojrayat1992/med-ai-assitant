@@ -24,6 +24,8 @@ public class AnalysisResponse {
     private String errorMessage;
     private String modelUsed;
     private String modalityUsed;
+    private Boolean abstained;
+    private String abstentionReason;
     private Integer promptTokens;
     private Integer completionTokens;
     private Integer totalTokens;

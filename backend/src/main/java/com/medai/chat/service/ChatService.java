@@ -16,8 +16,9 @@ import com.medai.chat.repository.ChatMessageRepository;
 import com.medai.chat.repository.ChatSessionRepository;
 import com.medai.common.dto.PagedResponse;
 import com.medai.common.exception.ResourceNotFoundException;
-import com.medai.config.ModelPricing;
+import com.medai.config.AiRuntimeConfig;
 import com.medai.config.RateLimitService;
+import com.medai.config.TenantAiSettingsService;
 import com.medai.patient.entity.Patient;
 import com.medai.patient.repository.PatientRepository;
 import com.medai.tenant.TenantContext;
@@ -31,7 +32,6 @@ import org.springframework.ai.chat.messages.Message;
 import org.springframework.ai.chat.messages.SystemMessage;
 import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.model.ChatResponse;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -60,14 +60,10 @@ public class ChatService {
     private final ChatOutputGuardrailService outputGuardrailService;
     private final AiMetricsService metricsService;
     private final ChatContextBuilderService contextBuilderService;
-    private final ChatClient chatClient;
+    private final TenantAiSettingsService aiSettingsService;
     private final ChatMessagePersistence persistence;
     private final RateLimitService rateLimitService;
-    private final ModelPricing modelPricing;
     private final ObjectMapper objectMapper;
-
-    @Value("${spring.ai.openai.chat.options.model:qwen/qwen3.6-27b}")
-    private String modelName;
 
     /** How many prior messages are replayed to the model as conversational memory. */
     private static final int HISTORY_WINDOW = 10;
@@ -300,6 +296,7 @@ public class ChatService {
             ChatMessage userMessage,
             ChatContextBuilderService.BuiltContext context,
             List<Message> prompt,
+            AiRuntimeConfig aiConfig,
             long startedAtMillis
     ) {
     }
@@ -321,6 +318,7 @@ public class ChatService {
     private PreparedTurn prepareTurn(UUID sessionId, SendMessageRequest request, UserPrincipal principal) {
         long startedAt = System.currentTimeMillis();
         rateLimitService.checkRateLimit(principal.tenantId());
+        AiRuntimeConfig aiConfig = aiSettingsService.resolveRuntimeConfig(principal.tenantId());
 
         ChatSession session = persistence.loadSession(sessionId, principal.tenantId());
 
@@ -374,18 +372,20 @@ public class ChatService {
         }
         prompt.add(new UserMessage(guardrailResult.getSanitizedInput()));
 
-        return new PreparedTurn(session, patient, guardrailResult, userMsg, builtContext, prompt, startedAt);
+        return new PreparedTurn(session, patient, guardrailResult, userMsg, builtContext, prompt, aiConfig, startedAt);
     }
 
     /** Buffered invocation: one request, one complete answer. */
     private ModelOutcome invokeModel(PreparedTurn turn, UserPrincipal principal, UUID sessionId) {
         try {
+            ChatClient chatClient = aiSettingsService.createChatClient(turn.aiConfig());
             ChatResponse response = chatClient.prompt()
                     .messages(turn.prompt())
                     .call()
                     .chatResponse();
 
-            return usageFrom(response, response.getResult().getOutput().getContent(), principal);
+            return usageFrom(response, response.getResult().getOutput().getContent(), principal,
+                    turn.aiConfig().chatModel());
         } catch (Exception e) {
             return modelFailure(e, sessionId, principal);
         }
@@ -404,6 +404,7 @@ public class ChatService {
         ChatResponse lastWithUsage = null;
 
         try {
+            ChatClient chatClient = aiSettingsService.createChatClient(turn.aiConfig());
             var responses = chatClient.prompt()
                     .messages(turn.prompt())
                     .stream()
@@ -448,11 +449,11 @@ public class ChatService {
             full.append("\n\n_[The response was cut short by a connection error and is incomplete.]_");
         }
 
-        return usageFrom(lastWithUsage, full.toString(), principal);
+        return usageFrom(lastWithUsage, full.toString(), principal, turn.aiConfig().chatModel());
     }
 
     /** Reads token usage off a response, meters it, and pairs it with the text. */
-    private ModelOutcome usageFrom(ChatResponse response, String text, UserPrincipal principal) {
+    private ModelOutcome usageFrom(ChatResponse response, String text, UserPrincipal principal, String modelName) {
         if (response == null || response.getMetadata() == null || response.getMetadata().getUsage() == null) {
             return new ModelOutcome(text, false, 0, 0, 0, BigDecimal.ZERO);
         }
@@ -462,7 +463,7 @@ public class ChatService {
         int completionTokens = usage.getGenerationTokens() != null ? usage.getGenerationTokens().intValue() : 0;
         int totalTokens = usage.getTotalTokens() != null ? usage.getTotalTokens().intValue() : 0;
 
-        BigDecimal cost = modelPricing.estimate(modelName, promptTokens, completionTokens);
+        BigDecimal cost = rateLimitService.estimateCost(modelName, promptTokens, completionTokens);
         rateLimitService.recordUsage(principal.tenantId(), modelName, promptTokens, completionTokens);
 
         return new ModelOutcome(text, false, promptTokens, completionTokens, totalTokens, cost);
@@ -485,6 +486,7 @@ public class ChatService {
     /** Guards the output, persists the assistant message, and returns it. */
     private ChatMessageDto finishTurn(PreparedTurn turn, ModelOutcome outcome,
                                       UUID sessionId, UserPrincipal principal) {
+        String modelName = turn.aiConfig().chatModel();
         metricsService.recordChatTurn(principal.tenantId().toString(), modelName,
                 outcome.failed() ? "FAILED" : "SUCCESS",
                 System.currentTimeMillis() - turn.startedAtMillis());

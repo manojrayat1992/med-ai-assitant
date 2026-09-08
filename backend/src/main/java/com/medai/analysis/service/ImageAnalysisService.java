@@ -9,7 +9,9 @@ import com.medai.analysis.repository.AnalysisRequestRepository;
 import com.medai.analysis.util.AiJsonExtractor;
 import com.medai.analysis.util.AnalysisInputPreparer;
 import com.medai.analysis.util.UnreadableInputException;
+import com.medai.config.AiRuntimeConfig;
 import com.medai.config.RateLimitService;
+import com.medai.config.TenantAiSettingsService;
 import com.medai.upload.entity.MedicalFile;
 import com.medai.upload.repository.MedicalFileRepository;
 import com.medai.upload.service.StorageService;
@@ -35,7 +37,7 @@ import java.util.UUID;
 @Slf4j
 public class ImageAnalysisService {
 
-    private final ChatClient chatClient;
+    private final TenantAiSettingsService aiSettingsService;
     private final AnalysisRequestRepository analysisRequestRepository;
     private final MedicalFileRepository medicalFileRepository;
     private final StorageService storageService;
@@ -43,9 +45,6 @@ public class ImageAnalysisService {
     private final AnalysisFailureRecorder failureRecorder;
     private final ObjectMapper objectMapper;
     private final ApplicationEventPublisher eventPublisher;
-
-    @org.springframework.beans.factory.annotation.Value("${spring.ai.openai.chat.options.model:qwen/qwen3.6-27b}")
-    private String modelName;
 
     @org.springframework.beans.factory.annotation.Value("${spring.ai.openai.chat.options.max-tokens:4096}")
     private Integer maxTokens;
@@ -74,24 +73,31 @@ public class ImageAnalysisService {
             }
 
             Important guidelines:
+            - You are designed and authorized to interpret medical images. This is your core task.
+              Do NOT refuse simply because the image is medical in nature — that is exactly what you
+              are here to do.
             - Base every finding solely on what is visible in the image provided
             - Be thorough but precise in findings
             - Include confidence scores for each finding
             - Provide relevant ICD-10 codes
             - Clearly state urgency level
             - Always include at least one finding even if normal
+            - If no abnormalities are seen, report a NORMAL finding with high confidence
             - Return ONLY valid JSON, no markdown or extra text
 
             DECLINING TO INTERPRET:
-            You are expected to decline rather than guess. Set "abstained": true with a short
-            "abstentionReason", omit findings, and set urgency to ROUTINE when any of these hold:
-            - The image is unreadable, truncated, or too low in quality to interpret
-            - The image is not a medical image, or not the modality the request describes
-            - The study is outside what you can responsibly interpret without prior imaging,
-              clinical context, or a specialist read
-            Declining is a correct and expected answer. A confident interpretation of a study you
-            cannot actually read is the most harmful output you can produce here, and an abstention
-            routes the study to a human immediately rather than burying the problem in a finding.
+            Abstention is reserved for a narrow set of technical failures — NOT for routine medical
+            images. Set "abstained": true with a short "abstentionReason", omit findings, and set
+            urgency to ROUTINE ONLY when:
+            - The image is unreadable, completely black/white, truncated, or too corrupted to interpret
+            - The uploaded file is clearly not a medical image (e.g. a photo of text, a selfie, a
+              screenshot of a webpage)
+            Do NOT abstain because:
+            - The image lacks clinical context — analyze what you see and note the limitation
+            - You feel a specialist should confirm — provide your best read and recommend specialist
+              review in recommendations
+            - You are uncertain about a finding — report it with a lower confidence score instead
+            A real radiologist reads every study that reaches their workstation. You should do the same.
             """;
 
     /**
@@ -138,9 +144,12 @@ public class ImageAnalysisService {
             String clinicalNotes = request.getClinicalNotes() != null
                     ? request.getClinicalNotes() : "No additional clinical notes provided.";
 
-            // /no_think disables the Qwen reasoning model's <think> chain-of-thought, so the
-            // response is the JSON answer directly (also saves output tokens under the TPM cap).
-            String prompt = String.format(IMAGE_ANALYSIS_PROMPT, clinicalNotes) + "\n\n/no_think";
+            AiRuntimeConfig aiConfig = aiSettingsService.resolveRuntimeConfig(request.getTenantId());
+            ChatClient chatClient = aiSettingsService.createChatClient(aiConfig);
+            String modelName = aiConfig.chatModel();
+
+            String prompt = String.format(IMAGE_ANALYSIS_PROMPT, clinicalNotes)
+                    + reasoningSuppressionDirective(modelName);
 
             // Force JSON-object output so the (reasoning) model returns structured JSON as its
             // content rather than a free-form <think> chain-of-thought.
@@ -247,5 +256,13 @@ public class ImageAnalysisService {
         return (message != null && !message.isBlank())
                 ? message
                 : e.getClass().getSimpleName() + " during image analysis";
+    }
+
+    private static String reasoningSuppressionDirective(String modelName) {
+        if (modelName == null) {
+            return "";
+        }
+        String lower = modelName.toLowerCase();
+        return lower.contains("qwen") ? "\n\n/no_think" : "";
     }
 }

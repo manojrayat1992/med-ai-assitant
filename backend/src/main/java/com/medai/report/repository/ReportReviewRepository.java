@@ -34,6 +34,10 @@ public interface ReportReviewRepository extends JpaRepository<ReportReview, UUID
     Page<ReportReview> findByTenantIdAndStatusInOrderByCreatedAtAsc(
             UUID tenantId, List<String> statuses, Pageable pageable);
 
+    /** Signed reports, newest first. */
+    Page<ReportReview> findByTenantIdAndStatusOrderBySignedAtDesc(
+            UUID tenantId, String status, Pageable pageable);
+
     Page<ReportReview> findByTenantIdAndPatientIdOrderByCreatedAtDesc(
             UUID tenantId, UUID patientId, Pageable pageable);
 

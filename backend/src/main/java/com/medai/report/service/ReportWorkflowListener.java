@@ -1,7 +1,7 @@
 package com.medai.report.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.medai.analysis.dto.AnalysisResultDto;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.medai.analysis.entity.AnalysisRequest;
 import com.medai.notification.event.AnalysisCompletedEvent;
 import com.medai.tenant.TenantContext;
@@ -10,6 +10,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.event.TransactionPhase;
+import org.springframework.transaction.event.TransactionalEventListener;
 
 /**
  * Puts a completed analysis onto the reading worklist, and pages the ward if it is critical.
@@ -29,7 +31,7 @@ public class ReportWorkflowListener {
     private final ObjectMapper objectMapper;
 
     @Async
-    @EventListener
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT, fallbackExecution = true)
     public void onAnalysisCompleted(AnalysisCompletedEvent event) {
         AnalysisRequest analysis = event.getAnalysisRequest();
         if (analysis == null || !event.isSuccess()) {
@@ -46,7 +48,7 @@ public class ReportWorkflowListener {
                     analysis.getTenantId(),
                     analysis.getId(),
                     analysis.getUrgency(),
-                    impressionOf(analysis));
+                    summaryOf(analysis));
 
         } catch (Exception e) {
             // A failure here must not lose the analysis, but it does mean a report is not on
@@ -58,16 +60,41 @@ public class ReportWorkflowListener {
         }
     }
 
-    /** The model's impression, which is what a clinician needs to see on the page. */
-    private String impressionOf(AnalysisRequest analysis) {
+    /** The model's summary, which is what a clinician needs to see on urgent notifications. */
+    private String summaryOf(AnalysisRequest analysis) {
         if (analysis.getResult() == null || analysis.getResult().isBlank()) {
             return null;
         }
         try {
-            AnalysisResultDto result = objectMapper.readValue(analysis.getResult(), AnalysisResultDto.class);
-            return result.getImpression();
+            JsonNode result = objectMapper.readTree(analysis.getResult());
+            String summary = firstText(result,
+                    "impression",
+                    "overall_impression",
+                    "interpretation",
+                    "overallAssessment",
+                    "clinicalCorrelation");
+            if (summary != null) {
+                return summary;
+            }
+
+            JsonNode criticalFindings = result.get("criticalFindings");
+            if (criticalFindings != null && criticalFindings.isArray() && !criticalFindings.isEmpty()) {
+                String finding = criticalFindings.get(0).asText();
+                return finding.isBlank() ? null : finding;
+            }
         } catch (Exception e) {
             return null;
         }
+        return null;
+    }
+
+    private static String firstText(JsonNode node, String... fieldNames) {
+        for (String fieldName : fieldNames) {
+            JsonNode value = node.get(fieldName);
+            if (value != null && value.isTextual() && !value.asText().isBlank()) {
+                return value.asText();
+            }
+        }
+        return null;
     }
 }

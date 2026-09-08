@@ -6,6 +6,7 @@ import com.medai.knowledge.dto.RagQueryRequest;
 import com.medai.knowledge.dto.RagResponse;
 import com.medai.knowledge.repository.ChunkSimilarityProjection;
 import com.medai.knowledge.repository.DocumentChunkRepository;
+import com.medai.config.TenantAiSettingsService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.client.ChatClient;
@@ -21,7 +22,7 @@ public class RagService {
 
     private final DocumentChunkRepository chunkRepository;
     private final EmbeddingService embeddingService;
-    private final ChatClient chatClient;
+    private final TenantAiSettingsService aiSettingsService;
 
     private static final String RAG_SYSTEM_PROMPT = """
             You are an expert Hospital Clinical Intelligence Assistant for Med-AI.
@@ -91,6 +92,8 @@ public class RagService {
 
         String answer;
         try {
+            ChatClient chatClient = aiSettingsService.createChatClient(
+                    aiSettingsService.resolveRuntimeConfig(principal.tenantId()));
             answer = chatClient.prompt()
                     .system(prompt)
                     .user(request.getQuery())
