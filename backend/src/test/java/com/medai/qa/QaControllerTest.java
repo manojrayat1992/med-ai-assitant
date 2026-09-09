@@ -70,7 +70,7 @@ class QaControllerTest extends BaseIntegrationTest {
                 .andExpect(jsonPath("$.data.issues[0].anatomyCode").value("HUMERUS"))
                 .andExpect(jsonPath("$.data.issues[0].region").value("PROXIMAL"))
                 .andExpect(jsonPath("$.data.issues[0].detector").value("LateralityRule"))
-                .andExpect(jsonPath("$.data.issues[0].detectorVersion").value("1.0.0"))
+                .andExpect(jsonPath("$.data.issues[0].detectorVersion").value("2.0.0"))
                 .andExpect(jsonPath("$.data.issues[0].evidence", hasSize(2)))
                 .andExpect(jsonPath("$.data.issues[0].evidence[0].sourceSection").value("FINDINGS"))
                 .andExpect(jsonPath("$.data.issues[0].evidence[0].findingType").value("FRACTURE"))

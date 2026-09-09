@@ -45,6 +45,7 @@ vi.mock('@/services/reportService', async () => {
     reportService: {
       ...actual.reportService,
       worklist: vi.fn(),
+      signedWorklist: vi.fn(),
       summary: vi.fn(),
       criticalResults: vi.fn(),
       get: vi.fn(),
@@ -62,6 +63,14 @@ const PATIENT_ID = '33333333-3333-4333-8333-333333333333';
 const PRIOR_REVIEW_ID = '44444444-4444-4444-8444-444444444444';
 const FINDING_TEXT = 'Comminuted fracture involving the proximal right humerus.';
 const IMPRESSION_TEXT = 'Comminuted fracture of the proximal left humerus.';
+const QA_REQUEST_TEXT = `FINDINGS:
+${FINDING_TEXT}
+
+COMPARISON:
+Not recorded in this review.
+
+IMPRESSION:
+${IMPRESSION_TEXT}`;
 const REAL_FINDINGS_TEXT = 'There is a comminuted fracture involving the proximal right humerus.';
 const REAL_COMPARISON_TEXT = 'No prior study available.';
 const REAL_IMPRESSION_TEXT = 'Comminuted fracture of the proximal left humerus.';
@@ -89,6 +98,7 @@ describe('QA workflow regression coverage', () => {
       tenantName: 'QA Hospital',
     });
     vi.mocked(reportService.summary).mockResolvedValue(worklistSummary());
+    vi.mocked(reportService.signedWorklist).mockResolvedValue(pagedReviews([]));
     vi.mocked(reportService.criticalResults).mockResolvedValue([]);
     vi.mocked(reportService.forPatient).mockResolvedValue(pagedReviews([]));
   });
@@ -110,7 +120,7 @@ describe('QA workflow regression coverage', () => {
     );
 
     const worklistReview = await screen.findByRole('button', { name: /Asha Menon/i });
-    expect(screen.getByText('Reading worklist')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Awaiting Review/i })).toBeInTheDocument();
 
     await user.click(worklistReview);
 
@@ -135,7 +145,7 @@ describe('QA workflow regression coverage', () => {
     await user.click(screen.getByRole('button', { name: /^Run QA$/i }));
 
     expect(reportQaApi.runReportQa).toHaveBeenCalledTimes(1);
-    expect(reportQaApi.runReportQa).toHaveBeenCalledWith(REVIEW_ID);
+    expect(reportQaApi.runReportQa).toHaveBeenCalledWith(REVIEW_ID, QA_REQUEST_TEXT);
     expect(screen.getByRole('button', { name: /Running QA/i })).toBeDisabled();
     expect(screen.getByText('Running report QA')).toBeInTheDocument();
 
@@ -304,10 +314,8 @@ describe('QA workflow regression coverage', () => {
 
     expect(await screen.findByText('Right Humerus')).toBeInTheDocument();
     expect(screen.queryByText('Conflicting mapped structures')).not.toBeInTheDocument();
-    // No viewer key means no single structure to render, and the metadata still stands.
-    expect(
-      screen.getByText('No single 3D structure is available for this mapped finding.')
-    ).toBeInTheDocument();
+    // The known structure and explicit side resolve to the fallback viewer key.
+    expect(screen.getByText('viewerKey: skeleton.humerus.right')).toBeInTheDocument();
     expect(screen.getByText('HUMERUS')).toBeInTheDocument();
     expect(screen.getByText('PROXIMAL')).toBeInTheDocument();
   });
@@ -353,8 +361,8 @@ describe('QA workflow regression coverage', () => {
     await user.click(screen.getByRole('button', { name: /Retry/i }));
 
     expect(reportQaApi.runReportQa).toHaveBeenCalledTimes(2);
-    expect(reportQaApi.runReportQa).toHaveBeenNthCalledWith(1, REVIEW_ID);
-    expect(reportQaApi.runReportQa).toHaveBeenNthCalledWith(2, REVIEW_ID);
+    expect(reportQaApi.runReportQa).toHaveBeenNthCalledWith(1, REVIEW_ID, QA_REQUEST_TEXT);
+    expect(reportQaApi.runReportQa).toHaveBeenNthCalledWith(2, REVIEW_ID, QA_REQUEST_TEXT);
     expect(await screen.findByText('No visible QA issues')).toBeInTheDocument();
   });
 

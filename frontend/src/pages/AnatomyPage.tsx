@@ -54,7 +54,7 @@ export function AnatomyPage() {
   // 3D Selection State
   const [selection, setSelection] = useState<AnatomySelection>({
     system: 'RESPIRATORY',
-    structureCode: 'LUNG',
+    structure: 'LUNG',
     displayName: 'Right Lung',
     side: 'RIGHT',
     region: 'chest',
@@ -99,10 +99,10 @@ export function AnatomyPage() {
   const selectPreset = (preset: AnatomyTargetPreset) => {
     setSelection({
       system: preset.system,
-      structureCode: preset.structureCode,
+      structure: preset.structureCode,
       displayName: preset.label,
       side: preset.side,
-      region: undefined,
+      region: 'UNSPECIFIED',
       viewerKey: preset.viewerKey,
     });
     setExploredStructure(null);
@@ -118,9 +118,10 @@ export function AnatomyPage() {
 
     setSelection({
       system: def.system,
-      structureCode: def.structureCode,
+      structure: def.structureCode,
       displayName: label,
       side: def.paired ? side : 'MIDLINE',
+      region: 'UNSPECIFIED',
       viewerKey: key,
     });
     setExploredStructure(null);
@@ -219,7 +220,7 @@ export function AnatomyPage() {
 
               {exploredStructure && (
                 <div className="px-2.5 py-1 rounded-md bg-violet-950/60 border border-violet-500/30 text-[11px] text-violet-300 font-medium">
-                  Clicked: {exploredStructure.label} ({exploredStructure.side})
+                  Clicked: {exploredStructure.displayName} ({exploredStructure.side})
                 </div>
               )}
             </CardHeader>
@@ -307,7 +308,7 @@ export function AnatomyPage() {
                       </h3>
                       <div className="space-y-1.5">
                         {items.map((def) => {
-                          const isCurrentlySelected = selection.structureCode === def.structureCode;
+                          const isCurrentlySelected = selection.structure === def.structureCode;
                           return (
                             <div
                               key={def.structureCode}

@@ -378,12 +378,13 @@ class ReportSignOffTest extends BaseIntegrationTest {
                     INSERT INTO tenants (id, name, subdomain, contact_email)
                     VALUES (?, 'Other', ?, 'o@example.test')
                     """, otherTenant, "other-" + otherTenant.toString().substring(0, 8));
+            // Seed the second tenant's doctor under that tenant's RLS context.
+            TenantContext.setCurrentTenantId(otherTenant);
             UUID otherDoctor = UUID.randomUUID();
             jdbcTemplate.update("""
                     INSERT INTO users (id, tenant_id, email, password_hash, first_name, last_name, role)
                     VALUES (?, ?, ?, 'x', 'Nina', 'Rao', 'DOCTOR')
                     """, otherDoctor, otherTenant, "doc-" + otherDoctor + "@signoff.test");
-            TenantContext.setCurrentTenantId(otherTenant);
 
             assertThatThrownBy(() -> signOffService.createTextDraft(
                     new CreateTextDraftRequest(firstTenantPatient, "FINDINGS: Clear lungs.",

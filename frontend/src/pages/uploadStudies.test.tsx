@@ -62,6 +62,7 @@ vi.mock('@/services/reportService', async () => {
     reportService: {
       ...actual.reportService,
       createTextDraft: vi.fn(),
+      getForAnalysis: vi.fn(),
       forPatient: vi.fn(),
     },
   };
@@ -91,6 +92,7 @@ describe('Upload Studies workflow', () => {
     vi.mocked(analysisService.requestBloodReport).mockResolvedValue(analysisResponse({ analysisType: 'BLOOD_REPORT' }));
     vi.mocked(analysisService.getAnalysis).mockResolvedValue(analysisResponse({ status: 'COMPLETED' }));
     vi.mocked(reportService.createTextDraft).mockResolvedValue(reportReview());
+    vi.mocked(reportService.getForAnalysis).mockRejectedValue(new Error('Review lookup unavailable'));
     vi.mocked(reportService.forPatient).mockResolvedValue(paged([reportReview()]));
     vi.mocked(api.post).mockResolvedValue(apiPostResponse([]));
   });
@@ -253,7 +255,8 @@ describe('Upload Studies workflow', () => {
         '55555555-5555-4555-8555-555555555555',
         undefined
       );
-      expect(reportService.forPatient).toHaveBeenCalledWith(PATIENT_ID, 0, 25);
+      expect(reportService.getForAnalysis).toHaveBeenCalledWith(ANALYSIS_ID);
+      expect(reportService.forPatient).toHaveBeenCalledWith(PATIENT_ID, 0, 50);
     });
     expect(await screen.findByText('Workspace opened')).toBeInTheDocument();
     expect(reportService.createTextDraft).not.toHaveBeenCalled();

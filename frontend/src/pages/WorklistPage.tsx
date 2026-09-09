@@ -253,7 +253,6 @@ export function WorklistPage() {
           ) : (
             <ul className="divide-y" style={{ borderColor: 'var(--clr-border, #1e2d45)' }}>
               {(activeTab === 'pending' ? reviews : signedReports).map((review) => {
-                const urgency = parseDraft(review.draftContent)?.urgency ?? 'ROUTINE';
                 const isSelected = selected?.id === review.id;
                 return (
                   <li key={review.id}>
