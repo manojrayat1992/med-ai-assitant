@@ -1,5 +1,10 @@
 const menuButton = document.querySelector("[data-menu-button]");
 const contactForm = document.querySelector("[data-contact-form]");
+const startedAtInput = document.querySelector("[data-started-at]");
+
+if (startedAtInput) {
+  startedAtInput.value = String(Date.now());
+}
 
 if (menuButton) {
   menuButton.addEventListener("click", () => {
@@ -12,21 +17,40 @@ if (menuButton) {
 }
 
 if (contactForm) {
-  contactForm.addEventListener("submit", (event) => {
+  const status = contactForm.querySelector("[data-form-status]");
+  const submit = contactForm.querySelector("[data-contact-submit]");
+
+  contactForm.addEventListener("submit", async (event) => {
     event.preventDefault();
     const data = new FormData(contactForm);
-    const subject = encodeURIComponent("Design Partner Inquiry - Med-AI Clinical");
-    const body = encodeURIComponent(
-      [
-        `Name: ${data.get("name") || ""}`,
-        `Organization: ${data.get("organization") || ""}`,
-        `Email: ${data.get("email") || ""}`,
-        `Role: ${data.get("role") || ""}`,
-        `Interest: ${data.get("interest") || ""}`,
-        "",
-        data.get("message") || "",
-      ].join("\n")
-    );
-    window.location.href = `mailto:hello@medaiclinical.com?subject=${subject}&body=${body}`;
+    const payload = Object.fromEntries(data.entries());
+
+    status.textContent = "Sending your request...";
+    status.dataset.state = "loading";
+    submit.disabled = true;
+
+    try {
+      const response = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      const result = await response.json().catch(() => ({}));
+
+      if (!response.ok || result.ok === false) {
+        throw new Error(result.message || "Could not send the message.");
+      }
+
+      status.textContent = result.message || "Thanks. We received your request.";
+      status.dataset.state = "success";
+      contactForm.reset();
+      if (startedAtInput) startedAtInput.value = String(Date.now());
+    } catch (error) {
+      status.textContent =
+        error.message || "We could not send the message right now. Please email hello@medaiclinical.com directly.";
+      status.dataset.state = "error";
+    } finally {
+      submit.disabled = false;
+    }
   });
 }

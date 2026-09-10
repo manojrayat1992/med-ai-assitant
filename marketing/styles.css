@@ -436,6 +436,26 @@ p { margin: 0; }
   padding: 12px 13px;
 }
 .field-grid textarea { min-height: 132px; resize: vertical; }
+.website-field {
+  position: absolute;
+  left: -10000px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+.form-status {
+  min-height: 22px;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 750;
+}
+.form-status[data-state="success"] { color: var(--green); }
+.form-status[data-state="error"] { color: #a33a32; }
+.button:disabled {
+  cursor: not-allowed;
+  opacity: 0.62;
+  transform: none;
+}
 .notice {
   border: 1px solid var(--line);
   border-left: 4px solid var(--amber);

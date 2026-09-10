@@ -73,6 +73,27 @@ npx wrangler deploy --dry-run
 
 ---
 
+## Contact form email
+
+The public contact form posts to `/api/contact` on the marketing Worker. Static assets still come
+from `marketing/`; dynamic form submission is handled by `worker/index.js`.
+
+Before deploying the form, enable Cloudflare Email Sending for the apex domain and make sure
+`hello@medaiclinical.com` is allowed as both the destination and sender configured in
+`wrangler.jsonc`.
+
+```bash
+npx wrangler email sending enable medaiclinical.com
+npx wrangler email sending dns get medaiclinical.com
+npx wrangler email sending list
+```
+
+The Worker uses the native `send_email` binding named `EMAIL`; it does not require an email API key
+in source code. Local `wrangler dev` simulates the binding unless `remote: true` is added temporarily,
+and `remote: true` sends real emails, so only use it with test addresses you control.
+
+---
+
 ## Content rules
 
 The copy is a regulatory artifact — it is what a CDSCO or FDA reviewer reads first.

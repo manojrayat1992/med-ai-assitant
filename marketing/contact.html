@@ -36,17 +36,20 @@
       <div class="wrap split-page">
         <div class="contact-card">
           <h2>Send pilot details.</h2>
-          <p class="lead">The form opens an email with your details. Do not include patient information or confidential clinical data in the message.</p>
+          <p class="lead">The form sends your details to the Med-AI Clinical team. Do not include patient information or confidential clinical data in the message.</p>
           <div class="notice">For direct email, write to <a href="mailto:hello@medaiclinical.com">hello@medaiclinical.com</a> with subject "Design Partner Inquiry".</div>
         </div>
         <form class="card field-grid" data-contact-form>
+          <input type="hidden" name="startedAt" data-started-at>
+          <label class="website-field">Website <input name="website" tabindex="-1" autocomplete="off"></label>
           <label>Name <input name="name" autocomplete="name" required></label>
           <label>Organization <input name="organization" autocomplete="organization" required></label>
           <label>Work email <input type="email" name="email" autocomplete="email" required></label>
           <label>Role <select name="role"><option>Medical director</option><option>Radiology lead</option><option>Hospital administrator</option><option>Technology leader</option><option>Other</option></select></label>
           <label>Interest <select name="interest"><option>8-week validation pilot</option><option>Security review</option><option>PACS/RIS integration discussion</option><option>General product conversation</option></select></label>
           <label>Message <textarea name="message" placeholder="Tell us about modality, report volume, and the QA problem you want to validate."></textarea></label>
-          <button class="button button-primary" type="submit">Open email draft</button>
+          <p class="form-status" role="status" aria-live="polite" data-form-status></p>
+          <button class="button button-primary" type="submit" data-contact-submit>Send pilot request</button>
         </form>
       </div>
     </section>

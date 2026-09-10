@@ -14,7 +14,9 @@
   "assets": {
     // Plain static HTML. No build step, which is why there is no build command.
     // _headers and _redirects inside this directory are honoured by Workers static assets.
-    "directory": "marketing"
+    "directory": "marketing",
+    "binding": "ASSETS",
+    "run_worker_first": ["/api/*"]
   },
 
   "observability": {
@@ -30,5 +32,21 @@
   // *.workers.dev URLs. A second, identical copy of a healthcare brand on a generic shared
   // subdomain is a lookalike-site signal to Google Safe Browsing, and it splits SEO for nothing.
   "workers_dev": false,
-  "preview_urls": false
+  "preview_urls": false,
+
+  "main": "worker/index.js",
+
+  "vars": {
+    "CONTACT_TO": "hello@medaiclinical.com",
+    "CONTACT_FROM": "hello@medaiclinical.com",
+    "CONTACT_FROM_NAME": "Med-AI Clinical Website"
+  },
+
+  "send_email": [
+    {
+      "name": "EMAIL",
+      "destination_address": "hello@medaiclinical.com",
+      "allowed_sender_addresses": ["hello@medaiclinical.com"]
+    }
+  ]
 }
