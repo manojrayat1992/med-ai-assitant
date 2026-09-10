@@ -8,7 +8,7 @@
   // the entire React source tree — every .tsx, tsconfig, package.json — as publicly fetchable
   // files. No secrets were in it, but it served source instead of a website and gave away the
   // internal structure for nothing.
-  "name": "medaiclinical-site",
+  "name": "med-ai-assitant",
   "compatibility_date": "2026-08-20",
 
   "assets": {
