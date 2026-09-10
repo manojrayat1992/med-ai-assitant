@@ -32,6 +32,7 @@ body {
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
+  overflow-x: hidden;
 }
 body.nav-open { overflow: hidden; }
 img, svg { display: block; max-width: 100%; }
@@ -491,7 +492,21 @@ p { margin: 0; }
   .wrap { width: min(100% - 28px, 1180px); }
   .brand-name span { display: none; }
   .hero { min-height: 690px; background-position: 61% center; }
+  .eyebrow {
+    position: relative;
+    display: block;
+    max-width: 100%;
+    padding-left: 16px;
+    line-height: 1.45;
+  }
+  .eyebrow::before {
+    position: absolute;
+    left: 0;
+    top: 0.45em;
+  }
   .hero h1, .page-hero h1 { font-size: 44px; }
+  .hero p { font-size: 18px; }
+  .hero-proof span, .pill { white-space: normal; }
   .hero-actions, .cta-band { align-items: stretch; }
   .button { width: 100%; }
   .timeline-item { grid-template-columns: 1fr; gap: 8px; }
