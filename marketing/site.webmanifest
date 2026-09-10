@@ -1,7 +1,7 @@
 {
   "name": "Med-AI Clinical",
   "short_name": "Med-AI",
-  "description": "Enterprise clinical documentation infrastructure. AI drafts radiology and pathology reports. Clinicians sign.",
+  "description": "Radiology report QA workflow for supervised validation pilots. AI drafts and flags; clinicians review and sign.",
   "start_url": "/",
   "display": "browser",
   "background_color": "#fcfdfc",

@@ -1,1245 +1,250 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-
-<!-- ── Primary SEO ── -->
-<title>Med-AI Clinical — AI Drafts. Clinicians Sign.</title>
-<meta name="description" content="Enterprise clinical documentation infrastructure for diagnostic chains and hospitals. AI drafts radiology and pathology reports. Licensed clinicians edit, verify, and sign. Multi-tenant, FHIR R4, designed to align with HIPAA and DPDP requirements.">
-<meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
-<meta name="author" content="Med-AI Clinical">
-<meta name="keywords" content="clinical AI documentation, radiology report AI, pathology AI, FHIR R4 India, ABDM integration, DPDP Act compliance, hospital AI software, diagnostic chain software, physician sign-off, clinical decision support, medical AI India">
-<meta name="theme-color" content="#0b6953">
-<link rel="canonical" href="https://medaiclinical.com/">
-
-<!-- ── Google Search Console Verification ── -->
-<meta name="google-site-verification" content="6fcaf84656f5cf34">
-
-<!-- ── Open Graph / Facebook ── -->
-<meta property="og:type" content="website">
-<meta property="og:url" content="https://medaiclinical.com/">
-<meta property="og:site_name" content="Med-AI Clinical">
-<meta property="og:locale" content="en_IN">
-<meta property="og:title" content="Med-AI Clinical — AI Drafts. Clinicians Sign.">
-<meta property="og:description" content="Enterprise clinical documentation infrastructure for hospitals and diagnostic chains. AI drafts radiology and pathology reports — every output reviewed and cryptographically signed by a licensed physician. FHIR R4, ABDM, DPDP-compliant.">
-<meta property="og:image" content="https://medaiclinical.com/og-image.jpg">
-<meta property="og:image:secure_url" content="https://medaiclinical.com/og-image.jpg">
-<meta property="og:image:type" content="image/jpeg">
-<meta property="og:image:width" content="1200">
-<meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="Med-AI Clinical — AI Drafts. Clinicians Sign. Clinical documentation platform for hospitals.">
-
-<!-- ── Twitter / X Card ── -->
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:site" content="@medaiclinical">
-<meta name="twitter:creator" content="@medaiclinical">
-<meta name="twitter:title" content="Med-AI Clinical — AI Drafts. Clinicians Sign.">
-<meta name="twitter:description" content="Enterprise clinical documentation infrastructure for hospitals. AI drafts radiology & pathology reports. Every report reviewed and signed by a licensed clinician. FHIR R4 · ABDM · DPDP.">
-<meta name="twitter:image" content="https://medaiclinical.com/og-image.jpg">
-<meta name="twitter:image:alt" content="Med-AI Clinical platform — clinical documentation AI">
-
-<!-- ── Favicon & Icons ── -->
-<link rel="icon" type="image/svg+xml" href="/favicon.svg">
-<link rel="manifest" href="/site.webmanifest">
-
-<!-- ── JSON-LD Structured Data ── -->
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@graph": [
-    {
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Med-AI Clinical | Radiology Report QA Before Clinician Sign-Off</title>
+  <meta name="description" content="Med-AI Clinical helps imaging teams prepare structured radiology report QA, review queues, critical result workflows, and audit-ready sign-off. Built for supervised validation pilots.">
+  <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
+  <meta name="author" content="Med-AI Clinical">
+  <meta name="theme-color" content="#0d7c66">
+  <link rel="canonical" href="https://medaiclinical.com/">
+  <meta name="google-site-verification" content="6fcaf84656f5cf34">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://medaiclinical.com/">
+  <meta property="og:site_name" content="Med-AI Clinical">
+  <meta property="og:locale" content="en_IN">
+  <meta property="og:title" content="Med-AI Clinical | AI drafts. Clinicians sign.">
+  <meta property="og:description" content="Radiology report QA and clinical documentation workflows for supervised hospital validation pilots.">
+  <meta property="og:image" content="https://medaiclinical.com/og-image.jpg">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Med-AI Clinical | Radiology report QA">
+  <meta name="twitter:description" content="A safer AI workflow for imaging teams: draft, review, sign, audit, and validate.">
+  <meta name="twitter:image" content="https://medaiclinical.com/og-image.jpg">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="manifest" href="/site.webmanifest">
+  <link rel="stylesheet" href="/styles.css">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "Med-AI Clinical",
+    "applicationCategory": "HealthApplication",
+    "operatingSystem": "Web",
+    "url": "https://medaiclinical.com/",
+    "description": "Radiology report quality assurance and clinician sign-off workflow software for supervised validation pilots.",
+    "publisher": {
       "@type": "Organization",
-      "@id": "https://medaiclinical.com/#organization",
       "name": "Med-AI Clinical",
-      "url": "https://medaiclinical.com",
-      "logo": {
-        "@type": "ImageObject",
-        "url": "https://medaiclinical.com/og-image.jpg",
-        "width": 1200,
-        "height": 630
-      },
-      "contactPoint": {
-        "@type": "ContactPoint",
-        "email": "hello@medaiclinical.com",
-        "contactType": "sales",
-        "areaServed": "IN",
-        "availableLanguage": "English"
-      },
-      "sameAs": []
-    },
-    {
-      "@type": "WebSite",
-      "@id": "https://medaiclinical.com/#website",
-      "url": "https://medaiclinical.com",
-      "name": "Med-AI Clinical",
-      "description": "Enterprise clinical documentation infrastructure powered by AI, with mandatory physician sign-off.",
-      "publisher": {
-        "@id": "https://medaiclinical.com/#organization"
-      },
-      "inLanguage": "en-IN"
-    },
-    {
-      "@type": "WebPage",
-      "@id": "https://medaiclinical.com/#webpage",
-      "url": "https://medaiclinical.com",
-      "name": "Med-AI Clinical — AI Drafts. Clinicians Sign.",
-      "description": "Enterprise clinical documentation infrastructure for diagnostic chains and hospitals. AI drafts radiology and pathology reports. Licensed clinicians edit, verify, and sign.",
-      "isPartOf": { "@id": "https://medaiclinical.com/#website" },
-      "about": { "@id": "https://medaiclinical.com/#organization" },
-      "inLanguage": "en-IN",
-      "breadcrumb": {
-        "@type": "BreadcrumbList",
-        "itemListElement": [
-          {
-            "@type": "ListItem",
-            "position": 1,
-            "name": "Home",
-            "item": "https://medaiclinical.com/"
-          }
-        ]
-      }
-    },
-    {
-      "@type": "SoftwareApplication",
-      "@id": "https://medaiclinical.com/#software",
-      "name": "Med-AI Clinical",
-      "applicationCategory": "HealthApplication",
-      "operatingSystem": "Web",
-      "url": "https://app.medaiclinical.com",
-      "description": "AI-powered clinical documentation infrastructure for radiology and pathology. Structured draft generation from DICOM and lab data, with mandatory physician review, cryptographic sign-off, and FHIR R4 output.",
-      "publisher": { "@id": "https://medaiclinical.com/#organization" },
-      "offers": {
-        "@type": "Offer",
-        "price": "0",
-        "priceCurrency": "INR",
-        "description": "Paid 8-week validation pilot for diagnostic chains and hospitals"
-      },
-      "featureList": [
-        "AI-generated radiology report drafts from DICOM studies",
-        "Pathology and laboratory biomarker synthesis",
-        "Mandatory physician review and cryptographic sign-off",
-        "FHIR R4 DiagnosticReport and Observation resources",
-        "ABDM-compatible EHR integration",
-        "Multi-tenant PostgreSQL Row-Level Security",
-        "6-year immutable audit trail",
-        "ICD-10 and LOINC code validation",
-        "Critical STAT result escalation",
-        "DPDP Act 2023 and HIPAA-aligned data handling"
-      ]
-    },
-    {
-      "@type": "FAQPage",
-      "@id": "https://medaiclinical.com/#faq",
-      "mainEntity": [
-        {
-          "@type": "Question",
-          "name": "How does Med-AI Clinical generate radiology and pathology reports?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "Medical imaging (DICOM, X-Ray, CT, MRI) or lab panels arrive from your PACS or LIS. The neural synthesis engine extracts biomarker matrices and visual abnormalities and prepares a structured, ICD-10 and SNOMED-coded clinical draft automatically."
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "Can AI reports be sent to patients without physician review?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "No. The platform strictly enforces human-in-the-loop governance. No report can be committed to an EHR, exported, or communicated to a patient without an authenticated cryptographic signature from a licensed practitioner."
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "Is Med-AI Clinical compliant with India's ABDM and DPDP Act?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "The platform natively outputs FHIR R4 resources compatible with ABDM (Ayushman Bharat Digital Mission), and data handling is designed to align with India's Digital Personal Data Protection Act 2023, with data residency in Indian data centers. No independent compliance audit or certification has been completed to date."
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "How is patient data isolated across multiple hospitals?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "Tenant isolation is enforced at the PostgreSQL database level using Row-Level Security policies. A missed application-layer filter cannot leak patient data across hospital or diagnostic chain boundaries."
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "How can my hospital become a design partner?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "Med-AI Clinical is selecting two diagnostic chains or hospital departments for a paid 8-week retrospective validation pilot. Contact the clinical team at hello@medaiclinical.com with subject 'Design Partner Inquiry'."
-          }
-        }
-      ]
+      "url": "https://medaiclinical.com/"
     }
-  ]
-}
-</script>
-
-<!-- ── Performance Hints ── -->
-<link rel="dns-prefetch" href="//fonts.googleapis.com">
-<link rel="dns-prefetch" href="//fonts.gstatic.com">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&family=JetBrains+Mono:wght@400;500;600&display=swap" onload="this.onload=null;this.rel='stylesheet'">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&family=JetBrains+Mono:wght@400;500;600&display=swap">
-<style>
-:root {
-  --bg-main: #fcfdfc;
-  --bg-surface: #ffffff;
-  --bg-subtle: #f4f6f4;
-  --bg-elevated: #ffffff;
-  --ink-primary: #091312;
-  --ink-secondary: #2c3a37;
-  --ink-muted: #5e706c;
-  --ink-faint: #8d9f9b;
-  --border-light: #e5eae6;
-  --border-medium: #d1dcda;
-  --accent-primary: #0b6953;
-  --accent-hover: #075240;
-  --accent-glow: rgba(11, 105, 83, 0.12);
-  --accent-tint: #eaf4f0;
-  --accent-bright: #10b981;
-  --warning-bg: #fef7ed;
-  --warning-text: #9a470c;
-  --warning-border: #fed7aa;
-  --danger-bg: #fef2f2;
-  --danger-text: #991b1b;
-  --font-display: "Newsreader", Georgia, serif;
-  --font-sans: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  --font-mono: "JetBrains Mono", ui-monospace, Menlo, monospace;
-  --radius-sm: 6px;
-  --radius-md: 10px;
-  --radius-lg: 16px;
-  --radius-xl: 24px;
-  --shadow-sm: 0 1px 2px rgba(0,0,0,0.03);
-  --shadow-md: 0 4px 20px -2px rgba(9, 19, 18, 0.05);
-  --shadow-lg: 0 12px 36px -4px rgba(9, 19, 18, 0.08), 0 4px 12px rgba(0,0,0,0.02);
-  --shadow-xl: 0 20px 50px -10px rgba(11, 105, 83, 0.12), 0 8px 24px -4px rgba(0,0,0,0.04);
-}
-
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-body {
-  background-color: var(--bg-main);
-  color: var(--ink-primary);
-  font-family: var(--font-sans);
-  font-size: 16px;
-  line-height: 1.65;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  overflow-x: hidden;
-}
-
-.wrap {
-  max-width: 74rem;
-  margin: 0 auto;
-  padding: 0 clamp(1.25rem, 5vw, 2.5rem);
-}
-
-a { color: var(--accent-primary); text-decoration: none; transition: color 0.15s ease; }
-a:hover { color: var(--accent-hover); }
-
-/* ── Typography Helpers ── */
-h1, h2, h3, h4 { color: var(--ink-primary); font-weight: 600; line-height: 1.2; text-wrap: balance; }
-.display-title { font-family: var(--font-display); font-weight: 500; }
-
-/* ── Badges & Tags ── */
-.badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.45rem;
-  font-family: var(--font-mono);
-  font-size: 0.75rem;
-  font-weight: 600;
-  letter-spacing: 0.04em;
-  padding: 0.3rem 0.75rem;
-  border-radius: 9999px;
-  text-transform: uppercase;
-}
-.badge-accent {
-  background: var(--accent-tint);
-  color: var(--accent-primary);
-  border: 1px solid rgba(11, 105, 83, 0.2);
-}
-.badge-dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: var(--accent-bright);
-  box-shadow: 0 0 8px var(--accent-bright);
-}
-
-/* ── Buttons ── */
-.btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  font-family: var(--font-sans);
-  font-weight: 600;
-  font-size: 0.95rem;
-  padding: 0.75rem 1.4rem;
-  border-radius: var(--radius-sm);
-  cursor: pointer;
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-  border: 1px solid transparent;
-}
-.btn-primary {
-  background: var(--accent-primary);
-  color: #ffffff !important;
-  box-shadow: 0 2px 10px rgba(11, 105, 83, 0.25);
-}
-.btn-primary:hover {
-  background: var(--accent-hover);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 16px rgba(11, 105, 83, 0.35);
-}
-.btn-secondary {
-  background: var(--bg-surface);
-  color: var(--ink-primary);
-  border-color: var(--border-medium);
-}
-.btn-secondary:hover {
-  background: var(--bg-subtle);
-  border-color: var(--ink-muted);
-  transform: translateY(-1px);
-}
-.btn-sm {
-  padding: 0.5rem 1rem;
-  font-size: 0.88rem;
-}
-
-/* ── Header & Navigation ── */
-nav {
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  background: rgba(252, 253, 252, 0.88);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border-bottom: 1px solid var(--border-light);
-  transition: all 0.2s ease;
-}
-nav .wrap {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  height: 4.2rem;
-}
-.brand-logo {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  font-family: var(--font-display);
-  font-size: 1.35rem;
-  font-weight: 500;
-  letter-spacing: -0.01em;
-  color: var(--ink-primary);
-}
-.brand-logo svg { color: var(--accent-primary); }
-.brand-logo span { color: var(--accent-primary); }
-.nav-menu {
-  display: flex;
-  align-items: center;
-  gap: 2rem;
-}
-.nav-link {
-  font-size: 0.92rem;
-  font-weight: 500;
-  color: var(--ink-muted);
-}
-.nav-link:hover { color: var(--ink-primary); }
-.nav-actions {
-  display: flex;
-  align-items: center;
-  gap: 0.85rem;
-}
-@media (max-width: 768px) {
-  .nav-menu { display: none; }
-}
-
-/* ── Hero Section ── */
-.hero {
-  position: relative;
-  padding: clamp(3.5rem, 8vw, 6.5rem) 0 clamp(2.5rem, 6vw, 4.5rem);
-  background: radial-gradient(circle at 50% 0%, rgba(11, 105, 83, 0.05) 0%, transparent 60%);
-}
-.hero-content {
-  text-align: center;
-  max-width: 54rem;
-  margin: 0 auto;
-}
-.hero-title {
-  font-family: var(--font-display);
-  font-size: clamp(2.5rem, 6vw, 4.2rem);
-  line-height: 1.08;
-  letter-spacing: -0.025em;
-  margin: 1.4rem 0 1.2rem;
-  color: var(--ink-primary);
-}
-.hero-title em {
-  font-style: italic;
-  color: var(--accent-primary);
-  font-weight: 400;
-}
-.hero-lede {
-  font-size: clamp(1.05rem, 2vw, 1.25rem);
-  line-height: 1.6;
-  color: var(--ink-secondary);
-  max-width: 44rem;
-  margin: 0 auto 2.2rem;
-}
-.hero-cta {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  align-items: center;
-  gap: 1rem;
-  margin-bottom: 1rem;
-}
-.hero-footnote {
-  font-size: 0.85rem;
-  color: var(--ink-muted);
-}
-
-/* ── Clinical Mockup Card ── */
-.mockup-container {
-  margin: clamp(2.5rem, 5vw, 4rem) auto 0;
-  max-width: 64rem;
-  background: var(--bg-surface);
-  border: 1px solid var(--border-medium);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-xl);
-  overflow: hidden;
-}
-.mockup-header {
-  background: var(--bg-subtle);
-  border-bottom: 1px solid var(--border-light);
-  padding: 0.85rem 1.4rem;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  font-family: var(--font-mono);
-  font-size: 0.8rem;
-  color: var(--ink-muted);
-}
-.mockup-dots {
-  display: flex;
-  gap: 0.4rem;
-}
-.mockup-dot {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background: #cbd5e1;
-}
-.mockup-dot:nth-child(1) { background: #fca5a5; }
-.mockup-dot:nth-child(2) { background: #fde047; }
-.mockup-dot:nth-child(3) { background: #86efac; }
-.mockup-body {
-  display: grid;
-  grid-template-columns: 1.2fr 1fr;
-  background: var(--bg-surface);
-}
-@media (max-width: 860px) {
-  .mockup-body { grid-template-columns: 1fr; }
-}
-.mockup-pane {
-  padding: 1.8rem;
-}
-.mockup-pane-left {
-  border-right: 1px solid var(--border-light);
-  background: #fafbfa;
-}
-@media (max-width: 860px) {
-  .mockup-pane-left { border-right: none; border-bottom: 1px solid var(--border-light); }
-}
-.mockup-label {
-  font-family: var(--font-mono);
-  font-size: 0.72rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: var(--ink-muted);
-  margin-bottom: 0.6rem;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-.mockup-status-tag {
-  background: #dbeafe;
-  color: #1e40af;
-  padding: 0.15rem 0.5rem;
-  border-radius: 4px;
-  font-weight: 700;
-}
-.mockup-title {
-  font-size: 1.15rem;
-  font-weight: 700;
-  margin-bottom: 0.8rem;
-  color: var(--ink-primary);
-}
-.mockup-text {
-  font-size: 0.92rem;
-  color: var(--ink-secondary);
-  line-height: 1.55;
-  margin-bottom: 1.2rem;
-}
-.mockup-findings {
-  background: var(--bg-surface);
-  border: 1px solid var(--border-light);
-  border-radius: var(--radius-sm);
-  padding: 1rem;
-  font-size: 0.88rem;
-  margin-bottom: 1rem;
-}
-.finding-item {
-  display: flex;
-  align-items: flex-start;
-  gap: 0.5rem;
-  margin-bottom: 0.5rem;
-  color: var(--ink-secondary);
-}
-.finding-item:last-child { margin-bottom: 0; }
-.finding-bullet {
-  color: var(--accent-primary);
-  font-weight: bold;
-}
-.signoff-card {
-  background: #ffffff;
-  border: 1.5px solid var(--accent-primary);
-  border-radius: var(--radius-md);
-  padding: 1.2rem;
-  box-shadow: 0 4px 12px rgba(11, 105, 83, 0.08);
-}
-.signoff-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 0.75rem;
-}
-.signoff-practitioner {
-  display: flex;
-  align-items: center;
-  gap: 0.6rem;
-}
-.signoff-avatar {
-  width: 34px;
-  height: 34px;
-  border-radius: 50%;
-  background: var(--accent-tint);
-  color: var(--accent-primary);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 700;
-  font-size: 0.85rem;
-}
-.signoff-name {
-  font-weight: 700;
-  font-size: 0.9rem;
-  color: var(--ink-primary);
-}
-.signoff-reg {
-  font-size: 0.75rem;
-  color: var(--ink-muted);
-}
-.signoff-status {
-  background: #dcfce7;
-  color: #15803d;
-  border: 1px solid #bbf7d0;
-  padding: 0.2rem 0.6rem;
-  border-radius: 4px;
-  font-size: 0.72rem;
-  font-family: var(--font-mono);
-  font-weight: 700;
-}
-.signoff-audit {
-  font-family: var(--font-mono);
-  font-size: 0.74rem;
-  color: var(--ink-muted);
-  border-top: 1px solid var(--border-light);
-  padding-top: 0.65rem;
-  margin-top: 0.65rem;
-  display: flex;
-  justify-content: space-between;
-}
-
-/* ── Metrics Band ── */
-.metrics-band {
-  border-top: 1px solid var(--border-light);
-  border-bottom: 1px solid var(--border-light);
-  background: var(--bg-surface);
-  padding: 2.2rem 0;
-}
-.metrics-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 1.5rem;
-}
-@media (max-width: 768px) {
-  .metrics-grid { grid-template-columns: repeat(2, 1fr); }
-}
-.metric-item {
-  text-align: center;
-}
-.metric-val {
-  font-family: var(--font-sans);
-  font-weight: 800;
-  font-size: clamp(1.6rem, 3.5vw, 2.2rem);
-  color: var(--ink-primary);
-  line-height: 1.1;
-  letter-spacing: -0.03em;
-}
-.metric-val span { color: var(--accent-primary); }
-.metric-desc {
-  font-size: 0.85rem;
-  color: var(--ink-muted);
-  margin-top: 0.35rem;
-}
-
-/* ── Workflow Steps Section ── */
-.section {
-  padding: clamp(3.5rem, 7vw, 5.5rem) 0;
-}
-.section-header {
-  text-align: center;
-  max-width: 44rem;
-  margin: 0 auto clamp(2.5rem, 5vw, 3.5rem);
-}
-.section-title {
-  font-family: var(--font-display);
-  font-size: clamp(1.8rem, 4vw, 2.6rem);
-  letter-spacing: -0.02em;
-  margin-bottom: 0.8rem;
-}
-.section-sub {
-  font-size: 1.05rem;
-  color: var(--ink-secondary);
-  line-height: 1.6;
-}
-
-.workflow-steps {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 1.5rem;
-}
-@media (max-width: 860px) {
-  .workflow-steps { grid-template-columns: 1fr; }
-}
-.step-card {
-  background: var(--bg-surface);
-  border: 1px solid var(--border-light);
-  border-radius: var(--radius-md);
-  padding: 2rem;
-  box-shadow: var(--shadow-sm);
-  transition: all 0.2s ease;
-  position: relative;
-}
-.step-card:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-md);
-  border-color: var(--border-medium);
-}
-.step-number {
-  font-family: var(--font-display);
-  font-size: 2.8rem;
-  font-weight: 400;
-  color: var(--border-medium);
-  line-height: 1;
-  margin-bottom: 0.8rem;
-}
-.step-title {
-  font-size: 1.15rem;
-  font-weight: 700;
-  margin-bottom: 0.6rem;
-  color: var(--ink-primary);
-}
-.step-desc {
-  font-size: 0.94rem;
-  color: var(--ink-secondary);
-  line-height: 1.55;
-}
-
-/* ── Features Grid ── */
-.features-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 1.5rem;
-}
-@media (max-width: 960px) {
-  .features-grid { grid-template-columns: repeat(2, 1fr); }
-}
-@media (max-width: 600px) {
-  .features-grid { grid-template-columns: 1fr; }
-}
-.feature-card {
-  background: var(--bg-surface);
-  border: 1px solid var(--border-light);
-  border-radius: var(--radius-md);
-  padding: 1.8rem;
-  transition: all 0.2s ease;
-}
-.feature-card:hover {
-  border-color: var(--accent-primary);
-  box-shadow: var(--shadow-md);
-  transform: translateY(-2px);
-}
-.feature-icon {
-  width: 42px;
-  height: 42px;
-  border-radius: var(--radius-sm);
-  background: var(--accent-tint);
-  color: var(--accent-primary);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 1.2rem;
-}
-.feature-title {
-  font-size: 1.05rem;
-  font-weight: 700;
-  margin-bottom: 0.5rem;
-}
-.feature-desc {
-  font-size: 0.92rem;
-  color: var(--ink-secondary);
-  line-height: 1.55;
-}
-
-/* ── Status Matrix ── */
-.status-card {
-  background: var(--bg-surface);
-  border: 1px solid var(--border-medium);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-sm);
-  overflow: hidden;
-}
-.status-list {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  divide-y: 1px solid var(--border-light);
-}
-@media (max-width: 768px) {
-  .status-list { grid-template-columns: 1fr; }
-}
-.status-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 1.1rem 1.6rem;
-  border-bottom: 1px solid var(--border-light);
-}
-.status-label {
-  font-size: 0.94rem;
-  font-weight: 500;
-  color: var(--ink-primary);
-}
-.status-tag {
-  font-family: var(--font-mono);
-  font-size: 0.72rem;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  padding: 0.25rem 0.65rem;
-  border-radius: 9999px;
-  text-transform: uppercase;
-  flex-shrink: 0;
-}
-.status-built {
-  background: #dcfce7;
-  color: #15803d;
-  border: 1px solid #bbf7d0;
-}
-.status-progress {
-  background: var(--warning-bg);
-  color: var(--warning-text);
-  border: 1px solid var(--warning-border);
-}
-
-/* ── Design Partner CTA Panel ── */
-.partner-panel {
-  background: linear-gradient(135deg, #091a16 0%, #06120f 100%);
-  color: #f1f5f3;
-  border-radius: var(--radius-xl);
-  padding: clamp(2.5rem, 6vw, 4.5rem);
-  box-shadow: var(--shadow-xl);
-  position: relative;
-  overflow: hidden;
-}
-.partner-panel::before {
-  content: "";
-  position: absolute;
-  top: -20%;
-  right: -10%;
-  width: 380px;
-  height: 380px;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(16, 185, 129, 0.15) 0%, transparent 70%);
-  pointer-events: none;
-}
-.partner-inner {
-  position: relative;
-  max-width: 44rem;
-}
-.partner-title {
-  font-family: var(--font-display);
-  font-size: clamp(2rem, 4.5vw, 3rem);
-  color: #ffffff;
-  margin-bottom: 1rem;
-  letter-spacing: -0.02em;
-}
-.partner-desc {
-  font-size: 1.08rem;
-  color: #cbd5d1;
-  line-height: 1.6;
-  margin-bottom: 2rem;
-}
-.partner-actions {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 1rem;
-}
-.btn-white {
-  background: #ffffff;
-  color: var(--ink-primary) !important;
-  font-weight: 700;
-}
-.btn-white:hover {
-  background: #eef3f1;
-  transform: translateY(-1px);
-}
-
-/* ── Footer ── */
-footer {
-  border-top: 1px solid var(--border-light);
-  background: var(--bg-surface);
-  padding: 4rem 0 3rem;
-}
-.footer-disclaimer {
-  background: var(--bg-subtle);
-  border-left: 3px solid var(--accent-primary);
-  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
-  padding: 1.2rem 1.4rem;
-  font-size: 0.85rem;
-  color: var(--ink-secondary);
-  line-height: 1.6;
-  margin-bottom: 2.2rem;
-}
-.footer-bottom {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-  font-size: 0.88rem;
-  color: var(--ink-muted);
-  padding-top: 1.5rem;
-  border-top: 1px solid var(--border-light);
-}
-
-/* ── Smooth micro-interactions ── */
-:focus-visible {
-  outline: 2px solid var(--accent-primary);
-  outline-offset: 2px;
-}
-
-/* ── Illustrative-sample labelling on the product mock-up ── */
-.mockup-sample-tag{display:inline-flex;align-items:center;font-family:'JetBrains Mono',ui-monospace,monospace;font-size:.6rem;letter-spacing:.07em;text-transform:uppercase;font-weight:600;padding:.2rem .5rem;border-radius:4px;background:#fef3c7;color:#92400e;border:1px solid #fde68a;white-space:nowrap}
-.mockup-disclaimer{margin:1rem auto 0;max-width:64ch;text-align:center;font-size:.78rem;line-height:1.55;color:#64748b}
-.status-note{margin-top:1rem;font-size:.8rem;line-height:1.55;color:#64748b}
-</style>
+  }
+  </script>
 </head>
 <body>
-
-<!-- Navigation -->
-<nav>
-  <div class="wrap">
-    <a class="brand-logo" href="/">
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
-      </svg>
-      Med<span>·</span>AI Clinical
-    </a>
-    <div class="nav-menu">
-      <a class="nav-link" href="#how">How It Works</a>
-      <a class="nav-link" href="#platform">Platform Architecture</a>
-      <a class="nav-link" href="#status">Readiness Matrix</a>
-      <a class="nav-link" href="#partner">Design Partners</a>
-    </div>
-    <div class="nav-actions">
-      <a class="btn btn-secondary btn-sm" href="https://app.medaiclinical.com/login">Sign In</a>
-      <a class="btn btn-primary btn-sm" href="#partner">Request Pilot</a>
-    </div>
-  </div>
-</nav>
-
-<!-- Hero Section -->
-<header class="hero">
-  <div class="wrap">
-    <div class="hero-content">
-      <div class="badge badge-accent">
-        <span class="badge-dot"></span>
-        Enterprise Clinical Documentation Infrastructure
-      </div>
-      <h1 class="hero-title">
-        AI drafts the report.<br>
-        <em>A licensed clinician signs it.</em>
-      </h1>
-      <p class="hero-lede">
-        Med-AI Clinical synthesizes radiology studies and complex laboratory biomarkers into structured, conformant clinical drafts. Every output is reviewed, edited, and cryptographically signed by a physician before entering the patient record.
-      </p>
-      <div class="hero-cta">
-        <a class="btn btn-primary" href="mailto:hello@medaiclinical.com?subject=Design%20Partner%20Inquiry%20-%20Med-AI%20Clinical">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <rect width="20" height="16" x="2" y="4" rx="2"/>
-            <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>
-          </svg>
-          Become a Design Partner
+  <header class="site-header">
+    <div class="wrap">
+      <div class="nav-inner">
+        <a class="brand" href="/" aria-label="Med-AI Clinical home">
+          <span class="brand-mark" aria-hidden="true">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M7 6.5h10M6 12h12M7 17.5h10"/><path d="M17 4.5c2 1.6 3 4.1 3 7.5s-1 5.9-3 7.5M7 4.5c-2 1.6-3 4.1-3 7.5s1 5.9 3 7.5"/></svg>
+          </span>
+          <span class="brand-name"><strong>Med-AI Clinical</strong><span>Report QA Platform</span></span>
         </a>
-        <a class="btn btn-secondary" href="https://app.medaiclinical.com">
-          Launch Live Platform
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M5 12h14m-7-7 7 7-7 7"/>
-          </svg>
-        </a>
-      </div>
-      <p class="hero-footnote">Selecting two diagnostic chains or multi-specialty hospitals for paid 8-week validation pilots.</p>
-    </div>
-
-    <!-- Live Interactive Mockup Card -->
-    <div class="mockup-container">
-      <div class="mockup-header">
-        <div class="mockup-dots">
-          <span class="mockup-dot"></span>
-          <span class="mockup-dot"></span>
-          <span class="mockup-dot"></span>
+        <nav class="nav-links" aria-label="Primary navigation">
+          <a href="/" aria-current="page">Home</a>
+          <a href="/product.html">Product</a>
+          <a href="/screenshots.html">Screens</a>
+          <a href="/security.html">Security</a>
+          <a href="/validation.html">Validation</a>
+          <a href="/pricing.html">Pricing</a>
+        </nav>
+        <div class="nav-actions">
+          <a class="button button-secondary" href="https://app.medaiclinical.com/login">Sign in</a>
+          <a class="button button-primary" href="/contact.html">Request pilot</a>
         </div>
-        <div>WORKLIST // SAMPLE-STUDY &bull; CHEST_XR_PA</div>
-        <div class="mockup-sample-tag">Illustrative sample &middot; synthetic data</div>
-        <div class="mockup-status-tag">AWAITING SIGN-OFF</div>
+        <button class="menu-toggle" type="button" aria-label="Open navigation" aria-expanded="false" data-menu-button>
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+        </button>
       </div>
-      <div class="mockup-body">
-        <!-- Left Column: Draft Analysis -->
-        <div class="mockup-pane mockup-pane-left">
-          <div class="mockup-label">
-            <span>AI SYNTHESIS ENGINE &bull; VISION 4.5</span>
-            <span style="color: var(--accent-primary);">SAMPLE OUTPUT</span>
+      <nav class="mobile-panel" aria-label="Mobile navigation">
+        <a href="/" aria-current="page">Home</a>
+        <a href="/product.html">Product</a>
+        <a href="/screenshots.html">Screens</a>
+        <a href="/security.html">Security</a>
+        <a href="/validation.html">Validation</a>
+        <a href="/pricing.html">Pricing</a>
+        <a href="/contact.html">Request pilot</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="wrap hero-inner">
+        <span class="eyebrow">For imaging teams running supervised AI validation</span>
+        <h1>Med-AI Clinical</h1>
+        <p>AI-assisted radiology report QA for the stage before clinician sign-off: draft review, issue flags, prior-study context, critical result escalation, and audit-ready governance.</p>
+        <div class="hero-actions">
+          <a class="button button-primary" href="/contact.html">Request design-partner pilot</a>
+          <a class="button button-secondary" href="/screenshots.html">View current app screens</a>
+        </div>
+        <div class="hero-proof" aria-label="Product positioning">
+          <span>Clinician in control</span>
+          <span>Synthetic screenshots shown</span>
+          <span>Validation-stage product</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="stat-grid" aria-label="Product principles">
+      <div class="stat"><strong>100%</strong><span>Clinical outputs stay behind review and sign-off gates.</span></div>
+      <div class="stat"><strong>QA</strong><span>The wedge is report quality, not autonomous care.</span></div>
+      <div class="stat"><strong>RLS</strong><span>Tenant isolation is designed into the database layer.</span></div>
+      <div class="stat"><strong>Pilot</strong><span>Built for retrospective validation with design partners.</span></div>
+    </section>
+
+    <section class="section">
+      <div class="wrap problem-layout">
+        <div class="quote-panel">
+          <p>People buy this only if it solves a painful workflow, not because it says AI.</p>
+        </div>
+        <div class="feature-list">
+          <div class="feature-row">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+            <div>
+              <h3>It gives radiologists a review surface, not another chatbot.</h3>
+              <p>The product is strongest when framed as a QA workbench for draft reports, evidence, laterality checks, comparison gaps, and sign-off decisions.</p>
+            </div>
           </div>
-          <h3 class="mockup-title">PA Chest Radiograph &bull; Initial Interpretation</h3>
-          <p class="mockup-text">
-            Example of an automated structured draft generated from DICOM metadata and pixel matrix analysis, correlated against patient history and prior studies. The findings below are fictional and describe no real patient.
-          </p>
-          <div class="mockup-findings">
-            <div class="finding-item">
-              <span class="finding-bullet">&bull;</span>
-              <span><strong>Lungs:</strong> Focal consolidation in the right lower lobe consistent with acute community-acquired pneumonia. Left lung clear.</span>
-            </div>
-            <div class="finding-item">
-              <span class="finding-bullet">&bull;</span>
-              <span><strong>Cardiovascular:</strong> Cardiothoracic ratio within normal physiological limits (0.46). No mediastinal widening.</span>
-            </div>
-            <div class="finding-item">
-              <span class="finding-bullet">&bull;</span>
-              <span><strong>Pleura:</strong> Subtle blunting of the right costophrenic angle; minimal reactive pleural effusion.</span>
+          <div class="feature-row">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20"/><path d="M5 7h14"/><path d="M5 17h14"/><path d="M7 2h10a2 2 0 0 1 2 2v16a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2z"/></svg>
+            <div>
+              <h3>It creates operational proof for the buyer.</h3>
+              <p>Accepted, edited, and rejected drafts become measurable signals. That helps a medical director decide whether AI is improving throughput and report consistency.</p>
             </div>
           </div>
-          <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
-            <span class="badge" style="background:#e0e7ff; color:#3730a3; border: 1px solid #c7d2fe;">ICD-10: J18.9</span>
-            <span class="badge" style="background:#e0e7ff; color:#3730a3; border: 1px solid #c7d2fe;">SNOMED: 233604007</span>
-            <span class="badge" style="background:#dcfce7; color:#166534; border: 1px solid #bbf7d0;">FHIR R4 CONFORMANT</span>
+          <div class="feature-row">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg>
+            <div>
+              <h3>It has the governance pieces hospitals ask for.</h3>
+              <p>Audit trails, clinician attribution, critical result workflows, consent models, and FHIR-oriented export are already part of the product architecture.</p>
+            </div>
           </div>
         </div>
+      </div>
+    </section>
 
-        <!-- Right Column: Verification & Clinician Signature -->
-        <div class="mockup-pane" style="display: flex; flex-direction: column; justify-content: space-between;">
+    <section class="section section-alt">
+      <div class="wrap">
+        <div class="section-head center">
+          <span class="section-kicker">Product story</span>
+          <h2>The workflow buyers can understand in one meeting.</h2>
+          <p class="lead">Med-AI Clinical should be sold as a narrow, accountable report QA system for imaging operations. The buyer is not purchasing a model. They are purchasing review discipline, throughput visibility, and safer adoption of GenAI.</p>
+        </div>
+        <div class="grid-3">
+          <article class="card">
+            <div class="card-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M8 13h8M8 17h5"/></svg></div>
+            <h3>Prepare the draft</h3>
+            <p>Turn a study and draft report into a structured review item with sections, urgency labels, and evidence for the clinician to inspect.</p>
+          </article>
+          <article class="card">
+            <div class="card-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.3 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v9"/><path d="M9 11l3 3 7-7"/><path d="M16 19l2 2 4-4"/></svg></div>
+            <h3>Review the risks</h3>
+            <p>Surface laterality conflicts, missing prior comparisons, critical result acknowledgements, and report quality issues before final release.</p>
+          </article>
+          <article class="card">
+            <div class="card-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 7L10 17l-5-5"/><path d="M3 21h18"/></svg></div>
+            <h3>Sign and learn</h3>
+            <p>Capture accept, edit, or reject decisions as quality data for model evaluation, clinician governance, and future rollout planning.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="wrap">
+        <div class="section-head">
+          <span class="section-kicker">Current app screenshots</span>
+          <h2>A real product surface, not a slide deck.</h2>
+          <p class="lead">The screenshots below are captured from the current local application using synthetic demo data. They are included to show the buyer-facing workflow and where the product still needs implementation discipline.</p>
+        </div>
+        <div class="screen-block">
+          <figure class="screen-stage">
+            <img src="/screenshots/app-clinical-workspace.png" alt="Med-AI Clinical workspace showing report QA, anatomy context, and issue review">
+            <figcaption>Clinical workspace: report text, QA issue list, anatomy context, and sign-off actions.</figcaption>
+          </figure>
+          <div class="screen-copy">
+            <span class="tag blue">Primary screen</span>
+            <h3>Report QA before the signature.</h3>
+            <p>This is the strongest product moment. A reviewer sees the draft report, evidence-backed issues, and the actions needed before the report becomes final.</p>
+            <ul>
+              <li>Best buyer: head of radiology, medical director, or quality lead.</li>
+              <li>Best promise: fewer report QA misses and better review traceability.</li>
+              <li>Important limitation: AI text must remain advisory until clinician sign-off.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section section-dark">
+      <div class="wrap">
+        <div class="section-head">
+          <span class="section-kicker">Honest readiness</span>
+          <h2>Strong enough for a supervised pilot. Not finished for unsupervised production.</h2>
+          <p class="lead">The website now positions the product at the correct stage: credible infrastructure, real workflow screens, and a design-partner path, while avoiding claims that require external validation or certification.</p>
+        </div>
+        <div class="grid-3">
+          <article class="card">
+            <h3>Built foundations</h3>
+            <p>Worklist, clinical workspace, QA analytics, audit posture, tenant isolation, and review status are visible and explainable.</p>
+          </article>
+          <article class="card">
+            <h3>Needs pilot proof</h3>
+            <p>Clinical quality, acceptance rate, correction rate, and operational impact need retrospective validation with real partner data.</p>
+          </article>
+          <article class="card">
+            <h3>Needs enterprise hardening</h3>
+            <p>SSO, provider agreements, deployment controls, and integration work must be completed before broad hospital production use.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="wrap">
+        <div class="cta-band">
           <div>
-            <div class="mockup-label">CLINICIAN SIGN-OFF VERIFICATION</div>
-            <h3 class="mockup-title" style="font-size: 1.05rem;">Human-in-the-Loop Governance</h3>
-            <p class="mockup-text" style="font-size: 0.88rem;">
-              The software strictly enforces physician review. Reports cannot be committed to EHR, exported, or communicated to patients without an authenticated signature stamp.
-            </p>
+            <h2>Use the site to sell a focused pilot, not the whole future roadmap.</h2>
+            <p>Invite imaging groups to validate report QA on retrospective studies. That is the clearest route to customer requirements, product vision, and evidence that somebody will pay.</p>
           </div>
+          <a class="button button-primary" href="/contact.html">Start pilot conversation</a>
+        </div>
+      </div>
+    </section>
+  </main>
 
-          <div class="signoff-card">
-            <div class="signoff-header">
-              <div class="signoff-practitioner">
-                <div class="signoff-avatar">RR</div>
-                <div>
-                  <div class="signoff-name">Reviewing Radiologist</div>
-                  <div class="signoff-reg">Placeholder &bull; not a real practitioner or registration</div>
-                </div>
-              </div>
-              <span class="signoff-status">&check; SIGNED</span>
-            </div>
-            <div class="signoff-audit">
-              <span>TIMESTAMP: SAMPLE</span>
-              <span>AUTH: SHA-256</span>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-    <p class="mockup-disclaimer">
-      The interface above is an illustrative rendering of the product using synthetic data. It is not a real
-      patient study, not a real diagnostic report, and the reviewing clinician shown is a placeholder rather
-      than a real, registered practitioner.
-    </p>
-  </div>
-</header>
-
-<!-- Key Metrics Band -->
-<section class="metrics-band">
-  <div class="wrap">
-    <div class="metrics-grid">
-      <div class="metric-item">
-        <div class="metric-val">&lt; <span>2.1</span>s</div>
-        <div class="metric-desc">Median draft latency &mdash; internal benchmark, synthetic studies</div>
-      </div>
-      <div class="metric-item">
-        <div class="metric-val"><span>100</span>%</div>
-        <div class="metric-desc">Of reports require physician sign-off &mdash; enforced in code</div>
-      </div>
-      <div class="metric-item">
-        <div class="metric-val"><span>FHIR</span> R4</div>
-        <div class="metric-desc">ABDM & EHR interoperability native</div>
-      </div>
-      <div class="metric-item">
-        <div class="metric-val"><span>RLS</span> Isolated</div>
-        <div class="metric-desc">Row-level database tenant security</div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- How It Works Section -->
-<section class="section" id="how">
-  <div class="wrap">
-    <div class="section-header">
-      <div class="badge badge-accent" style="margin-bottom: 0.8rem;">Clinical Workflow</div>
-      <h2 class="section-title">Draft, Review, Sign.</h2>
-      <p class="section-sub">
-        The workflow radiologists and pathologists already trust, with the initial heavy lifting prepared for them. Strict protocol governance enforced by code.
-      </p>
-    </div>
-
-    <div class="workflow-steps">
-      <div class="step-card">
-        <div class="step-number">01</div>
-        <h3 class="step-title">Study Ingestion & Extraction</h3>
-        <p class="step-desc">
-          Medical imaging (DICOM, X-Ray, CT, MRI) or lab panels arrive from your PACS/LIS. The neural engine extracts biomarker matrices, visual abnormalities, and prepares a structured clinical draft.
-        </p>
-      </div>
-      <div class="step-card">
-        <div class="step-number">02</div>
-        <h3 class="step-title">Clinician Reading Worklist</h3>
-        <p class="step-desc">
-          Drafts queue on the reading worklist prioritized by urgency triage. Reviewing physicians accept, edit, or reject findings with full clinical autonomy. Critical alerts trigger instant escalation protocols.
-        </p>
-      </div>
-      <div class="step-card">
-        <div class="step-number">03</div>
-        <h3 class="step-title">Cryptographic Sign-Off</h3>
-        <p class="step-desc">
-          Signing permanently attributes the report to the licensed practitioner with an immutable timestamp and audit trail. The finalized report syncs downstream via FHIR R4.
-        </p>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- Enterprise Platform Architecture -->
-<section class="section" id="platform" style="background: var(--bg-subtle); border-top: 1px solid var(--border-light); border-bottom: 1px solid var(--border-light);">
-  <div class="wrap">
-    <div class="section-header">
-      <div class="badge badge-accent" style="margin-bottom: 0.8rem;">Enterprise Infrastructure</div>
-      <h2 class="section-title">Built for the parts nobody demos.</h2>
-      <p class="section-sub">
-        Clinical AI cannot survive in production on models alone. It requires database isolation, auditability, consent frameworks, and regulatory interoperability.
-      </p>
-    </div>
-
-    <div class="features-grid">
-      <div class="feature-card">
-        <div class="feature-icon">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <rect width="18" height="18" x="3" y="3" rx="2"/><path d="M3 9h18M9 21V9"/>
-          </svg>
-        </div>
-        <h3 class="feature-title">PostgreSQL Row-Level Security</h3>
-        <p class="feature-desc">
-          Tenant isolation is enforced in the database engine itself. A missed filter in application code cannot leak patient data across hospital boundaries.
-        </p>
-      </div>
-
-      <div class="feature-card">
-        <div class="feature-icon">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-          </svg>
-        </div>
-        <h3 class="feature-title">Immutable 6-Year Audit Trail</h3>
-        <p class="feature-desc">
-          Every report generation, clinician edit, sign-off, and view action is written to an append-only audit ledger with 6-year retention compliance.
-        </p>
-      </div>
-
-      <div class="feature-card">
-        <div class="feature-icon">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1zM4 22v-7"/>
-          </svg>
-        </div>
-        <h3 class="feature-title">FHIR R4 & ABDM Standard</h3>
-        <p class="feature-desc">
-          Native FHIR R4 resources (DiagnosticReport, Observation, ImagingStudy) ready for seamless integration with ABDM (Ayushman Bharat) and hospital EHRs.
-        </p>
-      </div>
-
-      <div class="feature-card">
-        <div class="feature-icon">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
-          </svg>
-        </div>
-        <h3 class="feature-title">ICD-10 & LOINC Validation</h3>
-        <p class="feature-desc">
-          Conclusions and lab parameters are rigorously standardized against verified medical ontologies. Unmatched terms remain explicit text rather than hallucinated codes.
-        </p>
-      </div>
-
-      <div class="feature-card">
-        <div class="feature-icon">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="12" cy="12" r="10"/><path d="m15 9-6 6M9 9l6 6"/>
-          </svg>
-        </div>
-        <h3 class="feature-title">Prescription Safety Checks</h3>
-        <p class="feature-desc">
-          Automated cross-reactivity, duplicate therapy, and contraindication screening with daily dosage caps. Critical alerts block issuance until clinician acknowledgement.
-        </p>
-      </div>
-
-      <div class="feature-card">
-        <div class="feature-icon">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
-          </svg>
-        </div>
-        <h3 class="feature-title">Consent & PHI Redaction</h3>
-        <p class="feature-desc">
-          Granular per-patient consent tracking for research use, automated client-side PHI de-identification, and data residency in sovereign Indian data centers.
-        </p>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- Readiness Matrix Section -->
-<section class="section" id="status">
-  <div class="wrap">
-    <div class="section-header">
-      <div class="badge badge-accent" style="margin-bottom: 0.8rem;">Transparent Product Status</div>
-      <h2 class="section-title">Where we actually stand.</h2>
-      <p class="section-sub">
-        Healthcare software is built on transparency and trust. Here is the honest state of our engineering stack and clinical roadmap. &ldquo;Built &amp; internally tested&rdquo; means the capability is implemented and covered by our own test suite &mdash; it does not mean clinically validated, independently audited, or certified.
-      </p>
-    </div>
-
-    <div class="status-card">
-      <div class="status-list">
-        <div class="status-row">
-          <span class="status-label">Radiology & Laboratory Report Synthesis Engine</span>
-          <span class="status-tag status-built">&check; Built &amp; internally tested</span>
-        </div>
-        <div class="status-row">
-          <span class="status-label">Clinician Sign-off, Amendment & Audit Log</span>
-          <span class="status-tag status-built">&check; Built &amp; internally tested</span>
-        </div>
-        <div class="status-row">
-          <span class="status-label">Critical STAT Result Escalation Protocol</span>
-          <span class="status-tag status-built">&check; Built &amp; internally tested</span>
-        </div>
-        <div class="status-row">
-          <span class="status-label">FHIR R4 DiagnosticReport & Observation Facade</span>
-          <span class="status-tag status-built">&check; Built &amp; internally tested</span>
-        </div>
-        <div class="status-row">
-          <span class="status-label">Multi-Tenant PostgreSQL Row-Level Security</span>
-          <span class="status-tag status-built">&check; Built &amp; internally tested</span>
-        </div>
-        <div class="status-row">
-          <span class="status-label">Interactive Anatomical Condition & Biomarker Map</span>
-          <span class="status-tag status-built">&check; Built &amp; internally tested</span>
-        </div>
-        <div class="status-row">
-          <span class="status-label">Hospital Enterprise SSO (SAML 2.0 / OIDC)</span>
-          <span class="status-tag status-progress">&bull; In Active Development</span>
-        </div>
-        <div class="status-row">
-          <span class="status-label">Retrospective Clinical Validation Pilot Data</span>
-          <span class="status-tag status-progress">&bull; Design Partner Phase</span>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- Design Partner Callout Panel -->
-<section class="section" id="partner" style="padding-top: 0;">
-  <div class="wrap">
-    <div class="partner-panel">
-      <div class="partner-inner">
-        <div class="badge" style="background: rgba(255,255,255,0.15); color: #ffffff; border: 1px solid rgba(255,255,255,0.25); margin-bottom: 1.2rem;">
-          Clinical Cohort 2026
-        </div>
-        <h2 class="partner-title">Partner with us on clinical validation.</h2>
-        <p class="partner-desc">
-          We are selecting two diagnostic chains or hospital departments to participate in a paid eight-week retrospective validation pilot. Your team receives full platform deployment and a comprehensive retrospective accuracy analysis on historical anonymized studies.
-        </p>
-        <div class="partner-actions">
-          <a class="btn btn-white" href="mailto:hello@medaiclinical.com?subject=Design%20Partner%20Inquiry%20-%20Med-AI%20Clinical">
-            Contact Clinical Team
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M5 12h14m-7-7 7 7-7 7"/>
-            </svg>
+  <footer class="footer">
+    <div class="wrap">
+      <div class="footer-grid">
+        <div>
+          <a class="brand" href="/">
+            <span class="brand-mark" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M7 6.5h10M6 12h12M7 17.5h10"/></svg></span>
+            <span class="brand-name"><strong>Med-AI Clinical</strong><span>Report QA Platform</span></span>
           </a>
-          <a class="btn" style="background: rgba(255,255,255,0.12); color: #fff; border: 1px solid rgba(255,255,255,0.2);" href="https://app.medaiclinical.com">
-            Explore System Dashboard
-          </a>
+          <p style="margin-top:14px">AI-assisted clinical documentation infrastructure for supervised imaging report QA pilots.</p>
         </div>
+        <div><h4>Product</h4><a href="/product.html">Product</a><a href="/screenshots.html">Screens</a><a href="/validation.html">Validation</a></div>
+        <div><h4>Trust</h4><a href="/security.html">Security</a><a href="/pricing.html">Pricing</a><a href="/contact.html">Contact</a></div>
+        <div><h4>Access</h4><a href="https://app.medaiclinical.com/login">Sign in</a><a href="mailto:hello@medaiclinical.com">hello@medaiclinical.com</a></div>
+      </div>
+      <div class="footer-bottom">
+        <small>&copy; <span id="year">2026</span> Med-AI Clinical.</small>
+        <small class="legal">Regulatory statement: Med-AI Clinical is positioned as clinical decision-support and documentation workflow software for qualified professionals. It does not provide autonomous clinical decisions and has no CDSCO, US FDA, or CE medical-device clearance.</small>
       </div>
     </div>
-  </div>
-</section>
-
-<!-- Footer & Legal Notice -->
-<footer>
-  <div class="wrap">
-    <div class="footer-disclaimer">
-      <strong>Intended Use & Regulatory Statement:</strong> Med-AI Clinical is clinical decision-support software designed to draft structured documentation for review by qualified healthcare professionals. It does not provide autonomous clinical diagnoses, nor is it a substitute for physician judgement. Every clinical output requires review, validation, and sign-off by a licensed practitioner prior to patient disclosure. The system holds no CDSCO, US FDA, or CE medical device clearance.
-    </div>
-
-    <div class="footer-bottom">
-      <div class="brand-logo" style="font-size: 1.15rem;">
-        Med<span>·</span>AI Clinical
-      </div>
-      <div>
-        Engineered to align with India's <strong>DPDP Act 2023</strong> and the US <strong>HIPAA Security Rule</strong>. No independent audit or certification has been completed.
-      </div>
-      <div>
-        &copy; <span id="year">2026</span> Med-AI Clinical &bull; <a href="mailto:hello@medaiclinical.com">hello@medaiclinical.com</a>
-      </div>
-    </div>
-  </div>
-</footer>
-
-<script>
-  document.getElementById('year').textContent = new Date().getFullYear();
-</script>
+  </footer>
+  <script src="/app.js" defer></script>
 </body>
 </html>

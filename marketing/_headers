@@ -15,6 +15,15 @@
 /favicon.svg
   Cache-Control: public, max-age=86400
 
+/styles.css
+  Cache-Control: public, max-age=86400
+
+/app.js
+  Cache-Control: public, max-age=86400
+
+/screenshots/*
+  Cache-Control: public, max-age=2592000, immutable
+
 /site.webmanifest
   Cache-Control: public, max-age=86400
 
