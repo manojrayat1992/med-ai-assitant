@@ -5,6 +5,7 @@
           http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
   <url><loc>https://medaiclinical.com/</loc><lastmod>2026-09-10</lastmod><changefreq>weekly</changefreq><priority>1.0</priority></url>
   <url><loc>https://medaiclinical.com/product.html</loc><lastmod>2026-09-10</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://medaiclinical.com/demo.html</loc><lastmod>2026-09-12</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
   <url><loc>https://medaiclinical.com/screenshots.html</loc><lastmod>2026-09-10</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
   <url><loc>https://medaiclinical.com/security.html</loc><lastmod>2026-09-10</lastmod><changefreq>weekly</changefreq><priority>0.7</priority></url>
   <url><loc>https://medaiclinical.com/validation.html</loc><lastmod>2026-09-10</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>

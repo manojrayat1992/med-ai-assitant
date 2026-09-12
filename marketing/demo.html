@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Interactive Demo | Med-AI Clinical</title>
+  <meta name="description" content="Walk through the Med-AI Clinical supervised radiology report QA workflow using synthetic demo screenshots.">
+  <link rel="canonical" href="https://medaiclinical.com/demo.html">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="manifest" href="/site.webmanifest">
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="wrap">
+      <div class="nav-inner">
+        <a class="brand" href="/"><span class="brand-mark" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 2v20M7 6.5h10M6 12h12M7 17.5h10"/></svg></span><span class="brand-name"><strong>Med-AI Clinical</strong><span>Report QA Platform</span></span></a>
+        <nav class="nav-links" aria-label="Primary navigation"><a href="/">Home</a><a href="/product.html">Product</a><a href="/demo.html" aria-current="page">Demo</a><a href="/screenshots.html">Screens</a><a href="/security.html">Security</a><a href="/validation.html">Validation</a><a href="/pricing.html">Pricing</a></nav>
+        <div class="nav-actions"><a class="button button-secondary" href="https://app.medaiclinical.com/login">Sign in</a><a class="button button-primary" href="/contact.html">Request pilot</a></div>
+        <button class="menu-toggle" type="button" aria-label="Open navigation" aria-expanded="false" data-menu-button><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
+      </div>
+      <nav class="mobile-panel" aria-label="Mobile navigation"><a href="/">Home</a><a href="/product.html">Product</a><a href="/demo.html" aria-current="page">Demo</a><a href="/screenshots.html">Screens</a><a href="/security.html">Security</a><a href="/validation.html">Validation</a><a href="/pricing.html">Pricing</a><a href="/contact.html">Request pilot</a></nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="page-hero">
+      <div class="wrap">
+        <span class="section-kicker">Interactive demo</span>
+        <h1>Walk through the report QA workflow.</h1>
+        <p>Use this Product Hunt-ready demo to show the complete supervised flow: dashboard, clinical review, worklist governance, pilot analytics, and integration planning.</p>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="wrap demo-shell" data-demo>
+        <aside class="demo-steps" aria-label="Demo steps">
+          <button class="demo-step is-active" type="button" data-demo-step="0"><span>01</span><strong>Open dashboard</strong><small>Start with operational status and review entry points.</small></button>
+          <button class="demo-step" type="button" data-demo-step="1"><span>02</span><strong>Review report</strong><small>Inspect AI flags, evidence, anatomy context, and sign-off state.</small></button>
+          <button class="demo-step" type="button" data-demo-step="2"><span>03</span><strong>Govern worklist</strong><small>Move pending, critical, and signed reports through review.</small></button>
+          <button class="demo-step" type="button" data-demo-step="3"><span>04</span><strong>Measure pilot</strong><small>Track acceptance, correction, rejection, and escalation patterns.</small></button>
+          <button class="demo-step" type="button" data-demo-step="4"><span>05</span><strong>Plan rollout</strong><small>Keep PACS, RIS, reporting, and SSO status explicit.</small></button>
+        </aside>
+
+        <div class="demo-stage">
+          <div class="demo-toolbar">
+            <div>
+              <span class="section-kicker" data-demo-kicker>Step 01 / Operations</span>
+              <h2 data-demo-title>Start from a clear clinical dashboard.</h2>
+            </div>
+            <a class="button button-primary" href="/contact.html">Request pilot</a>
+          </div>
+          <figure class="demo-figure">
+            <img src="/screenshots/app-dashboard.png" alt="Med-AI Clinical dashboard screenshot" data-demo-image>
+            <figcaption data-demo-caption>Teams see volume, analysis status, QA access, and platform health before entering review work.</figcaption>
+          </figure>
+          <div class="demo-points" aria-label="Demo explanation">
+            <p data-demo-point-one>Buyer message: this is workflow infrastructure, not an autonomous diagnosis product.</p>
+            <p data-demo-point-two>Next action: choose a case queue and review before sign-off.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer"><div class="wrap"><div class="footer-bottom"><small>&copy; <span id="year">2026</span> Med-AI Clinical.</small><small class="legal">Interactive demo uses synthetic/demo screenshots. No patient records are shown.</small></div></div></footer>
+  <script src="/app.js" defer></script>
+</body>
+</html>
