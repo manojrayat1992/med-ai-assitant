@@ -78,19 +78,28 @@ npx wrangler deploy --dry-run
 The public contact form posts to `/api/contact` on the marketing Worker. Static assets still come
 from `marketing/`; dynamic form submission is handled by `worker/index.js`.
 
-Before deploying the form, enable Cloudflare Email Sending for the apex domain and make sure
-`hello@medaiclinical.com` is allowed as both the destination and sender configured in
-`wrangler.jsonc`.
+The default setup avoids the paid Cloudflare Email Sending binding. Use the free Google Apps Script
+webhook in `scripts/contact-google-apps-script.gs`, then add these Cloudflare secrets:
 
 ```bash
-npx wrangler email sending enable medaiclinical.com
-npx wrangler email sending dns get medaiclinical.com
-npx wrangler email sending list
+npx wrangler secret put CONTACT_WEBHOOK_URL
+npx wrangler secret put CONTACT_WEBHOOK_SECRET
 ```
 
-The Worker uses the native `send_email` binding named `EMAIL`; it does not require an email API key
-in source code. Local `wrangler dev` simulates the binding unless `remote: true` is added temporarily,
-and `remote: true` sends real emails, so only use it with test addresses you control.
+Setup steps:
+
+1. Open <https://script.google.com/> and create a new Apps Script project.
+2. Paste `scripts/contact-google-apps-script.gs`.
+3. Change `CONTACT_RECIPIENT` if leads should go somewhere other than `hello@medaiclinical.com`.
+4. Replace `WEBHOOK_SECRET` with a long random string.
+5. Deploy as a Web App, execute as yourself, and allow access from anyone with the deployment URL.
+6. Store the deployment URL as `CONTACT_WEBHOOK_URL` and the same random string as
+   `CONTACT_WEBHOOK_SECRET` in Cloudflare.
+7. Redeploy the Worker.
+
+Google controls MailApp quotas, so keep this for low-volume pilot inquiries. If the project later
+uses Cloudflare Email Sending, the Worker still supports an optional `EMAIL` binding as a fallback,
+but do not add `send_email` to `wrangler.jsonc` until that paid feature is available.
 
 ---
 

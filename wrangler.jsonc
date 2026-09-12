@@ -40,13 +40,9 @@
     "CONTACT_TO": "hello@medaiclinical.com",
     "CONTACT_FROM": "hello@medaiclinical.com",
     "CONTACT_FROM_NAME": "Med-AI Clinical Website"
-  },
+  }
 
-  "send_email": [
-    {
-      "name": "EMAIL",
-      "destination_address": "hello@medaiclinical.com",
-      "allowed_sender_addresses": ["hello@medaiclinical.com"]
-    }
-  ]
+  // No paid Cloudflare Email Sending binding is required for the default contact form path.
+  // Set CONTACT_WEBHOOK_URL and CONTACT_WEBHOOK_SECRET as Cloudflare secrets after creating the
+  // free Google Apps Script webhook in scripts/contact-google-apps-script.gs.
 }

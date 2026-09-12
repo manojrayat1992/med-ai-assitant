@@ -123,6 +123,70 @@ function buildEmail(payload) {
   };
 }
 
+async function sendWithWebhook(env, payload, email) {
+  const rawUrl = clean(env.CONTACT_WEBHOOK_URL, 2_048);
+  let webhookUrl;
+
+  try {
+    webhookUrl = new URL(rawUrl);
+  } catch {
+    throw new Error("CONTACT_WEBHOOK_URL is not a valid URL.");
+  }
+
+  if (webhookUrl.protocol !== "https:") {
+    throw new Error("CONTACT_WEBHOOK_URL must use HTTPS.");
+  }
+
+  const response = await fetch(webhookUrl.toString(), {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json; charset=utf-8",
+      "X-Contact-Source": "medaiclinical.com",
+    },
+    body: JSON.stringify({
+      secret: env.CONTACT_WEBHOOK_SECRET || undefined,
+      source: "medaiclinical.com",
+      submittedAt: new Date().toISOString(),
+      subject: email.subject,
+      text: email.text,
+      contact: {
+        name: payload.name,
+        organization: payload.organization,
+        email: payload.email,
+        role: payload.role,
+        interest: payload.interest,
+        message: payload.message,
+      },
+    }),
+  });
+
+  let result = {};
+  try {
+    result = await response.clone().json();
+  } catch {
+    result = {};
+  }
+
+  if (!response.ok || result.ok === false) {
+    throw new Error(result.message || `Webhook failed with status ${response.status}.`);
+  }
+}
+
+async function sendWithCloudflareEmail(env, payload, email) {
+  const to = env.CONTACT_TO || "hello@medaiclinical.com";
+  const fromEmail = env.CONTACT_FROM || "hello@medaiclinical.com";
+  const fromName = env.CONTACT_FROM_NAME || "Med-AI Clinical Website";
+
+  await env.EMAIL.send({
+    to,
+    from: { email: fromEmail, name: fromName },
+    replyTo: { email: payload.email, name: payload.name },
+    subject: email.subject,
+    html: email.html,
+    text: email.text,
+  });
+}
+
 async function handleContact(request, env) {
   if (request.method === "OPTIONS") {
     return new Response(null, { status: 204 });
@@ -144,10 +208,6 @@ async function handleContact(request, env) {
     }
   }
 
-  if (!env.EMAIL?.send) {
-    return json({ ok: false, message: "Contact email is not configured yet." }, 503);
-  }
-
   const parsed = await parseContactRequest(request);
   if (parsed.bot) {
     return json({ ok: true, message: "Thanks. We received your request." });
@@ -156,22 +216,20 @@ async function handleContact(request, env) {
     return json({ ok: false, message: parsed.error }, 400);
   }
 
-  const to = env.CONTACT_TO || "hello@medaiclinical.com";
-  const fromEmail = env.CONTACT_FROM || "hello@medaiclinical.com";
-  const fromName = env.CONTACT_FROM_NAME || "Med-AI Clinical Website";
   const email = buildEmail(parsed.payload);
 
+  if (!env.CONTACT_WEBHOOK_URL && !env.EMAIL?.send) {
+    return json({ ok: false, message: "Contact email is not configured yet." }, 503);
+  }
+
   try {
-    await env.EMAIL.send({
-      to,
-      from: { email: fromEmail, name: fromName },
-      replyTo: { email: parsed.payload.email, name: parsed.payload.name },
-      subject: email.subject,
-      html: email.html,
-      text: email.text,
-    });
+    if (env.CONTACT_WEBHOOK_URL) {
+      await sendWithWebhook(env, parsed.payload, email);
+    } else {
+      await sendWithCloudflareEmail(env, parsed.payload, email);
+    }
   } catch (error) {
-    console.error("Contact email send failed", {
+    console.error("Contact delivery failed", {
       code: error?.code,
       message: error?.message,
     });

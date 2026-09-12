@@ -16,6 +16,23 @@ if (menuButton) {
   });
 }
 
+function buildContactMailto(payload) {
+  const subject = encodeURIComponent("Design Partner Inquiry - Med-AI Clinical");
+  const body = encodeURIComponent(
+    [
+      `Name: ${payload.name || ""}`,
+      `Organization: ${payload.organization || ""}`,
+      `Email: ${payload.email || ""}`,
+      `Role: ${payload.role || ""}`,
+      `Interest: ${payload.interest || ""}`,
+      "",
+      payload.message || "",
+    ].join("\n")
+  );
+
+  return `mailto:hello@medaiclinical.com?subject=${subject}&body=${body}`;
+}
+
 if (contactForm) {
   const status = contactForm.querySelector("[data-form-status]");
   const submit = contactForm.querySelector("[data-contact-submit]");
@@ -38,7 +55,9 @@ if (contactForm) {
       const result = await response.json().catch(() => ({}));
 
       if (!response.ok || result.ok === false) {
-        throw new Error(result.message || "Could not send the message.");
+        const error = new Error(result.message || "Could not send the message.");
+        error.status = response.status;
+        throw error;
       }
 
       status.textContent = result.message || "Thanks. We received your request.";
@@ -46,8 +65,13 @@ if (contactForm) {
       contactForm.reset();
       if (startedAtInput) startedAtInput.value = String(Date.now());
     } catch (error) {
-      status.textContent =
-        error.message || "We could not send the message right now. Please email hello@medaiclinical.com directly.";
+      if (error.status >= 500) {
+        status.textContent = "Automatic send is not available yet. Opening an email draft instead.";
+        window.location.href = buildContactMailto(payload);
+      } else {
+        status.textContent =
+          error.message || "We could not send the message right now. Please email hello@medaiclinical.com directly.";
+      }
       status.dataset.state = "error";
     } finally {
       submit.disabled = false;
