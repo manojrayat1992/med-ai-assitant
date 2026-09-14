@@ -86,11 +86,10 @@ export function StudyImagesPanel({ patientId }: StudyImagesPanelProps) {
                   className="flex h-20 w-28 items-center justify-center overflow-hidden rounded-lg border bg-slate-950/40 transition-colors group-hover:border-blue-500/50"
                   style={{ borderColor: 'var(--clr-border, #1e2d45)' }}
                 >
-                  <img
-                    src={fileService.getViewUrl(patientId, file.id)}
+                  <AuthenticatedImage
+                    patientId={patientId}
+                    fileId={file.id}
                     alt={file.originalFileName ?? `Study image ${index + 1}`}
-                    className="h-full w-full object-cover"
-                    loading="lazy"
                   />
                 </div>
                 <p className="mt-1 truncate text-[10px] text-slate-500">{index + 1}. {file.originalFileName ?? file.fileType}</p>
@@ -114,6 +113,42 @@ export function StudyImagesPanel({ patientId }: StudyImagesPanelProps) {
       </CardContent>
     </Card>
   );
+}
+
+function AuthenticatedImage({ patientId, fileId, alt }: { patientId: string; fileId: string; alt: string }) {
+  const [src, setSrc] = useState<string | null>(null);
+  const [error, setError] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    fileService
+      .getFileBlob(patientId, fileId)
+      .then((blob) => {
+        if (cancelled) return;
+        setSrc(URL.createObjectURL(blob));
+      })
+      .catch(() => {
+        if (!cancelled) setError(true);
+      });
+
+    return () => {
+      cancelled = true;
+      if (src) {
+        URL.revokeObjectURL(src);
+      }
+    };
+  }, [patientId, fileId]);
+
+  if (error || !src) {
+    return (
+      <div className="flex h-full w-full flex-col items-center justify-center gap-1 bg-slate-900 text-slate-600">
+        <ImageOff className="h-4 w-4" />
+      </div>
+    );
+  }
+
+  return <img src={src} alt={alt} className="h-full w-full object-cover" />;
 }
 
 const IMAGE_FILE_TYPES = new Set(['XRAY', 'CT_SCAN', 'ULTRASOUND', 'MRI']);

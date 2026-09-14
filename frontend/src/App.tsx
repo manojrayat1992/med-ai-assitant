@@ -7,6 +7,7 @@ import { LoginPage } from '@/pages/LoginPage';
 import { RegisterPage } from '@/pages/RegisterPage';
 import { DashboardPage } from '@/pages/DashboardPage';
 import { PatientsPage } from '@/pages/PatientsPage';
+import { NewReportPage } from '@/pages/NewReportPage';
 import { UploadPage } from '@/pages/UploadPage';
 import { SettingsPage } from '@/pages/SettingsPage';
 import { AnalysisPage } from '@/pages/AnalysisPage';
@@ -41,6 +42,7 @@ export default function App() {
       <Route element={<DashboardLayout />}>
         <Route path="/dashboard" element={<DashboardPage />} />
         <Route path="/patients" element={<PatientsPage />} />
+        <Route path="/reports/new" element={<NewReportPage />} />
         <Route path="/worklist" element={<WorklistPage />} />
         <Route path="/clinical-workspace" element={<ClinicalWorkspacePage />} />
         <Route path="/clinical-workspace/:reviewId" element={<ClinicalWorkspacePage />} />

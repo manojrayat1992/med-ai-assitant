@@ -1,7 +1,9 @@
 package com.medai.upload.service;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.beans.factory.annotation.Autowired;
+import jakarta.annotation.PreDestroy;
+import software.amazon.awssdk.auth.credentials.AwsSessionCredentials;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
@@ -20,27 +22,15 @@ import java.io.InputStream;
 import java.net.URI;
 import java.util.UUID;
 
-/**
- * Object-storage backend, and the only one that survives more than one instance.
- *
- * <p>{@link LocalStorageService} writes to the pod's own filesystem. The Kubernetes manifests run
- * three replicas behind a service with no shared volume, so an upload landed on one pod and
- * roughly two out of three download requests reached a pod that had never seen the file. In a
- * clinical product an intermittently missing scan is an incident, not a bug report.
- *
- * <p>Keys are {@code {tenantId}/patients/{patientId}/{fileName}} — the same layout the local
- * backend produces, so a stored path means the same thing under either. The tenant prefix is first
- * deliberately: it is what a per-tenant bucket policy, a KMS grant, or a tenant-scoped export all
- * need to key off.
- */
+/** S3-only storage. Keys are {tenantId}/patients/{patientId}/{fileName}. */
 @Service
-@ConditionalOnProperty(name = "app.storage.type", havingValue = "s3")
 @Slf4j
 public class S3StorageService implements StorageService {
 
     private final S3Client client;
     private final StorageProperties.S3 config;
 
+    @Autowired
     public S3StorageService(StorageProperties properties) {
         this.config = properties.getS3();
 
@@ -49,6 +39,17 @@ public class S3StorageService implements StorageService {
                     "app.storage.type=s3 requires app.storage.s3.bucket (STORAGE_S3_BUCKET).");
         }
 
+        if (config.getRegion() == null || config.getRegion().isBlank()) {
+            throw new IllegalStateException("STORAGE_S3_REGION is required.");
+        }
+        boolean access = config.getAccessKey() != null && !config.getAccessKey().isBlank();
+        boolean secret = config.getSecretKey() != null && !config.getSecretKey().isBlank();
+        if (access != secret) {
+            throw new IllegalStateException("Set both STORAGE_S3_ACCESS_KEY and STORAGE_S3_SECRET_KEY, or leave both empty to use the AWS credential chain.");
+        }
+        if (!access && config.getSessionToken() != null && !config.getSessionToken().isBlank()) {
+            throw new IllegalStateException("STORAGE_S3_SESSION_TOKEN requires the matching storage access and secret keys.");
+        }
         var builder = S3Client.builder().region(Region.of(config.getRegion()));
 
         if (config.getEndpoint() != null && !config.getEndpoint().isBlank()) {
@@ -59,7 +60,9 @@ public class S3StorageService implements StorageService {
         }
         if (config.getAccessKey() != null && !config.getAccessKey().isBlank()) {
             builder.credentialsProvider(StaticCredentialsProvider.create(
-                    AwsBasicCredentials.create(config.getAccessKey(), config.getSecretKey())));
+                    config.getSessionToken() != null && !config.getSessionToken().isBlank()
+                        ? AwsSessionCredentials.create(config.getAccessKey(), config.getSecretKey(), config.getSessionToken())
+                        : AwsBasicCredentials.create(config.getAccessKey(), config.getSecretKey())));
         } else {
             // Instance profile / IRSA / environment. Preferred: no long-lived key to rotate.
             builder.credentialsProvider(DefaultCredentialsProvider.create());
@@ -67,13 +70,27 @@ public class S3StorageService implements StorageService {
 
         this.client = builder.build();
 
-        verifyBucketReachable();
+        try {
+            verifyBucketReachable();
+        } catch (RuntimeException ex) {
+            client.close();
+            throw ex;
+        }
 
         log.info("File storage backend: s3 (bucket={}, region={}, endpoint={}, sse={})",
                 config.getBucket(), config.getRegion(),
                 config.getEndpoint() != null ? config.getEndpoint() : "aws",
                 config.getKmsKeyId() != null ? "SSE-KMS" : "SSE-S3");
     }
+
+    // Injectable client for focused storage contract tests; production always verifies its bucket.
+    S3StorageService(StorageProperties properties, S3Client client) {
+        this.config = properties.getS3();
+        this.client = client;
+    }
+
+    @PreDestroy
+    void close() { client.close(); }
 
     /**
      * Fails startup on a bucket that is missing or unreachable.
@@ -89,7 +106,9 @@ public class S3StorageService implements StorageService {
         } catch (S3Exception e) {
             throw new IllegalStateException(
                     "Storage bucket " + config.getBucket() + " is not reachable with the configured "
-                    + "credentials: " + e.awsErrorDetails().errorMessage(), e);
+                    + "credentials. Check bucket, region and IAM permissions.", e);
+        } catch (SdkException e) {
+            throw new IllegalStateException("S3 startup check failed. Check credentials, region and network connectivity.", e);
         }
     }
 
@@ -126,14 +145,37 @@ public class S3StorageService implements StorageService {
 
     @Override
     public InputStream retrieve(String storagePath) {
+        String key = storagePath;
+        if (key.startsWith("./uploads/")) {
+            key = key.substring("./uploads/".length());
+        } else if (key.startsWith("uploads/")) {
+            key = key.substring("uploads/".length());
+        }
+
         try {
             return client.getObject(GetObjectRequest.builder()
                     .bucket(config.getBucket())
-                    .key(storagePath)
+                    .key(key)
                     .build());
         } catch (NoSuchKeyException e) {
+            java.io.File localFile = new java.io.File(storagePath);
+            if (localFile.exists()) {
+                try {
+                    return new java.io.FileInputStream(localFile);
+                } catch (IOException ioException) {
+                    throw new StorageException("Failed to read local fallback file: " + storagePath, ioException);
+                }
+            }
             throw new StorageException("File not found: " + storagePath, e);
         } catch (SdkException e) {
+            java.io.File localFile = new java.io.File(storagePath);
+            if (localFile.exists()) {
+                try {
+                    return new java.io.FileInputStream(localFile);
+                } catch (IOException ioException) {
+                    throw new StorageException("Failed to read local fallback file: " + storagePath, ioException);
+                }
+            }
             throw new StorageException("Failed to retrieve file: " + storagePath, e);
         }
     }

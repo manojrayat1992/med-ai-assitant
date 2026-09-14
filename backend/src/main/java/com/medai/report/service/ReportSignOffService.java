@@ -119,8 +119,8 @@ public class ReportSignOffService {
         UUID tenantId = TenantContext.requireTenantId();
         ReportReview review = reviewRepository.findByIdAndTenantId(reviewId, tenantId)
                 .orElseThrow(() -> new ResourceNotFoundException("ReportReview", "id", reviewId.toString()));
-        if ("SIGNED".equals(review.getStatus())) {
-            throw new BadRequestException("Signed reports cannot be modified. Use amend instead.");
+        if (!OPEN_STATUSES.contains(review.getStatus())) {
+            throw new BadRequestException("Only draft or in-review reports can be modified. Use amend for signed reports.");
         }
         review.setDraftContent(draftContent);
         if (principal != null) {
@@ -141,6 +141,15 @@ public class ReportSignOffService {
      */
     @Transactional
     public ReviewView createTextDraft(CreateTextDraftRequest request, UserPrincipal principal) {
+        return createNarrativeDraft(request, principal, false);
+    }
+
+    @Transactional
+    public ReviewView createAuthoredDraft(CreateTextDraftRequest request, UserPrincipal principal) {
+        return createNarrativeDraft(request, principal, true);
+    }
+
+    private ReviewView createNarrativeDraft(CreateTextDraftRequest request, UserPrincipal principal, boolean authored) {
         if (request == null) {
             throw new BadRequestException("A pasted report request is required.");
         }
@@ -166,13 +175,13 @@ public class ReportSignOffService {
         UUID sourceId = UUID.randomUUID();
 
         Map<String, Object> metadata = new HashMap<>();
-        metadata.put("ingestMode", "PASTED_REPORT_TEXT");
+        metadata.put("ingestMode", authored ? "AUTHORED_REPORT" : "PASTED_REPORT_TEXT");
 
         MedicalFile source = MedicalFile.builder()
                 .patientId(patient.getId())
                 .uploadedBy(principal.userId())
                 .fileName("pasted-report-" + sourceId + ".txt")
-                .originalFileName("Pasted report text")
+                .originalFileName(authored ? "Authored report" : "Pasted report text")
                 .fileType(modality)
                 .mimeType("text/plain")
                 .fileSizeBytes((long) reportText.getBytes(StandardCharsets.UTF_8).length)

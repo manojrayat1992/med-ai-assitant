@@ -53,11 +53,8 @@ services:
       DB_HOST: postgres
       DB_PORT: 5432
 
-      # One instance, so local disk is correct rather than a compromise — StorageTypeValidator's
-      # warning is about replicas, and there are none. Uploads live in the volume below; back it
-      # up with the database or a restore gives you records pointing at missing studies.
-      STORAGE_TYPE: local
-      STORAGE_LOCAL_PATH: /app/uploads
+      # Uploaded objects use the S3 bucket configured in the env file.
+      STORAGE_TYPE: s3
 
       # Same reasoning: the per-minute rate window is per-instance, and there is one instance,
       # so it is exactly correct without Redis.
@@ -68,8 +65,6 @@ services:
       CORS_ORIGINS: https://app.${BASE_DOMAIN:?BASE_DOMAIN is required}
       CORS_ORIGIN_PATTERNS: https://*.${BASE_DOMAIN}
       JWT_REFRESH_COOKIE_SECURE: "true"
-    volumes:
-      - uploads_data:/app/uploads
     depends_on:
       postgres:
         condition: service_healthy
@@ -129,7 +124,6 @@ services:
 
 volumes:
   postgres_data:
-  uploads_data:
   # Holds the issued certificates. Losing this means re-issuing on every restart, which will
   # hit Let's Encrypt's rate limit (5 per domain per week) and leave the site without TLS.
   caddy_data:

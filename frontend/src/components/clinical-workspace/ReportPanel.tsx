@@ -6,7 +6,7 @@ import type { DraftReport, QaIssue, ReportSection } from '@/types/clinicalWorksp
 interface ReportPanelProps {
   report: DraftReport;
   selectedIssue?: QaIssue | null;
-  onSaveReport?: (updatedSections: ReportSection[]) => void | Promise<void>;
+  onSaveReport?: (updatedSections: ReportSection[]) => void | boolean | Promise<void | boolean>;
   saving?: boolean;
 }
 
@@ -48,7 +48,8 @@ export function ReportPanel({ report, selectedIssue, onSaveReport, saving }: Rep
     }));
 
     if (onSaveReport) {
-      await onSaveReport(updated);
+      const saved = await onSaveReport(updated);
+      if (saved === false) return;
     }
     setIsEditing(false);
   };

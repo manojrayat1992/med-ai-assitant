@@ -5,22 +5,14 @@ import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
-/**
- * Storage backend configuration.
- *
- * <p>{@code type} selects the implementation. {@code local} is single-instance only; anything
- * running more than one replica must use {@code s3}, which covers any S3-compatible endpoint
- * (AWS, Cloudflare R2, MinIO, Ceph) via {@code endpoint}.
- */
+/** S3-only object storage configuration. */
 @Component
 @ConfigurationProperties(prefix = "app.storage")
 @Getter
 @Setter
 public class StorageProperties {
 
-    private String type = "local";
-
-    private String localPath = "./uploads";
+    private String type = "s3";
 
     private S3 s3 = new S3();
 
@@ -57,5 +49,7 @@ public class StorageProperties {
         private String accessKey;
 
         private String secretKey;
+
+        private String sessionToken;
     }
 }

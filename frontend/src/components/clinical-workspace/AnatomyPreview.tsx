@@ -222,11 +222,12 @@ export function AnatomyPreview({ selection, linkedIssueType, conflictNote, patie
                     className="block h-32 w-full overflow-hidden rounded-lg border"
                     style={{ borderColor: 'var(--clr-border, #1e2d45)', background: 'var(--surface, #111827)' }}
                   >
-                    <img
-                      src={fileService.getViewUrl(thumbnail.patientId, thumbnail.file.id)}
+                    <AuthenticatedAnatomyImg
+                      patientId={thumbnail.patientId}
+                      fileId={thumbnail.file.id}
                       alt={thumbnail.file.originalFileName ?? 'Study image'}
-                      className="h-full w-full object-cover"
                       onError={() => setThumbnailFailed(true)}
+                      className="h-full w-full object-cover"
                     />
                   </button>
                 )}
@@ -426,14 +427,62 @@ function TwoDImagePane({
       className={cn('flex items-center justify-center overflow-hidden rounded-xl border', heightClass)}
       style={{ borderColor: 'var(--clr-border-2, #243250)', background: 'var(--surface-2, #1a2235)' }}
     >
-      <img
-        src={fileService.getViewUrl(patientId, file.id)}
+      <AuthenticatedAnatomyImg
+        patientId={patientId}
+        fileId={file.id}
         alt={file.originalFileName ?? 'Study image'}
-        className="h-full w-full object-contain"
         onError={() => setImageFailed(true)}
+        className="h-full w-full object-contain"
       />
     </div>
   );
+}
+
+function AuthenticatedAnatomyImg({
+  patientId,
+  fileId,
+  alt,
+  className,
+  onError,
+}: {
+  patientId: string;
+  fileId: string;
+  alt: string;
+  className?: string;
+  onError?: () => void;
+}) {
+  const [src, setSrc] = useState<string | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    fileService
+      .getFileBlob(patientId, fileId)
+      .then((blob) => {
+        if (cancelled) return;
+        setSrc(URL.createObjectURL(blob));
+      })
+      .catch(() => {
+        if (!cancelled && onError) onError();
+      });
+
+    return () => {
+      cancelled = true;
+      if (src) {
+        URL.revokeObjectURL(src);
+      }
+    };
+  }, [patientId, fileId]);
+
+  if (!src) {
+    return (
+      <div className="flex h-full w-full items-center justify-center bg-slate-900">
+        <Loader2 className="h-4 w-4 animate-spin text-slate-500" />
+      </div>
+    );
+  }
+
+  return <img src={src} alt={alt} className={className} />;
 }
 
 function InfoRow({ label, value, mono = false }: { label: string; value: string; mono?: boolean }) {

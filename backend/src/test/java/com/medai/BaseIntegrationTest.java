@@ -32,6 +32,41 @@ import java.sql.Statement;
 @ActiveProfiles("test")
 public abstract class BaseIntegrationTest {
 
+    // Database integration tests use memory, never local upload files or a customer's bucket.
+    @org.springframework.boot.test.mock.mockito.MockBean
+    protected com.medai.upload.service.S3StorageService testObjectStorage;
+
+    private static final java.util.Map<String, byte[]> TEST_OBJECTS = new java.util.concurrent.ConcurrentHashMap<>();
+
+    @org.junit.jupiter.api.BeforeEach
+    void configureTestObjectStorage() {
+        var objects = TEST_OBJECTS; // Match database lifetime, including ordered upload/read tests.
+        org.mockito.Mockito.when(testObjectStorage.store(org.mockito.ArgumentMatchers.any(),
+                org.mockito.ArgumentMatchers.any(), org.mockito.ArgumentMatchers.anyString(),
+                org.mockito.ArgumentMatchers.any())).thenAnswer(call -> {
+            String key = call.getArgument(0) + "/patients/" + call.getArgument(1) + "/" + call.getArgument(2);
+            org.springframework.web.multipart.MultipartFile file = call.getArgument(3);
+            objects.put(key, file.getBytes()); return key;
+        });
+        org.mockito.Mockito.when(testObjectStorage.retrieve(org.mockito.ArgumentMatchers.anyString()))
+                .thenAnswer(call -> {
+                    byte[] bytes = objects.get(call.getArgument(0));
+                    if (bytes == null) throw new com.medai.upload.service.StorageException("Missing test object");
+                    return new java.io.ByteArrayInputStream(bytes);
+                });
+        org.mockito.Mockito.when(testObjectStorage.retrieveAsResource(org.mockito.ArgumentMatchers.anyString()))
+                .thenAnswer(call -> {
+                    byte[] bytes = objects.get(call.getArgument(0));
+                    if (bytes == null) throw new com.medai.upload.service.StorageException("Missing test object");
+                    return new org.springframework.core.io.ByteArrayResource(bytes);
+                });
+        org.mockito.Mockito.when(testObjectStorage.exists(org.mockito.ArgumentMatchers.anyString()))
+                .thenAnswer(call -> objects.containsKey(call.getArgument(0)));
+        org.mockito.Mockito.doAnswer(call -> { objects.remove(call.getArgument(0)); return null; })
+                .when(testObjectStorage).delete(org.mockito.ArgumentMatchers.anyString());
+    }
+
+
     /** Matches the application's runtime role; V11 creates it with this password. */
     protected static final String APP_DB_USERNAME = "medai_app";
     protected static final String APP_DB_PASSWORD = "test_app_pw";

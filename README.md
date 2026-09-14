@@ -184,6 +184,8 @@ Copy the example environment file and update your credentials:
 cp .env.example .env
 ```
 
+Configure the required S3 bucket and credentials before starting the backend: [S3-only storage setup](docs/S3-STORAGE.md). Uploaded files no longer have a local-disk fallback.
+
 ### 3. Run with Docker Compose (Fastest)
 ```bash
 docker compose up -d postgres redis

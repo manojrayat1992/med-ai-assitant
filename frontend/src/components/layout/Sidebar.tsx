@@ -29,6 +29,7 @@ const navGroups: NavGroup[] = [
   {
     label: 'Work',
     items: [
+      { to: '/reports/new', label: 'New Report', icon: FileText },
       { to: '/worklist', label: 'Worklist', icon: ClipboardCheck },
       { to: '/upload', label: 'Upload Studies', icon: Upload },
       { to: '/clinical-workspace', label: 'Clinical Workspace', icon: FileText },

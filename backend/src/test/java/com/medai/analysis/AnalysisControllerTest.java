@@ -20,6 +20,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class AnalysisControllerTest extends BaseIntegrationTest {
 
+    // This suite tests submission/deduplication, not external inference. Keep queued jobs pending.
+    @org.springframework.boot.test.mock.mockito.MockBean
+    private com.medai.analysis.job.AnalysisDispatcher dispatcher;
+
     @Autowired
     private MockMvc mockMvc;
 

@@ -9,9 +9,7 @@ data:
   DB_PORT: "5432"
   DB_NAME: "medai"
   DB_APP_USERNAME: "medai_app"
-  # Object storage is mandatory here: the backend Deployment runs multiple replicas, and the
-  # 'local' backend writes to each pod's own filesystem. Set STORAGE_S3_BUCKET before deploying —
-  # the application refuses to start without it rather than losing files quietly.
+  # S3 is mandatory. Set STORAGE_S3_BUCKET to your existing bucket before deploying.
   STORAGE_TYPE: "s3"
   STORAGE_S3_BUCKET: "medai-phi-ap-south-1"
   STORAGE_S3_REGION: "ap-south-1"

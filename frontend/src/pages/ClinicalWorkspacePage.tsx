@@ -152,6 +152,7 @@ export function ClinicalWorkspacePage() {
       setActionNotice('Draft report saved successfully.');
     } catch (e: any) {
       setActionNotice(e?.response?.data?.message || e?.message || 'Failed to save draft.');
+      return false;
     } finally {
       setSavingDraft(false);
     }

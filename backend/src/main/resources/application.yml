@@ -39,6 +39,7 @@ spring:
 
   servlet:
     multipart:
+      file-size-threshold: 100MB
       max-file-size: 100MB
       max-request-size: 100MB
 
@@ -115,10 +116,8 @@ app:
     # development — over the network the token would travel in clear text.
     refresh-cookie-secure: ${JWT_REFRESH_COOKIE_SECURE:true}
   storage:
-    # 'local' is single-instance only — see StorageTypeValidator. Anything running more than one
-    # replica must use 's3', which covers any S3-compatible endpoint (AWS, Cloudflare R2, MinIO).
-    type: ${STORAGE_TYPE:local}
-    local-path: ${STORAGE_LOCAL_PATH:./uploads}
+    # S3 only. Local storage is rejected at startup.
+    type: ${STORAGE_TYPE:s3}
     s3:
       bucket: ${STORAGE_S3_BUCKET:}
       region: ${STORAGE_S3_REGION:us-east-1}
@@ -133,6 +132,7 @@ app:
       # is preferable: no long-lived key to rotate or leak.
       access-key: ${STORAGE_S3_ACCESS_KEY:}
       secret-key: ${STORAGE_S3_SECRET_KEY:}
+      session-token: ${STORAGE_S3_SESSION_TOKEN:}
   cors:
     allowed-origins: ${CORS_ORIGINS:http://localhost:5173,http://localhost:3000}
     # Open-ended origins for per-tenant hostnames (https://*.medaiclinical.com). Empty by default

@@ -12,10 +12,4 @@ logging:
 
 app:
   storage:
-    # Honours STORAGE_TYPE, defaulting to s3.
-    #
-    # This was the literal `s3` with no placeholder, which meant the prod profile silently ignored
-    # STORAGE_TYPE and the application refused to start on any deployment that did not have an S3
-    # bucket — including a single-instance host where local disk is the correct choice. A
-    # profile that hardcodes a value cannot be configured, which defeats the point of the env var.
     type: ${STORAGE_TYPE:s3}

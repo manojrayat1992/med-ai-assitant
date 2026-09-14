@@ -78,7 +78,7 @@ redis:
     port: 6379
 
 storage:
-  # Local disk is single-instance only, and this chart runs three replicas. S3 is not optional here.
+  # S3 is the only supported upload backend. Configure an existing bucket.
   type: s3
   s3:
     bucket: ""
