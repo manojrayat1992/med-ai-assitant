@@ -194,6 +194,95 @@ button, input, textarea, select { font: inherit; }
   text-transform: uppercase;
 }
 
+/* Featured Badges - Hero & Footer */
+.hero-badges {
+  margin-top: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.hero-badges-label {
+  font-size: 11px;
+  font-weight: 850;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.65);
+}
+
+.badge-group {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.badge-link {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 8px;
+  overflow: hidden;
+  transition: transform 180ms ease, filter 180ms ease;
+  line-height: 0;
+}
+
+.badge-link:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.12);
+}
+
+.badge-link img {
+  height: 42px;
+  width: auto;
+  display: block;
+  border-radius: 8px;
+}
+
+.footer-badges {
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.footer-badges-title {
+  font-size: 11px;
+  font-weight: 850;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.footer-badge-group {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.footer-badge-link {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 8px;
+  overflow: hidden;
+  transition: transform 180ms ease, filter 180ms ease;
+  line-height: 0;
+}
+
+.footer-badge-link:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.15);
+}
+
+.footer-badge-link img {
+  height: 38px;
+  width: auto;
+  display: block;
+  border-radius: 8px;
+}
+
 .section { padding: clamp(64px, 8vw, 112px) 0; }
 .section-tight { padding: clamp(44px, 7vw, 78px) 0; }
 .section-alt { border-block: 1px solid var(--line); background: var(--paper-2); }
