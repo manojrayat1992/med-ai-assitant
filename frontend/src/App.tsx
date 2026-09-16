@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { bootstrapSession } from '@/services/api';
 import { AuthLayout } from '@/components/layout/AuthLayout';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
@@ -24,22 +24,38 @@ import { AnatomyPage } from '@/pages/AnatomyPage';
 import { QaAnalyticsPage } from '@/pages/QaAnalyticsPage';
 import { IntegrationsPage } from '@/pages/IntegrationsPage';
 
+import { EducationalCasesPage } from '@/pages/EducationalCasesPage';
+import { EducationalCaseEditorPage } from '@/pages/EducationalCaseEditorPage';
+import { PilotApplicationPage } from '@/pages/PilotApplicationPage';
+import { PilotResultsPage } from '@/pages/PilotResultsPage';
+import { PilotInboxPage } from '@/pages/PilotInboxPage';
+import { ClinicalDemoPage } from '@/pages/ClinicalDemoPage';
+
 export default function App() {
+  const routePath = useLocation().pathname.replace(/\/+$/, '');
+  const isPublicDemo = ['/demo', '/pilot', '/cases'].includes(routePath) || routePath.startsWith('/cases/');
   // Nothing about the session survives a reload in memory — by design, so no token is ever written
   // to disk. This exchanges the httpOnly refresh cookie for a fresh access token on load, which is
   // what keeps the user signed in across reloads. Route guards wait on `isBootstrapped`.
   useEffect(() => {
-    void bootstrapSession();
-  }, []);
+    if (!isPublicDemo) void bootstrapSession();
+  }, [isPublicDemo]);
 
   return (
     <Routes>
+      <Route path="/cases" element={<EducationalCasesPage />} />
+      <Route path="/cases/:caseId" element={<EducationalCasesPage />} />
+      <Route path="/demo" element={<ClinicalDemoPage />} />
+      <Route path="/pilot" element={<PilotApplicationPage />} />
       <Route element={<AuthLayout />}>
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
       </Route>
 
       <Route element={<DashboardLayout />}>
+        <Route path="/educational-cases" element={<EducationalCaseEditorPage />} />
+        <Route path="/pilot-results" element={<PilotResultsPage />} />
+        <Route path="/pilot-applications" element={<PilotInboxPage />} />
         <Route path="/dashboard" element={<DashboardPage />} />
         <Route path="/patients" element={<PatientsPage />} />
         <Route path="/reports/new" element={<NewReportPage />} />

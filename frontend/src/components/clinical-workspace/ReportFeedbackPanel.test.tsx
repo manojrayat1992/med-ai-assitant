@@ -1,0 +1,35 @@
+import {cleanup,render,screen,waitFor} from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import {afterEach,beforeEach,expect,it,vi} from 'vitest';
+import {ReportFeedbackPanel} from './ReportFeedbackPanel';
+import {reportFeedbackApi} from '@/services/reportFeedbackApi';
+vi.mock('@/services/reportFeedbackApi',()=>({reportFeedbackApi:{list:vi.fn(),submit:vi.fn()}}));
+beforeEach(()=>{vi.resetAllMocks();vi.mocked(reportFeedbackApi.list).mockResolvedValue([]);});
+afterEach(cleanup);
+it('preserves failed submission and reuses its ID on retry, then shows saved history',async()=>{
+ const user=userEvent.setup();render(<ReportFeedbackPanel reportId="report-one" />);
+ await user.click(screen.getByRole('button',{name:'Clinician feedback'}));
+ await screen.findByText('No feedback on this page.');
+ await user.type(screen.getByLabelText('Suggestion being flagged'),'Wrong side');
+ await user.type(screen.getByLabelText('What was wrong or missed?'),'Source states right.');
+ await user.type(screen.getByLabelText('Proposed correction'),'Use right side.');
+ vi.mocked(reportFeedbackApi.submit).mockRejectedValueOnce(new Error('offline'));
+ await user.click(screen.getByRole('button',{name:'Submit feedback'}));
+ expect(await screen.findByRole('alert')).toHaveTextContent('Your text is preserved');
+ const first=vi.mocked(reportFeedbackApi.submit).mock.calls[0][1];
+ expect(screen.getByLabelText('Proposed correction')).toHaveValue('Use right side.');
+ const saved={id:first.submissionId,reportId:'report-one',submittedBy:'clinician-one',category:first.category,createdAt:'2026-09-15T10:00:00Z',content:{...first,reportSnapshot:'Saved draft',reportStatus:'DRAFT',reportUpdatedAt:'2026-09-15T10:00:00Z'}};
+ vi.mocked(reportFeedbackApi.submit).mockResolvedValue(saved);vi.mocked(reportFeedbackApi.list).mockResolvedValue([saved]);
+ await user.click(screen.getByRole('button',{name:'Submit feedback'}));
+ await waitFor(()=>expect(reportFeedbackApi.submit).toHaveBeenLastCalledWith('report-one',first));
+ expect(await screen.findByRole('status')).toHaveTextContent('Feedback saved');
+ expect(await screen.findByText('Use right side.')).toBeInTheDocument();
+ expect(screen.getByLabelText('Proposed correction')).toHaveValue('');
+});
+it('does not label a failed history request as empty feedback',async()=>{
+ vi.mocked(reportFeedbackApi.list).mockRejectedValue(new Error('offline'));
+ const user=userEvent.setup();render(<ReportFeedbackPanel reportId="one" />);
+ await user.click(screen.getByRole('button',{name:'Clinician feedback'}));
+ expect(await screen.findByRole('alert')).toHaveTextContent('Could not load');
+ expect(screen.queryByText('No feedback on this page.')).not.toBeInTheDocument();
+});

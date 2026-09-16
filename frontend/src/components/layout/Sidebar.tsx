@@ -1,3 +1,5 @@
+import { useEffect, useState } from 'react';
+import { pilotApplicationApi } from '@/services/pilotApplicationApi';
 import { NavLink } from 'react-router-dom';
 import { useAuthStore } from '@/stores/authStore';
 import { logout } from '@/services/api';
@@ -39,6 +41,8 @@ const navGroups: NavGroup[] = [
   {
     label: 'Intelligence',
     items: [
+      { to: '/educational-cases', label: 'Educational cases', icon: FileText },
+      { to: '/pilot-results', label: 'Pilot results', icon: BarChart2 },
       { to: '/qa-analytics', label: 'QA Analytics', icon: BarChart2 },
       { to: '/anatomy', label: 'Anatomy', icon: Scan },
     ],
@@ -54,7 +58,17 @@ const navGroups: NavGroup[] = [
 ];
 
 export function Sidebar() {
-  const { fullName, role, tenantName } = useAuthStore();
+  const { fullName, role, tenantName, userId } = useAuthStore();
+  const [pilotReviewer, setPilotReviewer] = useState(false);
+  useEffect(() => {
+    let active = true;
+    setPilotReviewer(false);
+    if (role === 'HOSPITAL_ADMIN') pilotApplicationApi.access().then(allowed => {if(active) setPilotReviewer(allowed);}).catch(() => {});
+    return () => {active = false;};
+  }, [role, userId]);
+  const visibleGroups: NavGroup[] = pilotReviewer ? navGroups.map(group => group.label === 'Admin'
+    ? {...group, items: [...group.items, {to:'/pilot-applications', label:'Pilot applications', icon:ClipboardCheck}]}
+    : group) : navGroups;
 
   // Revokes the refresh token server-side and expires the cookie, then redirects. Clearing local
   // state alone used to leave the token valid for the rest of its seven days.
@@ -100,7 +114,7 @@ export function Sidebar() {
 
       {/* ── Navigation ── */}
       <nav className="flex-1 overflow-y-auto px-2 py-4 space-y-5">
-        {navGroups.map((group) => (
+        {visibleGroups.map((group) => (
           <div key={group.label ?? 'primary'}>
             {group.label && <p className="section-label mb-2">{group.label}</p>}
             <div className="space-y-0.5">

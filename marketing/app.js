@@ -67,7 +67,7 @@ if (contactForm) {
       if (startedAtInput) startedAtInput.value = String(Date.now());
     } catch (error) {
       if (error.status >= 500) {
-        status.textContent = "Automatic send is not available yet. Opening an email draft instead.";
+        status.textContent = `${error.message || "Automatic send is not available yet."} Opening an email draft instead.`;
         window.location.href = buildContactMailto(payload);
       } else {
         status.textContent =

@@ -9,8 +9,12 @@ public record QaResult(
         QaStatus status,
         List<QaIssue> issues,
         int issueCount,
-        Instant evaluatedAt
+        Instant evaluatedAt,
+        UUID runId
 ) {
+    public QaResult(UUID reportId, QaStatus status, List<QaIssue> issues, int issueCount, Instant evaluatedAt) {
+        this(reportId, status, issues, issueCount, evaluatedAt, null);
+    }
     public static QaResult from(UUID reportId, List<QaIssue> issues, Instant evaluatedAt) {
         List<QaIssue> immutableIssues = List.copyOf(issues);
         return new QaResult(

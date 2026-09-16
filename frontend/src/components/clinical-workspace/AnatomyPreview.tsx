@@ -343,10 +343,33 @@ export function AnatomyPreview({ selection, linkedIssueType, conflictNote, patie
         )}
 
         {linkedIssueType && (
-          <div className="rounded-lg border border-violet-500/20 bg-violet-950/20 px-3 py-2">
-            <p className="text-[11px] font-semibold text-violet-200">{linkedIssueType}</p>
-            <p className="mt-0.5 text-[11px] text-violet-100/70">
-              Mapped from the source finding for this QA issue. Laterality is not verified by the system.
+          <div
+            className={cn(
+              'rounded-lg border px-3 py-2',
+              ['UNREPORTED_IMAGE_FINDING', 'MEASUREMENT_DISCREPANCY', 'IMAGE_TEXT_LOCATION_MISMATCH'].includes(linkedIssueType)
+                ? 'border-blue-500/30 bg-blue-950/20'
+                : 'border-violet-500/20 bg-violet-950/20'
+            )}
+          >
+            <div className="flex items-center justify-between gap-2">
+              <p className={cn(
+                'text-[11px] font-semibold',
+                ['UNREPORTED_IMAGE_FINDING', 'MEASUREMENT_DISCREPANCY', 'IMAGE_TEXT_LOCATION_MISMATCH'].includes(linkedIssueType)
+                  ? 'text-blue-300'
+                  : 'text-violet-200'
+              )}>
+                {linkedIssueType.replace(/_/g, ' ')}
+              </p>
+              {['UNREPORTED_IMAGE_FINDING', 'MEASUREMENT_DISCREPANCY', 'IMAGE_TEXT_LOCATION_MISMATCH'].includes(linkedIssueType) && (
+                <span className="rounded bg-blue-500/20 border border-blue-400/40 px-1.5 py-0.5 text-[9px] font-bold text-blue-300 uppercase">
+                  Vision AI Ground-Truth
+                </span>
+              )}
+            </div>
+            <p className="mt-1 text-[11px] leading-relaxed text-slate-300">
+              {['UNREPORTED_IMAGE_FINDING', 'MEASUREMENT_DISCREPANCY', 'IMAGE_TEXT_LOCATION_MISMATCH'].includes(linkedIssueType)
+                ? 'Ground-truth verification active: structure highlighted directly from DICOM image vision AI analysis against draft report text.'
+                : 'Mapped from the source finding for this QA issue. Laterality is not verified by the system.'}
             </p>
           </div>
         )}

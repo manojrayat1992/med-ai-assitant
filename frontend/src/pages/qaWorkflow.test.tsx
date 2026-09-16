@@ -108,6 +108,22 @@ describe('QA workflow regression coverage', () => {
     useAuthStore.getState().clear();
   });
 
+  it('shows the feedback entry and worklist guidance in the sidebar demo workspace', () => {
+    renderDemoClinicalWorkspace();
+    expect(screen.getByRole('heading', { name: 'Clinician feedback' })).toBeVisible();
+    expect(screen.getByRole('link', { name: /Open Worklist to choose a saved report/ })).toHaveAttribute('href', '/worklist');
+  });
+
+  it('keeps saved-report feedback visible when switching workspace tabs', async () => {
+    const user = userEvent.setup();
+    vi.mocked(reportService.get).mockResolvedValue(makeReview());
+    renderClinicalWorkspace(REVIEW_ID);
+    await screen.findByText('Report review loaded. Run QA manually when ready.');
+    expect(screen.getByRole('button', { name: 'Clinician feedback' })).toBeVisible();
+    await user.click(screen.getByRole('button', { name: /^Prior Studies$/i }));
+    expect(screen.getByRole('button', { name: 'Clinician feedback' })).toBeVisible();
+  });
+
   it('displays a real ReportReview in the worklist and links to its QA Workspace route', async () => {
     const user = userEvent.setup();
     const review = makeReview();

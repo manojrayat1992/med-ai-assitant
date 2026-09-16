@@ -1,5 +1,5 @@
 const CONTACT_RECIPIENT = "hello@medaiclinical.com";
-const WEBHOOK_SECRET = "replace-with-the-same-secret-you-store-in-cloudflare";
+const WEBHOOK_SECRET = "medai-contact-2026-z9P4vQx72LmK8sR3";
 
 function doPost(event) {
   try {

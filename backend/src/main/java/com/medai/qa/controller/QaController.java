@@ -24,15 +24,17 @@ import java.util.UUID;
 public class QaController {
 
     private final QaService qaService;
+    private final com.medai.pilot.results.PilotEventRecorder pilotEvents;
 
     @PostMapping("/{reviewId}/qa")
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("hasAnyRole('DOCTOR','HOSPITAL_ADMIN','LAB_TECH')")
     @Operation(summary = "Run deterministic QA checks for a report review",
                description = "Returns potential issues and supporting evidence. The report is not modified.")
     public ResponseEntity<ApiResponse<QaResult>> evaluateReport(
             @PathVariable UUID reviewId,
+            @org.springframework.security.core.annotation.AuthenticationPrincipal com.medai.auth.security.UserPrincipal principal,
             @RequestBody(required = false) Map<String, String> body) {
         String customText = body != null ? body.get("reportText") : null;
-        return ResponseEntity.ok(ApiResponse.success(qaService.evaluateReport(reviewId, customText)));
+        return ResponseEntity.ok(ApiResponse.success(pilotEvents.qa(qaService.evaluateReport(reviewId, customText), principal)));
     }
 }

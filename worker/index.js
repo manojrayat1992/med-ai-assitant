@@ -167,9 +167,35 @@ async function sendWithWebhook(env, payload, email) {
     result = {};
   }
 
-  if (!response.ok || result.ok === false) {
+  if (!response.ok) {
     throw new Error(result.message || `Webhook failed with status ${response.status}.`);
   }
+
+  if (result.ok !== true) {
+    throw new Error(result.message || "Webhook did not return a success response.");
+  }
+}
+
+function contactDeliveryMessage(error) {
+  const message = error?.message || "";
+
+  if (message.includes("CONTACT_WEBHOOK_URL")) {
+    return "Contact webhook is configured incorrectly. Check CONTACT_WEBHOOK_URL in Cloudflare.";
+  }
+  if (message === "Unauthorized.") {
+    return "Contact webhook secret mismatch. Check CONTACT_WEBHOOK_SECRET in Cloudflare and Apps Script.";
+  }
+  if (message.includes("Daily email quota")) {
+    return "Google Apps Script email quota is exhausted.";
+  }
+  if (message.includes("Webhook did not return a success response")) {
+    return "Contact webhook is not returning JSON success. Check the Apps Script Web App URL and access settings.";
+  }
+  if (message.includes("Webhook failed with status")) {
+    return "Contact webhook did not accept the request. Check the Apps Script deployment URL and permissions.";
+  }
+
+  return "We could not send the message right now. Please email hello@medaiclinical.com directly.";
 }
 
 async function sendWithCloudflareEmail(env, payload, email) {
@@ -233,7 +259,7 @@ async function handleContact(request, env) {
       code: error?.code,
       message: error?.message,
     });
-    return json({ ok: false, message: "We could not send the message right now. Please email hello@medaiclinical.com directly." }, 502);
+    return json({ ok: false, message: contactDeliveryMessage(error) }, 502);
   }
 
   return json({ ok: true, message: "Thanks. We received your request and will reply by email." });

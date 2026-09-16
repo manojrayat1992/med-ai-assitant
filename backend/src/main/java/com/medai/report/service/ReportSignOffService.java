@@ -56,6 +56,7 @@ public class ReportSignOffService {
     private static final List<String> OPEN_STATUSES = List.of("DRAFT", "IN_REVIEW");
 
     private final ReportReviewRepository reviewRepository;
+    private final com.medai.pilot.results.PilotEventRecorder pilotEvents;
     private final AnalysisRequestRepository analysisRepository;
     private final PatientRepository patientRepository;
     private final MedicalFileRepository medicalFileRepository;
@@ -121,6 +122,9 @@ public class ReportSignOffService {
                 .orElseThrow(() -> new ResourceNotFoundException("ReportReview", "id", reviewId.toString()));
         if (!OPEN_STATUSES.contains(review.getStatus())) {
             throw new BadRequestException("Only draft or in-review reports can be modified. Use amend for signed reports.");
+        }
+        if (principal != null && !java.util.Objects.equals(review.getDraftContent(), draftContent)) {
+            pilotEvents.edit(reviewId, principal.userId());
         }
         review.setDraftContent(draftContent);
         if (principal != null) {

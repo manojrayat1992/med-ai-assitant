@@ -1,4 +1,4 @@
-import { Activity, FileClock, History, LayoutDashboard } from 'lucide-react';
+import { Activity, CalendarClock, FileClock, History, LayoutDashboard } from 'lucide-react';
 import { cn } from '@/utils/cn';
 import type { ClinicalContextTab } from '@/types/clinicalWorkspace';
 
@@ -9,6 +9,7 @@ interface WorkspaceTabBarProps {
 
 const tabs: { id: ClinicalContextTab; label: string; icon: typeof History }[] = [
   { id: 'clinical-workspace', label: 'Clinical Workspace', icon: LayoutDashboard },
+  { id: 'incidental-tracker', label: 'Incidental Tracker', icon: CalendarClock },
   { id: 'prior-studies', label: 'Prior Studies', icon: History },
   { id: 'timeline', label: 'Timeline', icon: FileClock },
   { id: 'audit', label: 'Audit Trail', icon: Activity },

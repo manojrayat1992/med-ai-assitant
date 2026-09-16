@@ -77,6 +77,15 @@ export function LoginPage() {
         </p>
       </div>
 
+      <Link to="/demo" className="mb-6 block rounded-xl border border-cyan-800 bg-cyan-950/30 p-4 text-sm text-cyan-200 hover:border-cyan-500">
+        Try the interactive clinical demo →
+        <span className="mt-1 block text-xs text-slate-400">Synthetic radiology and lab cases. No sign-in needed.</span>
+      </Link>
+
+      <Link to="/pilot" className="mb-6 block text-sm font-semibold text-cyan-300 underline">Apply for a centre pilot →</Link>
+
+      <Link to="/cases" className="mb-6 block text-sm text-cyan-300 underline">Browse educational cases →</Link>
+
       {/* Form card */}
       <div
         className="rounded-2xl p-7"

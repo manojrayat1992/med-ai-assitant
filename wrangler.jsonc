@@ -40,6 +40,10 @@
     "CONTACT_TO": "hello@medaiclinical.com",
     "CONTACT_FROM": "hello@medaiclinical.com",
     "CONTACT_FROM_NAME": "Med-AI Clinical Website"
+  },
+
+  "secrets": {
+    "required": ["CONTACT_WEBHOOK_URL", "CONTACT_WEBHOOK_SECRET"]
   }
 
   // No paid Cloudflare Email Sending binding is required for the default contact form path.

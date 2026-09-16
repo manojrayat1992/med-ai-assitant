@@ -1,5 +1,9 @@
 package com.medai.qa.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.medai.analysis.dto.AnalysisResultDto;
+import com.medai.analysis.entity.AnalysisRequest;
+import com.medai.analysis.repository.AnalysisRequestRepository;
 import com.medai.common.exception.ResourceNotFoundException;
 import com.medai.finding.extraction.ReportSectionParser;
 import com.medai.finding.extraction.ReportSectionText;
@@ -12,6 +16,7 @@ import com.medai.report.entity.ReportReview;
 import com.medai.report.repository.ReportReviewRepository;
 import com.medai.tenant.TenantContext;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,13 +26,16 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class QaService {
 
     private final ReportReviewRepository reviewRepository;
+    private final AnalysisRequestRepository analysisRequestRepository;
     private final QaEngine qaEngine;
     private final ReportSectionParser sectionParser;
     private final FindingExtractionService findingExtractionService;
     private final QaEvidenceEnricher evidenceEnricher;
+    private final ObjectMapper objectMapper;
 
     @Transactional(readOnly = true)
     public QaResult evaluateReport(UUID reviewId) {
@@ -40,7 +48,19 @@ public class QaService {
         ReportReview review = reviewRepository.findByIdAndTenantId(reviewId, tenantId)
                 .orElseThrow(() -> new ResourceNotFoundException("ReportReview", "id", reviewId.toString()));
 
-        QaResult result = qaEngine.evaluate(review.getId(), extractReportText(review, customText));
+        AnalysisResultDto imageResult = null;
+        if (review.getAnalysisId() != null) {
+            try {
+                AnalysisRequest analysisRequest = analysisRequestRepository.findByIdAndTenantId(review.getAnalysisId(), tenantId).orElse(null);
+                if (analysisRequest != null && analysisRequest.getResult() != null && !analysisRequest.getResult().isBlank()) {
+                    imageResult = objectMapper.readValue(analysisRequest.getResult(), AnalysisResultDto.class);
+                }
+            } catch (Exception e) {
+                log.warn("Failed to load or parse image analysis {} for QA evaluation: {}", review.getAnalysisId(), e.getMessage());
+            }
+        }
+
+        QaResult result = qaEngine.evaluate(review.getId(), extractReportText(review, customText), imageResult);
         return evidenceEnricher.enrich(result, findingExtractionService.extract(review));
     }
 

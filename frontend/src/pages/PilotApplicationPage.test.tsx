@@ -1,0 +1,32 @@
+import {cleanup,render,screen,waitFor} from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import {MemoryRouter} from 'react-router-dom';
+import {afterEach,beforeEach,expect,it,vi} from 'vitest';
+import {PilotApplicationPage} from './PilotApplicationPage';
+import {pilotApplicationApi} from '@/services/pilotApplicationApi';
+vi.mock('@/services/pilotApplicationApi',()=>({pilotApplicationApi:{submit:vi.fn()}}));
+beforeEach(()=>vi.resetAllMocks());afterEach(cleanup);
+it('submits centre workflow details and shows the persisted reference',async()=>{
+ const user=userEvent.setup();render(<MemoryRouter><PilotApplicationPage/></MemoryRouter>);
+ await user.type(screen.getByLabelText('Centre name'),'Test Centre');await user.type(screen.getByLabelText('City and country'),'Test City');
+ await user.type(screen.getByLabelText('Your name'),'Test Person');await user.type(screen.getByLabelText('Work email'),'test@example.test');
+ await user.type(screen.getByLabelText('Current reporting software'),'Test RIS');await user.type(screen.getByLabelText('Approximate reports per month'),'2000');
+ await user.type(screen.getByLabelText('Reporting team size'),'5');await user.type(screen.getByLabelText('Main workflow problem'),'Manual entry');
+ await user.click(screen.getByRole('checkbox'));
+ vi.mocked(pilotApplicationApi.submit).mockRejectedValueOnce(new Error('offline'));
+ await user.click(screen.getByRole('button',{name:'Submit pilot application'}));
+ expect(await screen.findByRole('alert')).toHaveTextContent('not confirmed as saved');
+ expect(screen.getByLabelText('Centre name')).toHaveValue('Test Centre');
+ const payload=vi.mocked(pilotApplicationApi.submit).mock.calls[0][0];
+ expect(payload).toMatchObject({monthlyReportVolume:2000,teamSize:5,contactConsent:true,reportingSoftware:'Test RIS'});
+ vi.mocked(pilotApplicationApi.submit).mockResolvedValue({reference:payload.submissionId,message:'Application received.'});
+ await user.click(screen.getByRole('button',{name:'Submit pilot application'}));
+ await waitFor(()=>expect(pilotApplicationApi.submit).toHaveBeenLastCalledWith(payload));
+ expect(await screen.findByRole('status')).toHaveTextContent(payload.submissionId);
+ expect(screen.queryByRole('button',{name:'Submit pilot application'})).not.toBeInTheDocument();
+});
+it('requires contact consent and does not offer uploads',()=>{
+ render(<MemoryRouter><PilotApplicationPage/></MemoryRouter>);
+ expect(screen.getByRole('checkbox')).toBeRequired();expect(screen.getByRole('checkbox')).not.toBeChecked();
+ expect(document.querySelector('input[type=file]')).toBeNull();
+});

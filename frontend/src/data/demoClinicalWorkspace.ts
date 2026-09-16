@@ -79,6 +79,33 @@ export const demoClinicalWorkspace: ClinicalWorkspaceDemoCase = {
       },
     },
     {
+      id: 'qa-multimodal-unreported-nodule',
+      severity: 'HIGH',
+      type: 'UNREPORTED_IMAGE_FINDING',
+      message: 'Ground-truth DICOM Vision AI detected a 1.2 cm pulmonary nodule in the right lower lobe, which is unaddressed in the draft text.',
+      recommendation: 'Click to insert "1.2 cm right lower lobe pulmonary nodule" into Findings section.',
+      evidence: [
+        {
+          label: 'DICOM Image Vision AI',
+          text: '1.2 cm solid nodule in the right lower lung (Confidence: 94%)',
+        },
+        {
+          label: 'Draft Text',
+          text: 'Clear lung fields bilaterally (Omitted from report text)',
+        },
+      ],
+      anatomySelection: {
+        structure: 'LUNG',
+        displayName: 'Right Lower Lung',
+        side: 'RIGHT',
+        region: 'LOWER',
+        system: 'Respiratory',
+        viewerKey: 'lung.right.lower',
+        sourceLabel: 'DICOM Vision AI',
+        sourceText: '1.2 cm solid nodule in the right lower lung',
+      },
+    },
+    {
       id: 'qa-prior-comparison-gap',
       severity: 'MEDIUM',
       type: 'COMPARISON_GAP',

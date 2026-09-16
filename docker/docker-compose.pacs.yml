@@ -1,0 +1,23 @@
+# Development-only overlay. Use only synthetic studies; Orthanc storage is ephemeral.
+# docker compose --env-file .env -f docker/docker-compose.yml -f docker/docker-compose.pacs.yml up -d --build backend orthanc
+services:
+  orthanc:
+    image: orthancteam/orthanc:26.7.0
+    ports:
+      - "127.0.0.1:8042:8042"
+      - "127.0.0.1:4242:4242"
+    environment:
+      ORTHANC__NAME: MedAI-Test-PACS
+      ORTHANC__DICOM_AET: ORTHANC
+      ORTHANC__REMOTE_ACCESS_ALLOWED: "true"
+      ORTHANC__AUTHENTICATION_ENABLED: "true"
+      ORTHANC__REGISTERED_USERS: '{"medai":"${ORTHANC_PASSWORD:?Set ORTHANC_PASSWORD in the compose environment}"}'
+      ORTHANC__DICOM_MODALITIES: '{"loopback":["ORTHANC","127.0.0.1",4242]}'
+    tmpfs:
+      - /var/lib/orthanc/db
+  backend:
+    environment:
+      PACS_ALLOWED_ORIGINS: ${PACS_ALLOWED_ORIGINS:-http://orthanc:8042}
+    depends_on:
+      orthanc:
+        condition: service_started

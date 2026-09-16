@@ -1,4 +1,6 @@
 import { LongitudinalComparisonPanel } from '@/components/clinical-workspace/LongitudinalComparisonPanel';
+import { IncidentalTrackerTab } from '@/components/incidental-tracker/IncidentalTrackerTab';
+import { PriorStudyDeltaGrowthPanel } from '@/components/clinical-workspace/PriorStudyDeltaGrowthPanel';
 import { Card, CardContent } from '@/components/ui/Card';
 import type { ReportReview } from '@/services/reportService';
 import type {
@@ -16,6 +18,11 @@ interface ClinicalContextTabsProps {
   audit: AuditEvent[];
   isDemoMode: boolean;
   currentReview: ReportReview | null;
+  currentReportText?: string;
+  patientId?: string;
+  patientName?: string;
+  mrn?: string;
+  onInsertComparisonText?: (text: string) => void;
   /** Forwarded to the longitudinal panel so comparisons can drive the shared anatomy preview. */
   onViewAnatomy?: (selection: AnatomySelection) => void;
 }
@@ -31,23 +38,52 @@ export function ClinicalContextTabs({
   audit,
   isDemoMode,
   currentReview,
+  currentReportText,
+  patientId,
+  patientName,
+  mrn,
+  onInsertComparisonText,
   onViewAnatomy,
 }: ClinicalContextTabsProps) {
   return (
     <Card>
       <div className="border-b px-4 py-3" style={{ borderColor: 'var(--clr-border, #1e2d45)' }}>
         <p className="text-xs text-slate-500">
-          {isDemoMode ? 'Demo supporting data for workspace layout' : 'Patient context and report comparison'}
+          {activeTab === 'incidental-tracker'
+            ? 'Fleischner 2017, TI-RADS, and BI-RADS closed-loop follow-up tracking and revenue recapture'
+            : activeTab === 'prior-studies'
+            ? 'Historical PACS scan comparison, volumetric doubling time, and RECIST 1.1 progression'
+            : isDemoMode
+            ? 'Demo supporting data for workspace layout'
+            : 'Patient context and report comparison'}
         </p>
       </div>
 
       <CardContent className="p-0">
+        {activeTab === 'incidental-tracker' && (
+          <IncidentalTrackerTab
+            currentReportText={currentReportText}
+            patientId={patientId}
+            patientName={patientName}
+            mrn={mrn}
+          />
+        )}
         {activeTab === 'prior-studies' && (
-          isDemoMode ? (
-            <PriorStudiesView priorStudies={priorStudies} />
-          ) : (
-            <LongitudinalComparisonPanel currentReview={currentReview} onViewAnatomy={onViewAnatomy} />
-          )
+          <div className="space-y-4">
+            <PriorStudyDeltaGrowthPanel onInsertComparisonText={onInsertComparisonText} />
+            <div className="border-t border-slate-800/80 pt-3">
+              <div className="px-5 pb-2">
+                <h4 className="text-xs font-semibold uppercase tracking-wider text-slate-400">
+                  PACS Historical Examination Archive
+                </h4>
+              </div>
+              {isDemoMode ? (
+                <PriorStudiesView priorStudies={priorStudies} />
+              ) : (
+                <LongitudinalComparisonPanel currentReview={currentReview} onViewAnatomy={onViewAnatomy} />
+              )}
+            </div>
+          </div>
         )}
         {activeTab === 'timeline' && <TimelineView timeline={timeline} />}
         {activeTab === 'audit' && <AuditView audit={audit} />}

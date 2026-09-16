@@ -1,0 +1,32 @@
+import {cleanup,render,screen} from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import {MemoryRouter} from 'react-router-dom';
+import {afterEach,beforeEach,expect,it,vi} from 'vitest';
+import {educationalCaseApi,type EducationalDraft} from '@/services/educationalCaseApi';
+import {useAuthStore} from '@/stores/authStore';
+import {EducationalCaseEditorPage} from './EducationalCaseEditorPage';
+vi.mock('@/services/educationalCaseApi',()=>({educationalCaseApi:{drafts:vi.fn(),review:vi.fn(),publish:vi.fn()}}));
+const draft:EducationalDraft={id:'draft-one',version:1,status:'DRAFT',reviewedAt:null,reviewedBy:null,reviewNote:null,content:{title:'Test case',specialty:'RADIOLOGY',scenario:'Synthetic',originalReport:'Draft',reportingIssue:'Issue',explanation:'Explanation',correction:'Correction',syntheticOnly:true}};
+beforeEach(()=>{vi.resetAllMocks();useAuthStore.setState({role:'DOCTOR'});vi.mocked(educationalCaseApi.drafts).mockResolvedValue([draft]);});
+afterEach(()=>{cleanup();useAuthStore.getState().clear();});
+it('requires explicit review note and confirmation and separates publication',async()=>{
+ const user=userEvent.setup();render(<MemoryRouter><EducationalCaseEditorPage/></MemoryRouter>);
+ await user.click(await screen.findByRole('button',{name:/Test case/}));
+ expect(screen.getByRole('button',{name:'Record clinical review'})).toBeDisabled();
+ await user.type(screen.getByLabelText('Clinical review note'),'Reviewed all content.');
+ await user.click(screen.getByRole('checkbox',{name:/I have reviewed the saved/}));
+ const reviewed={...draft,status:'REVIEWED' as const,reviewedAt:'2026-09-15T10:00:00Z'};
+ vi.mocked(educationalCaseApi.review).mockResolvedValue(reviewed);vi.mocked(educationalCaseApi.drafts).mockResolvedValue([reviewed]);
+ await user.click(screen.getByRole('button',{name:'Record clinical review'}));
+ expect(await screen.findByRole('button',{name:'Publish case'})).toBeDisabled();
+ expect(educationalCaseApi.publish).not.toHaveBeenCalled();
+ await user.type(screen.getByLabelText('Explanation'),' Changed');
+ await user.click(screen.getByRole('checkbox',{name:/Publish this reviewed/}));
+ expect(screen.getByRole('button',{name:'Publish case'})).toBeDisabled();
+});
+it('shows admins that a doctor must review the case',async()=>{
+ useAuthStore.setState({role:'HOSPITAL_ADMIN'});const user=userEvent.setup();render(<MemoryRouter><EducationalCaseEditorPage/></MemoryRouter>);
+ await user.click(await screen.findByRole('button',{name:/Test case/}));
+ expect(screen.getByText('A Doctor account at your centre must review this saved version.')).toBeInTheDocument();
+ expect(screen.queryByRole('button',{name:'Record clinical review'})).not.toBeInTheDocument();
+});

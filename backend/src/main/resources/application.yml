@@ -83,6 +83,10 @@ server:
   port: ${SERVER_PORT:8080}
 
 app:
+  pilot:
+    reviewer-user-ids: ${PILOT_REVIEWER_USER_IDS:}
+  integrations:
+    allowed-origins: ${PACS_ALLOWED_ORIGINS:}
   knowledge:
     # Stamped on every chunk so a model change is detectable instead of silently mixing
     # incompatible vector spaces in one index.

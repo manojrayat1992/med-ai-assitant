@@ -7,11 +7,14 @@ export type QaIssueType =
   | 'COMPARISON_GAP'
   | 'MISSING_MEASUREMENT'
   | 'RECOMMENDATION_REVIEW'
-  | 'DOCUMENTATION_NOTE';
+  | 'DOCUMENTATION_NOTE'
+  | 'UNREPORTED_IMAGE_FINDING'
+  | 'MEASUREMENT_DISCREPANCY'
+  | 'IMAGE_TEXT_LOCATION_MISMATCH';
 export type QaStatus = 'NO_ISSUES' | 'REVIEW_RECOMMENDED';
 export type QaRequestStatus = 'IDLE' | 'LOADING' | 'SUCCESS' | 'ERROR';
 export type AnatomySide = 'LEFT' | 'RIGHT' | 'MIDLINE' | 'BILATERAL' | 'UNSPECIFIED';
-export type ClinicalContextTab = 'clinical-workspace' | 'prior-studies' | 'timeline' | 'audit';
+export type ClinicalContextTab = 'clinical-workspace' | 'prior-studies' | 'timeline' | 'audit' | 'incidental-tracker';
 export type FindingChangeType =
   | 'NEW'
   | 'RESOLVED'
@@ -156,6 +159,7 @@ export interface ReportQaEvidence {
 }
 
 export interface ReportQaResult {
+  runId?: string | null;
   reportId: string;
   status: QaStatus;
   issues: ReportQaIssue[];

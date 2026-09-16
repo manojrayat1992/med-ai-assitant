@@ -1,11 +1,14 @@
 import { useEffect, useMemo, useState } from 'react';
 import { AlertTriangle, Loader2 } from 'lucide-react';
-import { useParams, useSearchParams } from 'react-router-dom';
+import { Link, useParams, useSearchParams } from 'react-router-dom';
 import { AnatomyPreview } from '@/components/clinical-workspace/AnatomyPreview';
 import { ClinicalContextSidebar } from '@/components/clinical-workspace/ClinicalContextSidebar';
 import { ClinicalContextTabs } from '@/components/clinical-workspace/ClinicalContextTabs';
 import { ClinicalHeader } from '@/components/clinical-workspace/ClinicalHeader';
+import { QaUsefulnessRating } from '@/components/clinical-workspace/QaUsefulnessRating';
 import { QaPanel } from '@/components/clinical-workspace/QaPanel';
+import { ReportFeedbackPanel } from '@/components/clinical-workspace/ReportFeedbackPanel';
+import { useAuthStore } from '@/stores/authStore';
 import { ReportPanel } from '@/components/clinical-workspace/ReportPanel';
 import { StudyImagesPanel } from '@/components/clinical-workspace/StudyImagesPanel';
 import { WorkspaceActions } from '@/components/clinical-workspace/WorkspaceActions';
@@ -33,6 +36,7 @@ import type {
 } from '@/types/clinicalWorkspace';
 
 export function ClinicalWorkspacePage() {
+  const feedbackRole = useAuthStore(s => s.role);
   const params = useParams<{ reviewId?: string }>();
   const [searchParams] = useSearchParams();
   const reviewIdFromRoute = params.reviewId ?? searchParams.get('reviewId');
@@ -45,6 +49,7 @@ export function ClinicalWorkspacePage() {
   const [reportStatus, setReportStatus] = useState<ClinicalReportStatus>(
     demoClinicalWorkspace.study.reportStatus
   );
+  const [qaRunId, setQaRunId] = useState<string | null>(null);
   const [qaIssues, setQaIssues] = useState<QaIssue[]>(demoClinicalWorkspace.qaIssues);
   const [qaRequestStatus, setQaRequestStatus] = useState<QaRequestStatus>('SUCCESS');
   const [qaError, setQaError] = useState<string | null>(null);
@@ -59,6 +64,7 @@ export function ClinicalWorkspacePage() {
   const [actionNotice, setActionNotice] = useState<string | null>(null);
 
   useEffect(() => {
+    setQaRunId(null);
     setActionNotice(null);
     setDismissedIssueIds([]);
     setQaError(null);
@@ -211,6 +217,7 @@ export function ClinicalWorkspacePage() {
   }
 
   async function runQa() {
+    setQaRunId(null);
     setDismissedIssueIds([]);
 
     if (!reviewId) {
@@ -231,6 +238,7 @@ export function ClinicalWorkspacePage() {
     try {
       const narrative = sectionsToNarrative(currentReport.sections);
       const result = await reportQaApi.runReportQa(reviewId, narrative);
+      setQaRunId(result.runId ?? null);
       const mappedIssues = result.issues.map(mapReportQaIssue);
       const defaultIssue = mappedIssues[0] ?? null;
       setQaIssues(mappedIssues);
@@ -265,6 +273,24 @@ export function ClinicalWorkspacePage() {
 
   function addClinicalNote() {
     setActionNotice('Clinical notes are not available yet for this workspace.');
+  }
+
+  function handleInsertComparisonText(text: string) {
+    const updatedSections = currentReport.sections.map((sec) => {
+      if (sec.id === 'comparison') {
+        const cleanBody = sec.body.filter(
+          (b) => b !== 'Not recorded in this review.' && b !== 'No comparison study available.'
+        );
+        return {
+          ...sec,
+          body: [...cleanBody, text],
+        };
+      }
+      return sec;
+    });
+
+    void handleSaveReport(updatedSections);
+    setActionNotice(`Comparison delta inserted into draft report: "${text.slice(0, 55)}..."`);
   }
 
   return (
@@ -307,6 +333,21 @@ export function ClinicalWorkspacePage() {
         runQaDisabled={Boolean(reviewId && (reviewLoading || reviewError))}
       />
 
+      {reviewId && review && !reviewLoading && !reviewError && ['DOCTOR','HOSPITAL_ADMIN'].includes(feedbackRole || '') ? (
+        <ReportFeedbackPanel key={reviewId} reportId={reviewId} selectedIssue={selectedIssue} />
+      ) : (
+        <section aria-label="Report feedback" className="rounded-xl border border-slate-700 bg-slate-900 p-4">
+          <h2 className="font-semibold text-slate-100">Clinician feedback</h2>
+          <p className="mt-2 text-sm text-slate-300">
+            {!reviewId ? 'You are viewing a demo case. Open a saved report to submit feedback linked to that report.'
+              : reviewLoading ? 'Feedback will be available after the report loads.'
+              : reviewError || !review ? 'The report could not be loaded. Open a saved report from the Worklist to submit feedback.'
+              : 'A Doctor or Hospital Admin account is required to submit clinician feedback.'}
+          </p>
+          {(!reviewId || reviewError) && <Link className="mt-3 inline-block text-sm font-semibold text-cyan-300 underline" to="/worklist">Open Worklist to choose a saved report →</Link>}
+        </section>
+      )}
+
       {/*
         Both views stay mounted and are toggled with `hidden` rather than conditionally rendered, so
         switching tabs never discards in-progress state elsewhere on the page — e.g. a longitudinal
@@ -314,18 +355,22 @@ export function ClinicalWorkspacePage() {
       */}
       <div className={activeContextTab === 'clinical-workspace' ? undefined : 'hidden'}>
         <div className="grid gap-5 xl:grid-cols-[minmax(0,0.65fr)_minmax(36rem,1.9fr)_minmax(20rem,0.8fr)]">
+          <div>
           <ReportPanel
             report={currentReport}
             selectedIssue={selectedIssue}
             onSaveReport={handleSaveReport}
             saving={savingDraft}
           />
+          </div>
           <AnatomyPreview
             selection={selectedAnatomy}
             linkedIssueType={selectedAnatomy && isQaAnatomySelection && selectedIssue?.anatomySelection ? selectedIssue.type : null}
             conflictNote={selectedAnatomy && isQaAnatomySelection ? anatomyConflictNote(selectedIssue) : null}
             patientId={contextPatientId}
           />
+          <div>
+          {qaRunId && selectedIssue && ['DOCTOR','HOSPITAL_ADMIN'].includes(feedbackRole || '') && <QaUsefulnessRating key={`${qaRunId}:${selectedIssue.id}`} runId={qaRunId} issue={selectedIssue} />}
           <QaPanel
             issues={qaIssues}
             dismissedIssueIds={dismissedIssueIds}
@@ -337,6 +382,7 @@ export function ClinicalWorkspacePage() {
             onDismissIssue={dismissIssue}
             onViewAnatomy={viewAnatomy}
           />
+          </div>
         </div>
 
         <div className="mt-5 grid gap-5 lg:grid-cols-[minmax(0,1fr)_20rem]">
@@ -357,6 +403,11 @@ export function ClinicalWorkspacePage() {
           audit={demoClinicalWorkspace.audit}
           isDemoMode={isDemoMode}
           currentReview={review}
+          currentReportText={sectionsToNarrative(currentReport.sections)}
+          patientId={contextPatientId ?? undefined}
+          patientName={currentStudy.patient.fullName}
+          mrn={currentStudy.patient.medicalRecordNumber}
+          onInsertComparisonText={handleInsertComparisonText}
           onViewAnatomy={viewLongitudinalAnatomy}
         />
       </div>
