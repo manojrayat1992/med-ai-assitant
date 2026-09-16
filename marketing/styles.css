@@ -713,3 +713,36 @@ p { margin: 0; }
   .timeline-item { grid-template-columns: 1fr; gap: 8px; }
   .status-table { display: block; overflow-x: auto; }
 }
+
+/* Feature overview on demo.html; scoped to preserve the other marketing pages. */
+.demo-page .demo-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 24px; }
+.demo-page .demo-access-note { margin-top: 18px; font-size: 14px; font-weight: 600; }
+.demo-page .demo-overview { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 42px; align-items: start; }
+.demo-page .demo-copy { display: grid; gap: 16px; }
+.demo-page .demo-copy h2, .demo-page .demo-section-heading h2, .demo-page .demo-next-step h2 { font-size: clamp(28px, 3vw, 40px); }
+.demo-page .demo-workflow { display: grid; gap: 14px; padding-left: 22px; color: var(--ink-2); }
+.demo-page .demo-limit { font-size: 13px; line-height: 1.65; color: var(--muted); }
+.demo-page .demo-badge { display: inline-block; font-size: 11px; font-weight: 800; letter-spacing: .07em; color: var(--brand); }
+.demo-page .demo-example { padding: 28px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--white); box-shadow: var(--shadow-soft); }
+.demo-page .demo-example h3 { margin: 14px 0 22px; font-size: 23px; }
+.demo-page .demo-example-source, .demo-page .demo-example-issue, .demo-page .demo-example-correction { margin-top: 14px; border-left: 3px solid var(--brand); padding: 16px; background: var(--paper-2); }
+.demo-page .demo-example-issue { border-color: #b45309; background: #fffbeb; }
+.demo-page .demo-example-correction { border-color: #047857; background: #ecfdf5; }
+.demo-page .demo-example span:not(.demo-badge) { display: block; margin-bottom: 8px; font-size: 12px; font-weight: 800; text-transform: uppercase; }
+.demo-page .demo-example p { font-size: 14px; line-height: 1.65; }
+.demo-page .demo-example-note { margin-top: 18px; color: var(--muted); }
+.demo-page .demo-feature-section { background: var(--paper-2); }
+.demo-page .demo-section-heading { max-width: 760px; display: grid; gap: 14px; margin-bottom: 30px; }
+.demo-page .demo-feature-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; }
+.demo-page .demo-feature-card { display: flex; flex-direction: column; gap: 16px; border: 1px solid var(--line); border-radius: var(--radius); padding: 28px; background: var(--white); }
+.demo-page .demo-feature-card h3 { font-size: 25px; }
+.demo-page .demo-feature-card ul { padding-left: 20px; display: grid; gap: 8px; color: var(--ink-2); }
+.demo-page .demo-feature-card .button { align-self: flex-start; margin-top: auto; }
+.demo-page .demo-location { font-size: 12px; font-weight: 700; color: var(--muted); }
+.demo-page .demo-next-step { padding-top: 10px; padding-bottom: 10px; }
+.demo-page .demo-next-step p { max-width: 720px; margin-top: 16px; }
+.demo-page a:focus-visible, .demo-page button:focus-visible { outline: 3px solid var(--brand); outline-offset: 4px; }
+@media (max-width: 760px) {
+  .demo-page .demo-overview, .demo-page .demo-feature-grid { grid-template-columns: minmax(0, 1fr); }
+  .demo-page .demo-example, .demo-page .demo-feature-card { padding: 22px; }
+}

@@ -4,66 +4,120 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Interactive Demo | Med-AI Clinical</title>
-  <meta name="description" content="Walk through the Med-AI Clinical supervised radiology report QA workflow using synthetic demo screenshots.">
+  <meta name="description" content="Walk through the Med-AI Clinical supervised radiology report QA workflow with synthetic cases, clinician feedback, educational cases and measured pilot results.">
   <link rel="canonical" href="https://medaiclinical.com/demo.html">
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
   <link rel="manifest" href="/site.webmanifest">
   <link rel="stylesheet" href="/styles.css">
 </head>
-<body>
+<body class="demo-page">
   <header class="site-header">
     <div class="wrap">
       <div class="nav-inner">
         <a class="brand" href="/"><span class="brand-mark" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 2v20M7 6.5h10M6 12h12M7 17.5h10"/></svg></span><span class="brand-name"><strong>Med-AI Clinical</strong><span>Report QA Platform</span></span></a>
         <nav class="nav-links" aria-label="Primary navigation"><a href="/">Home</a><a href="/product.html">Product</a><a href="/demo.html" aria-current="page">Demo</a><a href="/screenshots.html">Screens</a><a href="/security.html">Security</a><a href="/validation.html">Validation</a><a href="/pricing.html">Pricing</a></nav>
-        <div class="nav-actions"><a class="button button-secondary" href="/demo.html">Try demo</a><a class="button button-primary" href="/contact.html">Request pilot</a></div>
+        <div class="nav-actions"><a class="button button-secondary" href="https://app.medaiclinical.com/demo">Try demo</a><a class="button button-primary" href="https://app.medaiclinical.com/pilot">Apply for a pilot</a></div>
         <button class="menu-toggle" type="button" aria-label="Open navigation" aria-expanded="false" data-menu-button><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
       </div>
-      <nav class="mobile-panel" aria-label="Mobile navigation"><a href="/">Home</a><a href="/product.html">Product</a><a href="/demo.html" aria-current="page">Demo</a><a href="/screenshots.html">Screens</a><a href="/security.html">Security</a><a href="/validation.html">Validation</a><a href="/pricing.html">Pricing</a><a href="/contact.html">Request pilot</a></nav>
+      <nav class="mobile-panel" aria-label="Mobile navigation"><a href="/">Home</a><a href="/product.html">Product</a><a href="/demo.html" aria-current="page">Demo</a><a href="/screenshots.html">Screens</a><a href="/security.html">Security</a><a href="/validation.html">Validation</a><a href="/pricing.html">Pricing</a><a href="https://app.medaiclinical.com/pilot">Apply for a pilot</a></nav>
     </div>
   </header>
 
   <main>
     <section class="page-hero">
       <div class="wrap">
-        <span class="section-kicker">Interactive demo</span>
-        <h1>Walk through the report QA workflow.</h1>
-        <p>Use this Product Hunt-ready demo to show the complete supervised flow: dashboard, clinical review, worklist governance, pilot analytics, and integration planning.</p>
+        <span class="section-kicker">Explore Med-AI Clinical</span>
+        <h1>Try the review. See what a pilot can measure.</h1>
+        <p>Edit a synthetic report, inspect its discrepancies, and explore a workflow that keeps clinicians responsible for the final report.</p>
+        <div class="demo-actions">
+          <a class="button button-primary" href="https://app.medaiclinical.com/demo">Try the interactive demo</a>
+          <a class="button button-secondary" href="https://app.medaiclinical.com/pilot">Apply for a centre pilot</a>
+        </div>
+        <p class="demo-access-note">Public demo · No sign-in · Synthetic radiology and laboratory cases · No patient uploads</p>
+      </div>
+    </section>
+
+    <section class="section" aria-labelledby="try-title">
+      <div class="wrap demo-overview">
+        <div class="demo-copy">
+          <span class="section-kicker">01 / Interactive clinical demo</span>
+          <h2 id="try-title">Find the discrepancy. Make the correction.</h2>
+          <p>Choose a radiology or laboratory case, compare the supplied observations with the draft, then edit FINDINGS, COMPARISON and IMPRESSION.</p>
+          <ol class="demo-workflow">
+            <li><strong>Read the synthetic source.</strong> Each teaching draft intentionally contains a reporting issue.</li>
+            <li><strong>Run demo QA.</strong> Inspect the case-specific consistency checks and their explanations.</li>
+            <li><strong>Edit and rerun.</strong> Check your revision, view an example, or reset the exercise.</li>
+            <li><strong>Share the case.</strong> Each visitor starts with the original draft; your edits are not included in the link.</li>
+          </ol>
+          <div class="demo-actions">
+            <a class="button button-primary" href="https://app.medaiclinical.com/demo?case=radiology">Try radiology</a>
+            <a class="button button-secondary" href="https://app.medaiclinical.com/demo?case=laboratory">Try laboratory</a>
+          </div>
+          <p class="demo-limit">The public demo uses local teaching rules, not an AI model or the production QA engine. Edits stay in page memory. Passing these checks is not clinical clearance.</p>
+        </div>
+        <aside class="demo-example" aria-label="Illustrative synthetic teaching example">
+          <span class="demo-badge">SYNTHETIC TEACHING EXAMPLE</span>
+          <h3>One observation. Two conflicting statements.</h3>
+          <div class="demo-example-source"><span>Supplied observation</span><p>Small <strong>right</strong> pleural effusion.</p></div>
+          <div class="demo-example-issue"><span>Draft with intentional errors</span><p><strong>Findings:</strong> Small left pleural effusion.</p><p><strong>Impression:</strong> No pleural effusion.</p></div>
+          <div class="demo-example-correction"><span>Illustrative correction</span><p><strong>Findings:</strong> Small right pleural effusion.</p><p><strong>Impression:</strong> Small right pleural effusion.</p></div>
+          <p class="demo-example-note">The revision aligns the side and impression with the supplied fictional observation. This illustration is not a published clinician-reviewed case.</p>
+        </aside>
+      </div>
+    </section>
+
+    <section class="section demo-feature-section" aria-labelledby="workflow-title">
+      <div class="wrap">
+        <div class="demo-section-heading"><span class="section-kicker">From exploration to evaluation</span><h2 id="workflow-title">Four ways to learn from real workflow needs.</h2><p>Public experiences help teams explore. Signed-in tools capture clinician feedback and centre-level pilot evidence.</p></div>
+        <div class="demo-feature-grid">
+          <article class="demo-feature-card">
+            <span class="demo-badge">02 / SIGNED-IN WORKSPACE</span>
+            <h3>Feedback inside the report workspace</h3>
+            <p>Flag a wrong suggestion, explain what was missed, and submit a proposed correction linked to a saved report.</p>
+            <ul><li>Use the selected QA suggestion as context.</li><li>Review saved feedback with its clinician, timestamp and report snapshot.</li><li>Keep feedback separate from clinical editing and sign-off.</li></ul>
+            <p class="demo-limit">Available to Doctor and Hospital Admin accounts. Feedback does not automatically change a report or train a model.</p>
+            <a class="button button-secondary" href="https://app.medaiclinical.com/login">Sign in to your workspace</a>
+            <p class="demo-location">Worklist → saved report → Clinician feedback</p>
+          </article>
+          <article class="demo-feature-card">
+            <span class="demo-badge">03 / PUBLIC APPLICATION</span>
+            <h3>A pilot built around your centre</h3>
+            <p>Tell us which reporting software you use, your monthly report volume, team size and main workflow problem.</p>
+            <ul><li>Describe the integrations your team needs.</li><li>Include a contact person and consent for pilot follow-up.</li><li>Receive an application reference after submission is saved.</li></ul>
+            <p class="demo-limit">No account or patient reports required. An application is a request for assessment, not confirmation of pilot enrolment.</p>
+            <a class="button button-primary" href="https://app.medaiclinical.com/pilot">Submit a pilot application</a>
+          </article>
+          <article class="demo-feature-card">
+            <span class="demo-badge">04 / PUBLIC CASE LIBRARY</span>
+            <h3>Educational cases worth discussing</h3>
+            <p>Read a synthetic reporting issue alongside its explanation and a correction reviewed by a clinician in Med-AI.</p>
+            <ul><li>See the original issue and correction together.</li><li>Check the recorded review and publication dates.</li><li>Copy a read-only case link for community discussions.</li></ul>
+            <p class="demo-limit">Only explicitly published cases appear. Draft examples require Doctor review before publication; the library may be empty until cases are approved and published.</p>
+            <a class="button button-secondary" href="https://app.medaiclinical.com/cases">Browse educational cases</a>
+            <p class="demo-location">For authors: workspace sidebar → Educational cases</p>
+          </article>
+          <article class="demo-feature-card">
+            <span class="demo-badge">05 / SIGNED-IN PILOT RESULTS</span>
+            <h3>Evidence with visible denominators</h3>
+            <p>Assess recorded centre activity over a selected UTC date window, with sample sizes and definitions alongside the results.</p>
+            <ul><li>Useful / not-useful QA ratings and rating coverage.</li><li>Saved editing revisions and explicit EDITED sign-offs.</li><li>Median and 90th-percentile creation-to-signature time.</li><li>Active staff adoption and aggregate JSON export.</li></ul>
+            <p class="demo-limit">Turnaround includes waiting time; revisions are an effort proxy. Missing data is marked “Not measured.” No baseline means no claim of time savings or clinical accuracy.</p>
+            <a class="button button-secondary" href="https://app.medaiclinical.com/login">Sign in to view pilot results</a>
+            <p class="demo-location">Workspace sidebar → Pilot results</p>
+          </article>
+        </div>
       </div>
     </section>
 
     <section class="section">
-      <div class="wrap demo-shell" data-demo>
-        <aside class="demo-steps" aria-label="Demo steps">
-          <button class="demo-step is-active" type="button" data-demo-step="0"><span>01</span><strong>Open dashboard</strong><small>Start with operational status and review entry points.</small></button>
-          <button class="demo-step" type="button" data-demo-step="1"><span>02</span><strong>Review report</strong><small>Inspect AI flags, evidence, anatomy context, and sign-off state.</small></button>
-          <button class="demo-step" type="button" data-demo-step="2"><span>03</span><strong>Govern worklist</strong><small>Move pending, critical, and signed reports through review.</small></button>
-          <button class="demo-step" type="button" data-demo-step="3"><span>04</span><strong>Measure pilot</strong><small>Track acceptance, correction, rejection, and escalation patterns.</small></button>
-          <button class="demo-step" type="button" data-demo-step="4"><span>05</span><strong>Plan rollout</strong><small>Keep PACS, RIS, reporting, and SSO status explicit.</small></button>
-        </aside>
-
-        <div class="demo-stage">
-          <div class="demo-toolbar">
-            <div>
-              <span class="section-kicker" data-demo-kicker>Step 01 / Operations</span>
-              <h2 data-demo-title>Start from a clear clinical dashboard.</h2>
-            </div>
-            <a class="button button-primary" href="/contact.html">Request pilot</a>
-          </div>
-          <figure class="demo-figure">
-            <img src="/screenshots/app-dashboard.png" alt="Med-AI Clinical dashboard screenshot" data-demo-image>
-            <figcaption data-demo-caption>Teams see volume, analysis status, QA access, and platform health before entering review work.</figcaption>
-          </figure>
-          <div class="demo-points" aria-label="Demo explanation">
-            <p data-demo-point-one>Buyer message: this is workflow infrastructure, not an autonomous diagnosis product.</p>
-            <p data-demo-point-two>Next action: choose a case queue and review before sign-off.</p>
-          </div>
-        </div>
+      <div class="wrap demo-next-step">
+        <div><span class="section-kicker">Start with your workflow</span><h2>What would make reporting better for your team?</h2><p>Try a synthetic case first, then tell us where your centre needs help. Keep patient information out of demos and pilot applications.</p></div>
+        <div class="demo-actions"><a class="button button-primary" href="https://app.medaiclinical.com/pilot">Apply for a pilot</a><a class="button button-secondary" href="/validation.html">Read the validation approach</a></div>
       </div>
     </section>
   </main>
 
-  <footer class="footer"><div class="wrap"><div class="footer-bottom"><small>&copy; <span id="year">2026</span> Med-AI Clinical.</small><small class="legal">Interactive demo uses synthetic/demo screenshots. No patient records are shown.</small></div></div></footer>
+  <footer class="footer"><div class="wrap"><div class="footer-bottom"><small>&copy; <span id="year">2026</span> Med-AI Clinical.</small><small class="legal">Synthetic examples for education. Clinicians review and sign clinical reports.</small></div></div></footer>
   <script src="/app.js" defer></script>
 </body>
 </html>
