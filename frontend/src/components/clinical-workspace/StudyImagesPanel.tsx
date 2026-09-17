@@ -50,7 +50,7 @@ export function StudyImagesPanel({ patientId }: StudyImagesPanelProps) {
     };
   }, [patientId]);
 
-  const imageFiles = files.filter((file) => IMAGE_FILE_TYPES.has(file.fileType));
+  const imageFiles = files.filter((file) => IMAGE_FILE_TYPES.has(file.fileType) && !file.mimeType?.startsWith('text/'));
 
   return (
     <Card className="min-w-0">
@@ -97,7 +97,7 @@ export function StudyImagesPanel({ patientId }: StudyImagesPanelProps) {
             ))}
 
             <Link
-              to="/upload"
+              to={patientId ? `/patients/${patientId}/upload` : "/patients"}
               className="flex h-20 w-28 shrink-0 flex-col items-center justify-center gap-1 rounded-lg border border-dashed text-slate-500 transition-colors hover:border-blue-500/50 hover:text-blue-300"
               style={{ borderColor: 'var(--clr-border-2, #243250)' }}
             >

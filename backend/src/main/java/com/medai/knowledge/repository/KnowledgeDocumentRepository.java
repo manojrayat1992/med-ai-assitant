@@ -13,6 +13,8 @@ import java.util.UUID;
 @Repository
 public interface KnowledgeDocumentRepository extends JpaRepository<KnowledgeDocument, UUID> {
 
+    boolean existsByTenantIdAndStatus(UUID tenantId, com.medai.knowledge.entity.DocumentStatus status);
+
     Page<KnowledgeDocument> findByTenantIdOrderByCreatedAtDesc(UUID tenantId, Pageable pageable);
 
     Page<KnowledgeDocument> findByTenantIdAndDocumentTypeOrderByCreatedAtDesc(

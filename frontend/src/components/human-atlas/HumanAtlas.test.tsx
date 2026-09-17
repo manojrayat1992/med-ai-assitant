@@ -1,0 +1,31 @@
+import { act, cleanup, render, screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { afterEach, expect, it, vi } from 'vitest';
+import { HumanAtlasLauncher } from './HumanAtlas';
+import api from '@/services/api';
+import type { AnatomySelection } from '@/types/clinicalWorkspace';
+vi.mock('@/services/api',()=>({default:{get:vi.fn().mockResolvedValue({data:{data:[]}})}}));
+afterEach(()=>{cleanup();vi.clearAllMocks();});
+it('loads only on demand and restores focus on close',async()=>{
+ const user=userEvent.setup();render(<HumanAtlasLauncher reviewId="review-123"/>);
+ expect(api.get).not.toHaveBeenCalled();expect(screen.queryByTitle('Human Atlas anatomy explorer')).toBeNull();
+ const trigger=screen.getByRole('button',{name:'Open 3D Atlas'});await user.click(trigger);
+ expect(screen.getByRole('dialog')).toBeInTheDocument();expect(api.get).toHaveBeenCalledWith('/reports/review-123/anatomy-findings');
+ await user.click(screen.getByRole('button',{name:'Close 3D Atlas'}));
+ expect(screen.queryByRole('dialog')).toBeNull();expect(trigger).toHaveFocus();
+});
+it('rejects foreign messages and sends only anatomy identifiers to its own frame',async()=>{
+ const user=userEvent.setup();const selection={structure:'LUNG',side:'RIGHT',region:'LOWER',displayName:'Right lung',sourceText:'PRIVATE REPORT TEXT'} as AnatomySelection;
+ render(<HumanAtlasLauncher selection={selection}/>);await user.click(screen.getByRole('button',{name:'Open 3D Atlas'}));
+ const frame=screen.getByTitle('Human Atlas anatomy explorer') as HTMLIFrameElement;
+ const post=vi.spyOn(frame.contentWindow!,'postMessage');
+ const ready={channel:'medai-human-atlas',version:1,type:'ready'};
+ act(()=>window.dispatchEvent(new MessageEvent('message',{origin:'https://untrusted.example',source:frame.contentWindow,data:ready})));
+ expect(post).not.toHaveBeenCalled();
+ act(()=>window.dispatchEvent(new MessageEvent('message',{origin:window.location.origin,source:frame.contentWindow,data:ready})));
+ await waitFor(()=>expect(post).toHaveBeenCalled());
+ const payload=post.mock.calls[0][0];expect(payload.target).toEqual({structure:'LUNG',side:'RIGHT',region:'LOWER'});
+ expect(JSON.stringify(payload)).not.toContain('PRIVATE');
+ act(()=>window.dispatchEvent(new MessageEvent('message',{origin:window.location.origin,source:frame.contentWindow,data:{...ready,type:'selection',requestId:payload.requestId,mapped:false}})));
+ expect(screen.getByRole('status')).toHaveTextContent('No exact atlas mapping');
+});

@@ -5,7 +5,7 @@ import { useAuthStore } from '@/stores/authStore';
 import { logout } from '@/services/api';
 import {
   LayoutDashboard, Users, Settings, LogOut,
-  Brain, FileText, Zap, Upload,
+  Brain, FileText, Zap, BookOpen,
   Shield, Cpu, ClipboardCheck, Scan, BarChart2
 } from 'lucide-react';
 import { cn } from '@/utils/cn';
@@ -33,7 +33,6 @@ const navGroups: NavGroup[] = [
     items: [
       { to: '/reports/new', label: 'New Report', icon: FileText },
       { to: '/worklist', label: 'Worklist', icon: ClipboardCheck },
-      { to: '/upload', label: 'Upload Studies', icon: Upload },
       { to: '/clinical-workspace', label: 'Clinical Workspace', icon: FileText },
       { to: '/patients', label: 'Patients', icon: Users },
     ],
@@ -50,6 +49,7 @@ const navGroups: NavGroup[] = [
   {
     label: 'Admin',
     items: [
+      { to: '/upload', label: 'Knowledge Base', icon: BookOpen },
       { to: '/integrations', label: 'Integrations', icon: Cpu },
       { to: '/compliance', label: 'Compliance', icon: Shield },
       { to: '/settings', label: 'Settings', icon: Settings },
@@ -118,7 +118,7 @@ export function Sidebar() {
           <div key={group.label ?? 'primary'}>
             {group.label && <p className="section-label mb-2">{group.label}</p>}
             <div className="space-y-0.5">
-              {group.items.map((item) => (
+              {group.items.filter(item => item.to !== '/upload' || role === 'HOSPITAL_ADMIN').map((item) => (
                 <NavLink
                   key={item.to}
                   to={item.to}

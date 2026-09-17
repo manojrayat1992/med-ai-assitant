@@ -28,13 +28,23 @@
 	# connect-src 'self' is correct on every tenant host because the SPA calls a relative /api,
 	# so the API is always same-origin with the page that called it.
 	header {
-		Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; form-action 'self'; base-uri 'self'; object-src 'none'"
 		Strict-Transport-Security "max-age=63072000; includeSubDomains"
 		X-Content-Type-Options "nosniff"
-		X-Frame-Options "DENY"
 		Referrer-Policy "no-referrer"
 		Permissions-Policy "camera=(), microphone=(), geolocation=(), payment=(), usb=()"
 		-Server
+	}
+
+	# Only the locally hosted anatomy viewer can be framed by its own workspace.
+	@atlas path /human-atlas/*
+	@notAtlas not path /human-atlas/*
+	header @notAtlas {
+		Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; form-action 'self'; base-uri 'self'; object-src 'none'"
+		X-Frame-Options "DENY"
+	}
+	header @atlas {
+		Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self'; frame-ancestors 'self'; form-action 'self'; base-uri 'self'; object-src 'none'"
+		X-Frame-Options "SAMEORIGIN"
 	}
 
 	# API, FHIR facade and health, all to the backend. /fhir is routed explicitly because an EHR

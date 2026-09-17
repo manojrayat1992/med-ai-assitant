@@ -1,7 +1,7 @@
 import { Outlet, Navigate, Link, NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '@/stores/authStore';
 import { Sidebar } from './Sidebar';
-import { Shield, Clock, Search, X, Brain, LogOut, Upload as UploadIcon, ClipboardCheck, Users, ChevronDown } from 'lucide-react';
+import { Shield, Clock, Search, X, Brain, LogOut, ClipboardCheck, Users, ChevronDown } from 'lucide-react';
 import { useState, useEffect, useRef } from 'react';
 import { NotificationCenter } from '@/components/notification/NotificationCenter';
 import { patientService } from '@/services/patientService';
@@ -17,7 +17,6 @@ import type { Patient } from '@/types';
 const FULL_WIDTH_SEGMENTS = new Set(['clinical-workspace']);
 
 const topNavLinks = [
-  { to: '/upload', label: 'Upload', icon: UploadIcon },
   { to: '/worklist', label: 'Worklist', icon: ClipboardCheck },
   { to: '/patients', label: 'Patients', icon: Users },
 ];
@@ -30,11 +29,11 @@ const pageMeta: Record<string, { title: string; sub: string }> = {
   'qa-analytics': { title: 'QA Analytics',             sub: 'Quality assurance metrics for imaging operations' },
   anatomy:      { title: 'Anatomy',                    sub: 'Finding-to-anatomy visualization workspace' },
   integrations: { title: 'Integrations',               sub: 'PACS, RIS, reporting, and identity connections' },
-  upload:       { title: 'Upload Studies',             sub: 'Diagnostic file ingestion' },
+  upload:       { title: 'Knowledge Base',             sub: 'Workspace protocols, guardrails and reference studies' },
   workflows:    { title: 'Clinical Agent & LangGraph4j Workflows', sub: 'Autonomous multi-step actions & HITL approval' },
   analysis:     { title: 'AI Radiology & PACS',        sub: 'Multimodal image analysis' },
   'blood-reports': { title: 'Blood & Lab Reports',     sub: 'Laboratory analytics' },
-  knowledge:    { title: 'Hospital Protocols',         sub: 'RAG knowledge base' },
+  knowledge:    { title: 'Knowledge Base',         sub: 'Workspace reference documents' },
   chat:         { title: 'Clinical AI Chat',           sub: 'AI-assisted decision support' },
   compliance:   { title: 'Compliance & Consent',       sub: 'HIPAA Safe Harbor, GDPR consent & data retention' },
   finetuning:   { title: 'Fine-Tuning & Model Registry', sub: 'LoRA adapters, training pipelines & A/B testing' },
@@ -134,7 +133,9 @@ export function DashboardLayout() {
   if (!isAuthenticated) return <Navigate to="/login" replace />;
 
   const segment = location.pathname.split('/').filter(Boolean)[0] || 'dashboard';
-  const meta = pageMeta[segment] || { title: 'Med-AI', sub: 'Clinical Intelligence Platform' };
+  const meta = /^\/patients\/[^/]+\/upload$/.test(location.pathname)
+    ? {title: 'Patient reports', sub: 'Upload files and prepare a report for clinical review'}
+    : pageMeta[segment] || { title: 'Med-AI', sub: 'Clinical Intelligence Platform' };
   const isFullWidth = FULL_WIDTH_SEGMENTS.has(segment);
 
   const initials = fullName

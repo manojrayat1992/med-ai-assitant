@@ -28,7 +28,8 @@ public interface DocumentChunkRepository extends JpaRepository<DocumentChunk, UU
                    1 - (c.embedding <=> cast(:queryVector as vector)) as similarityScore
             FROM document_chunks c
             JOIN knowledge_documents d ON c.document_id = d.id
-            WHERE c.tenant_id = :tenantId AND c.embedding IS NOT NULL
+            WHERE c.tenant_id = :tenantId AND d.tenant_id = :tenantId
+              AND d.status = 'READY' AND c.embedding IS NOT NULL
             ORDER BY c.embedding <=> cast(:queryVector as vector)
             LIMIT :topK
             """, nativeQuery = true)

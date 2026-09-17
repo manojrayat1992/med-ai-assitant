@@ -1,7 +1,7 @@
 import api from './api';
 import type { ApiResponse, PagedResponse } from '@/types';
 
-export type DocumentType = 'CLINICAL_PROTOCOL' | 'GUIDELINE' | 'DRUG_FORMULARY' | 'SOP' | 'JOURNAL';
+export type DocumentType = 'CLINICAL_PROTOCOL' | 'GUIDELINE' | 'DRUG_FORMULARY' | 'SOP' | 'JOURNAL' | 'GUARDRAIL' | 'REFERENCE_STUDY';
 export type DocumentStatus = 'PROCESSING' | 'READY' | 'FAILED';
 
 export interface KnowledgeDocument {

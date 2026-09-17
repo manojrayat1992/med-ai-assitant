@@ -61,6 +61,7 @@ public class ReportSignOffService {
     private final PatientRepository patientRepository;
     private final MedicalFileRepository medicalFileRepository;
     private final ReportSectionParser sectionParser;
+    private final com.medai.upload.service.StorageService storageService;
 
     /**
      * Opens a review for a completed analysis, freezing what the model produced.
@@ -181,15 +182,18 @@ public class ReportSignOffService {
         Map<String, Object> metadata = new HashMap<>();
         metadata.put("ingestMode", authored ? "AUTHORED_REPORT" : "PASTED_REPORT_TEXT");
 
+        String sourceName = "pasted-report-" + sourceId + ".txt";
+        String storagePath = storageService.store(tenantId, patient.getId(), sourceName,
+                new com.medai.upload.service.TextUpload(sourceName, reportText));
         MedicalFile source = MedicalFile.builder()
                 .patientId(patient.getId())
                 .uploadedBy(principal.userId())
                 .fileName("pasted-report-" + sourceId + ".txt")
                 .originalFileName(authored ? "Authored report" : "Pasted report text")
                 .fileType(modality)
-                .mimeType("text/plain")
+                .mimeType("text/plain; charset=UTF-8")
                 .fileSizeBytes((long) reportText.getBytes(StandardCharsets.UTF_8).length)
-                .storagePath("inline-report-text://" + sourceId)
+                .storagePath(storagePath)
                 .description(studyDescription)
                 .uploadStatus(UploadStatus.COMPLETED)
                 .metadata(metadata)

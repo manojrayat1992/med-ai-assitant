@@ -158,25 +158,9 @@ public class S3StorageService implements StorageService {
                     .key(key)
                     .build());
         } catch (NoSuchKeyException e) {
-            java.io.File localFile = new java.io.File(storagePath);
-            if (localFile.exists()) {
-                try {
-                    return new java.io.FileInputStream(localFile);
-                } catch (IOException ioException) {
-                    throw new StorageException("Failed to read local fallback file: " + storagePath, ioException);
-                }
-            }
-            throw new StorageException("File not found: " + storagePath, e);
+            throw new StorageException("File not found in S3: " + storagePath, e);
         } catch (SdkException e) {
-            java.io.File localFile = new java.io.File(storagePath);
-            if (localFile.exists()) {
-                try {
-                    return new java.io.FileInputStream(localFile);
-                } catch (IOException ioException) {
-                    throw new StorageException("Failed to read local fallback file: " + storagePath, ioException);
-                }
-            }
-            throw new StorageException("Failed to retrieve file: " + storagePath, e);
+            throw new StorageException("Failed to retrieve file from S3: " + storagePath, e);
         }
     }
 

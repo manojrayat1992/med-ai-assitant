@@ -84,8 +84,8 @@ export function QaIssueCard({ issue, isSelected, onReview, onDismiss, onViewAnat
           >
             <LocateFixed className="h-3.5 w-3.5" />
             {hasMultipleAnatomyTargets && candidate.sourceLabel
-              ? `View ${candidate.sourceLabel} Anatomy`
-              : 'View Anatomy'}
+              ? `Open ${candidate.sourceLabel} in 3D Atlas`
+              : 'Open in 3D Atlas'}
           </Button>
         ))}
       </div>

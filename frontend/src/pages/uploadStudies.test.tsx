@@ -25,6 +25,7 @@ vi.mock('@/services/api', () => ({
 vi.mock('@/services/patientService', () => ({
   patientService: {
     list: vi.fn(),
+    get: vi.fn(),
   },
 }));
 
@@ -102,7 +103,7 @@ describe('Upload Studies workflow', () => {
     useAuthStore.getState().clear();
   });
 
-  it('keeps Upload Studies in the Work sidebar order and points it at /upload', () => {
+  it('moves patient uploads out of the sidebar and hides admin knowledge management from doctors', () => {
     render(
       <MemoryRouter>
         <Sidebar />
@@ -111,14 +112,34 @@ describe('Upload Studies workflow', () => {
 
     const workItems = screen.getAllByRole('link').map((link) => link.textContent?.trim());
     expect(workItems.slice(workItems.indexOf('Worklist'), workItems.indexOf('Patients') + 1))
-      .toEqual(['Worklist', 'Upload Studies', 'Clinical Workspace', 'Patients']);
-    expect(screen.getByRole('link', { name: /Upload Studies/i })).toHaveAttribute('href', '/upload');
+      .toEqual(['Worklist', 'Clinical Workspace', 'Patients']);
+    expect(screen.queryByRole('link', { name: /Knowledge Base/i })).not.toBeInTheDocument();
+  });
+
+  it('loads and locks the patient selected from the registry, even outside the first page', async () => {
+    vi.mocked(patientService.get).mockResolvedValue(patient());
+    render(<MemoryRouter initialEntries={[`/patients/${PATIENT_ID}/upload`]}><Routes>
+      <Route path="/patients/:patientId/upload" element={<UploadPage />} />
+    </Routes></MemoryRouter>);
+    await waitFor(() => expect(screen.getByLabelText('Select Patient')).toHaveValue(PATIENT_ID));
+    expect(screen.getByLabelText('Select Patient')).toBeDisabled();
+    expect(patientService.get).toHaveBeenCalledWith(PATIENT_ID);
+    expect(patientService.list).not.toHaveBeenCalled();
+  });
+
+  it('does not enable uploading when the linked patient cannot be loaded', async () => {
+    vi.mocked(patientService.get).mockRejectedValue(new Error('Forbidden'));
+    render(<MemoryRouter initialEntries={[`/patients/${PATIENT_ID}/upload`]}><Routes>
+      <Route path="/patients/:patientId/upload" element={<UploadPage />} />
+    </Routes></MemoryRouter>);
+    expect(await screen.findByRole('alert')).toHaveTextContent('Unable to load this patient');
+    expect(screen.getByRole('button', {name: 'Upload File'})).toBeDisabled();
   });
 
   it('renders the existing /upload page with all supported clinical input types', async () => {
     renderUploadRoute();
 
-    expect(await screen.findByRole('heading', { name: 'Upload Studies' })).toBeInTheDocument();
+    expect(await screen.findByRole('heading', { name: 'Upload patient reports' })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /Single File/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /Batch Studies/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /Paste Report Text/i })).toBeInTheDocument();

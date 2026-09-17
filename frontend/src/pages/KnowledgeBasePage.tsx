@@ -1,3 +1,5 @@
+import { useAuthStore } from '@/stores/authStore';
+import { Link } from 'react-router-dom';
 import React, { useState, useEffect, useCallback } from 'react';
 import { useDropzone } from 'react-dropzone';
 import {
@@ -33,6 +35,8 @@ const DOC_TYPE_CONFIG: Record<DocumentType, { label: string; badge: string }> = 
   GUIDELINE: { label: 'Practice Guideline', badge: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' },
   DRUG_FORMULARY: { label: 'Drug Formulary', badge: 'bg-purple-500/10 text-purple-400 border-purple-500/20' },
   SOP: { label: 'Hospital SOP', badge: 'bg-amber-500/10 text-amber-400 border-amber-500/20' },
+  GUARDRAIL: { label: 'Guardrail', badge: 'bg-rose-500/10 text-rose-300 border-rose-500/20' },
+  REFERENCE_STUDY: { label: 'Reference Study', badge: 'bg-cyan-500/10 text-cyan-300 border-cyan-500/20' },
   JOURNAL: { label: 'Medical Journal', badge: 'bg-slate-500/10 text-slate-400 border-slate-500/20' },
 };
 
@@ -44,7 +48,13 @@ const SUGGESTED_QUERIES = [
 ];
 
 export function KnowledgeBasePage() {
-  const [activeTab, setActiveTab] = useState<'qa' | 'docs'>('qa');
+  const role = useAuthStore(state => state.role);
+  if (role !== 'HOSPITAL_ADMIN') return <div className="p-6 space-y-3"><h1 className="text-xl font-bold">Knowledge Base</h1><p>Workspace administrators manage reference documents here.</p><Link to="/patients" className="text-blue-300">Go to Patients to upload patient reports</Link></div>;
+  return <KnowledgeBaseManager />;
+}
+
+function KnowledgeBaseManager() {
+  const [activeTab, setActiveTab] = useState<'qa' | 'docs'>('docs');
 
   // Q&A State
   const [query, setQuery] = useState('');
@@ -56,6 +66,7 @@ export function KnowledgeBasePage() {
   // Documents State
   const [documents, setDocuments] = useState<KnowledgeDocument[]>([]);
   const [loadingDocs, setLoadingDocs] = useState(false);
+  const [documentError, setDocumentError] = useState<string | null>(null);
   const [selectedType, setSelectedType] = useState<DocumentType | 'ALL'>('ALL');
   const [searchFilter, setSearchFilter] = useState('');
 
@@ -71,12 +82,13 @@ export function KnowledgeBasePage() {
   // Load Documents
   const loadDocuments = useCallback(async () => {
     setLoadingDocs(true);
+    setDocumentError(null);
     try {
       const typeParam = selectedType === 'ALL' ? undefined : selectedType;
       const res = await knowledgeService.listDocuments(typeParam, 0, 100);
       setDocuments(res.content);
     } catch {
-      // silent
+      setDocumentError('Could not load workspace reference documents. Please retry.');
     } finally {
       setLoadingDocs(false);
     }
@@ -119,6 +131,8 @@ export function KnowledgeBasePage() {
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
     maxFiles: 1,
+    maxSize: 20 * 1024 * 1024,
+    onDropRejected: () => setUploadError("Use a PDF, TXT or Markdown file up to 20 MB."),
     accept: {
       'application/pdf': ['.pdf'],
       'text/plain': ['.txt'],
@@ -134,13 +148,18 @@ export function KnowledgeBasePage() {
     setUploadError('');
 
     try {
-      await knowledgeService.uploadDocument(
+      const uploaded = await knowledgeService.uploadDocument(
         uploadFile,
         docTitle || uploadFile.name,
         docType,
         docSource || undefined
       );
 
+      if (uploaded.status !== 'READY') {
+        setUploadError(uploaded.errorMessage || 'Document could not be indexed. It will not be used by AI.');
+        void loadDocuments();
+        return;
+      }
       setUploadFile(null);
       setDocTitle('');
       setDocSource('');
@@ -183,10 +202,10 @@ export function KnowledgeBasePage() {
           </div>
           <div>
             <h1 className="text-xl font-bold tracking-tight text-white sm:text-2xl">
-              Hospital Knowledge Base & Clinical RAG Engine
+              Knowledge Base
             </h1>
             <p className="text-xs text-slate-400">
-              Grounded AI clinical decision support indexed directly from hospital protocols & SOPs
+              Admin-managed protocols, guardrails, reference studies, guidelines, formularies and SOPs for this workspace.
             </p>
           </div>
         </div>
@@ -215,11 +234,16 @@ export function KnowledgeBasePage() {
             onClick={() => setActiveTab('docs')}
           >
             <Database className="h-4 w-4" />
-            Protocol Documents ({documents.length})
+            Reference Documents ({documents.length})
           </button>
         </div>
       </div>
 
+      <div className="rounded-xl border border-blue-500/20 bg-blue-500/5 p-4 text-sm text-slate-300">
+        Upload reference documents as searchable PDFs, TXT or Markdown (up to 20 MB). Relevant indexed passages are retrieved during AI report analysis and report QA. Guardrail documents provide reference guidance; they do not create hard-coded safety rules.
+        <Link to="/patients" className="block mt-2 text-blue-300 hover:underline">For patient reports, go to Patients → Upload reports.</Link>
+      </div>
+      {documentError && <div role="alert" className="text-red-300">{documentError} <button onClick={() => void loadDocuments()} className="underline">Retry</button></div>}
       {/* 2. TAB 1: AI Clinical Q&A Grounded Assistant */}
       {activeTab === 'qa' && (
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
@@ -456,8 +480,8 @@ export function KnowledgeBasePage() {
               </div>
 
               {/* Type Filter Pills */}
-              <div className="flex items-center gap-1 overflow-x-auto text-xs">
-                {(['ALL', 'CLINICAL_PROTOCOL', 'GUIDELINE', 'DRUG_FORMULARY', 'SOP'] as const).map((t) => (
+              <div className="flex flex-wrap items-center gap-1 text-xs">
+                {(['ALL', 'CLINICAL_PROTOCOL', 'GUIDELINE', 'DRUG_FORMULARY', 'SOP', 'GUARDRAIL', 'REFERENCE_STUDY', 'JOURNAL'] as const).map((t) => (
                   <button
                     key={t}
                     onClick={() => setSelectedType(t)}
@@ -478,18 +502,18 @@ export function KnowledgeBasePage() {
               onClick={() => setShowUploadModal(true)}
             >
               <Plus className="h-4 w-4 mr-1.5" />
-              Ingest New Protocol
+              Upload reference document
             </Button>
           </div>
 
           {/* Document Ingestion Modal */}
           {showUploadModal && (
             <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm">
-              <div className="w-full max-w-lg rounded-2xl border border-slate-800 bg-slate-950 p-6 shadow-2xl space-y-4">
+              <div role="dialog" aria-label="Upload reference document" className="w-full max-w-lg rounded-2xl border border-slate-800 bg-slate-950 p-6 shadow-2xl space-y-4">
                 <div className="flex items-center justify-between border-b border-slate-800 pb-3">
                   <div className="flex items-center gap-2">
                     <Upload className="h-5 w-5 text-blue-400" />
-                    <h3 className="text-base font-bold text-slate-100">Ingest Knowledge Document</h3>
+                    <h3 className="text-base font-bold text-slate-100">Upload reference document</h3>
                   </div>
                   <button
                     onClick={() => setShowUploadModal(false)}
@@ -500,7 +524,7 @@ export function KnowledgeBasePage() {
                 </div>
 
                 {uploadError && (
-                  <div className="rounded-lg border border-red-500/30 bg-red-950/30 p-3 text-xs text-red-300">
+                  <div role="alert" className="rounded-lg border border-red-500/30 bg-red-950/30 p-3 text-xs text-red-300">
                     {uploadError}
                   </div>
                 )}
@@ -515,23 +539,24 @@ export function KnowledgeBasePage() {
                         : 'border-slate-800 bg-slate-900/50 hover:border-slate-700'
                     }`}
                   >
-                    <input {...getInputProps()} />
+                    <input {...getInputProps()} aria-label="Reference file" />
                     <FileText className="h-8 w-8 text-blue-400 mb-2" />
                     {uploadFile ? (
                       <p className="font-semibold text-slate-200">{uploadFile.name}</p>
                     ) : (
                       <>
                         <p className="font-semibold text-slate-200">Drag & drop PDF, TXT, or MD file here</p>
-                        <p className="text-[11px] text-slate-500 mt-1">Hospital SOPs, Guidelines, Dosing charts</p>
+                        <p className="text-[11px] text-slate-500 mt-1">Protocols, guardrails, studies and guidelines · Up to 20 MB</p>
                       </>
                     )}
                   </div>
 
                   <div className="space-y-1">
-                    <Label className="text-slate-300">Document Title</Label>
+                    <Label htmlFor="reference-title" className="text-slate-300">Document Title</Label>
                     <input
                       type="text"
                       className="w-full rounded-lg border border-slate-800 bg-slate-900 p-2.5 text-xs text-slate-200 focus:border-blue-500 focus:outline-none"
+                      id="reference-title"
                       placeholder="e.g. Hospital Community-Acquired Pneumonia Protocol 2026"
                       value={docTitle}
                       onChange={(e) => setDocTitle(e.target.value)}
@@ -541,8 +566,9 @@ export function KnowledgeBasePage() {
 
                   <div className="grid grid-cols-2 gap-3">
                     <div className="space-y-1">
-                      <Label className="text-slate-300">Category</Label>
+                      <Label htmlFor="reference-category" className="text-slate-300">Category</Label>
                       <select
+                        id="reference-category"
                         className="w-full rounded-lg border border-slate-800 bg-slate-900 p-2.5 text-xs text-slate-200 focus:border-blue-500 focus:outline-none"
                         value={docType}
                         onChange={(e) => setDocType(e.target.value as DocumentType)}
@@ -552,14 +578,17 @@ export function KnowledgeBasePage() {
                         <option value="DRUG_FORMULARY">Drug Formulary</option>
                         <option value="SOP">Hospital SOP</option>
                         <option value="JOURNAL">Medical Journal</option>
+                        <option value="GUARDRAIL">Guardrail</option>
+                        <option value="REFERENCE_STUDY">Reference Study</option>
                       </select>
                     </div>
 
                     <div className="space-y-1">
-                      <Label className="text-slate-300">Source / Author</Label>
+                      <Label htmlFor="reference-source" className="text-slate-300">Source / Author</Label>
                       <input
                         type="text"
                         className="w-full rounded-lg border border-slate-800 bg-slate-900 p-2.5 text-xs text-slate-200 focus:border-blue-500 focus:outline-none"
+                        id="reference-source"
                         placeholder="e.g. Dept of Infectious Diseases"
                         value={docSource}
                         onChange={(e) => setDocSource(e.target.value)}
@@ -620,7 +649,7 @@ export function KnowledgeBasePage() {
                 ) : filteredDocs.length === 0 ? (
                   <tr>
                     <td colSpan={6} className="p-8 text-center text-slate-500">
-                      No documents found in knowledge base. Ingest hospital guidelines using the button above.
+                      No documents found in knowledge base. Upload reference documents using the button above.
                     </td>
                   </tr>
                 ) : (
@@ -631,6 +660,7 @@ export function KnowledgeBasePage() {
                       <tr key={doc.id} className="hover:bg-slate-900/40 transition-colors">
                         <td className="p-3.5">
                           <p className="font-semibold text-slate-200">{doc.title}</p>
+                          {doc.status === 'FAILED' && <p className="text-red-300">{doc.errorMessage || "Indexing failed. This document is excluded from AI retrieval."}</p>}
                           <p className="text-[10px] text-slate-500 font-mono">{doc.fileName} {doc.source && `\u2022 ${doc.source}`}</p>
                         </td>
                         <td className="p-3.5">

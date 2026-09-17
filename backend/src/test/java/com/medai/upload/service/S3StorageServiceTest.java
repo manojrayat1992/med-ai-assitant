@@ -51,6 +51,16 @@ class S3StorageServiceTest {
         verify(client).deleteObject(argThat((DeleteObjectRequest r) -> r.key().equals(key) && r.bucket().equals("test-bucket")));
         service.close(); verify(client).close();
     }
+    @Test void neverFallsBackToExistingLocalFile(@org.junit.jupiter.api.io.TempDir java.nio.file.Path temp) throws Exception {
+        var client = mock(S3Client.class);
+        var service = new S3StorageService(config(), client);
+        var local = temp.resolve("must-not-read.txt");
+        java.nio.file.Files.writeString(local, "local data must not be served");
+        when(client.getObject(any(GetObjectRequest.class))).thenThrow(NoSuchKeyException.builder().message("missing").build());
+        assertThrows(StorageException.class, () -> service.retrieve(local.toString()));
+        when(client.getObject(any(GetObjectRequest.class))).thenThrow(software.amazon.awssdk.core.exception.SdkClientException.create("unavailable"));
+        assertThrows(StorageException.class, () -> service.retrieve(local.toString()));
+    }
     @Test void kmsAndMissingObjectAreHandled() {
         var client = mock(S3Client.class); var p = config(); p.getS3().setKmsKeyId("test-kms-key");
         var service = new S3StorageService(p, client);

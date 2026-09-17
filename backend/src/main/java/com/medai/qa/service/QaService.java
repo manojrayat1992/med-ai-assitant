@@ -32,6 +32,7 @@ public class QaService {
     private final ReportReviewRepository reviewRepository;
     private final AnalysisRequestRepository analysisRequestRepository;
     private final QaEngine qaEngine;
+    private final com.medai.qa.rules.KnowledgeQaRule knowledgeQa;
     private final ReportSectionParser sectionParser;
     private final FindingExtractionService findingExtractionService;
     private final QaEvidenceEnricher evidenceEnricher;
@@ -61,6 +62,9 @@ public class QaService {
         }
 
         QaResult result = qaEngine.evaluate(review.getId(), extractReportText(review, customText), imageResult);
+        var issues = new java.util.ArrayList<>(result.issues());
+        issues.addAll(knowledgeQa.evaluate(tenantId, hasText(customText) ? customText : sourceText(review)));
+        result = QaResult.from(reviewId, issues, result.evaluatedAt());
         return evidenceEnricher.enrich(result, findingExtractionService.extract(review));
     }
 

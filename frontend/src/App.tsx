@@ -65,11 +65,12 @@ export default function App() {
         <Route path="/qa-analytics" element={<QaAnalyticsPage />} />
         <Route path="/anatomy" element={<AnatomyPage />} />
         <Route path="/integrations" element={<IntegrationsPage />} />
-        <Route path="/upload" element={<UploadPage />} />
+        <Route path="/upload" element={<KnowledgeBasePage />} />
+        <Route path="/patients/:patientId/upload" element={<UploadPage />} />
         <Route path="/workflows" element={<WorkflowsPage />} />
         <Route path="/analysis" element={<AnalysisPage />} />
         <Route path="/blood-reports" element={<BloodReportPage />} />
-        <Route path="/knowledge" element={<KnowledgeBasePage />} />
+        <Route path="/knowledge" element={<Navigate to="/upload" replace />} />
         <Route path="/chat" element={<ChatPage />} />
         <Route path="/chat/:sessionId" element={<ChatPage />} />
         <Route path="/compliance" element={<CompliancePage />} />

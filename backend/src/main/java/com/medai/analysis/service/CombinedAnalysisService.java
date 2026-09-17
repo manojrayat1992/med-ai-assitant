@@ -36,6 +36,7 @@ import java.util.UUID;
 @Slf4j
 public class CombinedAnalysisService {
 
+    private final com.medai.knowledge.service.ClinicalKnowledgeService clinicalKnowledge;
     private final TenantAiSettingsService aiSettingsService;
     private final AnalysisRequestRepository analysisRequestRepository;
     private final PatientRepository patientRepository;
@@ -161,7 +162,8 @@ public class CombinedAnalysisService {
             String modelName = aiConfig.chatModel();
 
             String prompt = String.format(COMBINED_ANALYSIS_PROMPT, patientInfo, clinicalNotes, imageResults, bloodResults)
-                    + reasoningSuppressionDirective(modelName);
+                    + reasoningSuppressionDirective(modelName)
+                    + clinicalKnowledge.context(request.getTenantId(), clinicalNotes + " " + imageResults + " " + bloodResults);
 
             OpenAiChatOptions jsonOptions = OpenAiChatOptions.builder()
                     .withModel(modelName)
@@ -170,6 +172,7 @@ public class CombinedAnalysisService {
                     .build();
 
             ChatResponse response = chatClient.prompt()
+                    .system(com.medai.knowledge.service.ClinicalKnowledgeService.REFERENCE_POLICY)
                     .options(jsonOptions)
                     .user(prompt)
                     .call()

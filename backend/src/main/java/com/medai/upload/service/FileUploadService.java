@@ -32,6 +32,8 @@ public class FileUploadService {
     private final MedicalFileRepository medicalFileRepository;
     private final PatientRepository patientRepository;
     private final StorageService storageService;
+    private final org.springframework.jdbc.core.JdbcTemplate jdbc;
+    private final jakarta.persistence.EntityManager entityManager;
 
     private static final long MAX_FILE_SIZE = 100 * 1024 * 1024; // 100MB
 
@@ -80,12 +82,13 @@ public class FileUploadService {
         return toResponse(medicalFile);
     }
 
-    @Transactional(readOnly = true)
+    @Transactional
     public PagedResponse<FileUploadResponse> listFiles(UUID patientId, int page, int size) {
         UUID tenantId = TenantContext.requireTenantId();
         PageRequest pageRequest = PageRequest.of(page, size, Sort.by("createdAt").descending());
         Page<MedicalFile> files = medicalFileRepository.findByTenantIdAndPatientId(tenantId, patientId, pageRequest);
 
+        files.getContent().forEach(this::migrateInlineText);
         return PagedResponse.<FileUploadResponse>builder()
                 .content(files.getContent().stream().map(this::toResponse).toList())
                 .page(files.getNumber())
@@ -102,11 +105,13 @@ public class FileUploadService {
      * <p>Scoping by tenant alone was not enough: the {@code patientId} on the route was ignored,
      * so any authenticated user could read any file in the hospital by guessing file IDs.
      */
-    @Transactional(readOnly = true)
+    @Transactional
     public MedicalFile getFile(UUID patientId, UUID fileId) {
         UUID tenantId = TenantContext.requireTenantId();
-        return medicalFileRepository.findByIdAndPatientIdAndTenantId(fileId, patientId, tenantId)
+        MedicalFile file = medicalFileRepository.findByIdAndPatientIdAndTenantId(fileId, patientId, tenantId)
                 .orElseThrow(() -> new ResourceNotFoundException("File", "id", fileId));
+        migrateInlineText(file);
+        return file;
     }
 
     @Transactional
@@ -117,6 +122,35 @@ public class FileUploadService {
         storageService.delete(file.getStoragePath());
         medicalFileRepository.delete(file);
         log.info("File deleted: {} for patient {} (tenant: {})", fileId, patientId, tenantId);
+    }
+
+    /** Legacy text sources had no stored object. Recover the earliest available saved draft,
+     * mark its provenance, upload first, then persist the S3 key. Failed writes leave it retryable. */
+    private void migrateInlineText(MedicalFile file) {
+        if (file.getStoragePath() == null || !file.getStoragePath().startsWith("inline-report-text://")) return;
+        // Serialize simultaneous opens so they do not overwrite the recovered source snapshot.
+        entityManager.refresh(file, jakarta.persistence.LockModeType.PESSIMISTIC_WRITE);
+        if (!file.getStoragePath().startsWith("inline-report-text://")) return;
+        var texts = jdbc.queryForList("""
+                SELECT COALESCE(NULLIF(r.draft_content, ''), r.final_content)
+                FROM report_reviews r JOIN analysis_requests a ON a.id=r.analysis_id AND a.tenant_id=r.tenant_id
+                WHERE a.medical_file_id=? AND a.tenant_id=? AND a.patient_id=?
+                  AND r.patient_id=?
+                ORDER BY r.created_at ASC LIMIT 1
+                """, String.class, file.getId(), file.getTenantId(), file.getPatientId(), file.getPatientId());
+        if (texts.isEmpty() || texts.getFirst() == null) {
+            throw new StorageException("Saved source text is unavailable for file " + file.getId());
+        }
+        var upload = new TextUpload("recovered-report-" + file.getId() + ".txt", texts.getFirst());
+        String key = storageService.store(file.getTenantId(), file.getPatientId(), upload.getOriginalFilename(), upload);
+        file.setStoragePath(key);
+        file.setMimeType(upload.getContentType());
+        file.setFileSizeBytes(upload.getSize());
+        var metadata = new HashMap<String, Object>();
+        if (file.getMetadata() != null) metadata.putAll(file.getMetadata());
+        metadata.put("sourceRecovery", "EARLIEST_AVAILABLE_SAVED_REPORT");
+        file.setMetadata(metadata);
+        medicalFileRepository.save(file);
     }
 
     private UserPrincipal getCurrentUser() {

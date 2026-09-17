@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useDropzone } from 'react-dropzone';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import { patientService } from '@/services/patientService';
 import { fileService } from '@/services/fileService';
 import { analysisService, type AnalysisResponse } from '@/services/analysisService';
@@ -139,6 +139,8 @@ function delay(ms: number): Promise<void> {
 
 export function UploadPage() {
   const navigate = useNavigate();
+  const { patientId } = useParams<{ patientId: string }>();
+  const [patientError, setPatientError] = useState<string | null>(null);
   const role = useAuthStore((state) => state.role);
   const canDeleteUploads = role === 'HOSPITAL_ADMIN';
   const [mode, setMode] = useState<UploadMode>('single');
@@ -165,8 +167,26 @@ export function UploadPage() {
   const [savingTextDraft, setSavingTextDraft] = useState(false);
 
   useEffect(() => {
-    patientService.list(0, 100).then((r) => setPatients(r.content)).catch(() => {});
-  }, []);
+    let active = true;
+    setSP('');
+    setPatients([]);
+    setRecent([]);
+    setPatientError(null);
+    setSF(null);
+    setBatchFiles([]);
+    setDesc('');
+    setReportText('');
+    setResult(null);
+    setBatchResults([]);
+    if (patientId) {
+      patientService.get(patientId).then(patient => {
+        if (active) { setPatients([patient]); setSP(patient.id); }
+      }).catch(() => { if (active) setPatientError('Unable to load this patient. Return to Patients and select an accessible record.'); });
+    } else {
+      patientService.list(0, 100).then(r => { if (active) setPatients(r.content); }).catch(() => {});
+    }
+    return () => { active = false; };
+  }, [patientId]);
 
   const loadRecent = useCallback(async () => {
     if (!selectedPatient) return;
@@ -425,7 +445,7 @@ export function UploadPage() {
     <div className="space-y-6 max-w-[1100px]">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-white" style={{ fontFamily: 'Plus Jakarta Sans' }}>Upload Studies</h1>
+          <h1 className="text-2xl font-bold text-white" style={{ fontFamily: 'Plus Jakarta Sans' }}>Upload patient reports</h1>
           <p className="text-sm mt-0.5" style={{ color: 'var(--clr-text-3)' }}>Ingest studies, clinical documents, and report drafts for review</p>
         </div>
 
@@ -496,11 +516,15 @@ export function UploadPage() {
             )}
           </div>
 
+          <p className="text-sm text-slate-400">These files belong to this patient. AI analysis retrieves relevant workspace reference documents; patient files are not indexed into the shared knowledge base.</p>
+          <Link to="/patients" className="text-blue-300 hover:underline">Back to Patients</Link>
+          {patientError && <p role="alert" className="text-red-400">{patientError}</p>}
           {/* Patient select */}
           <div>
             <Label htmlFor="upload-patient-select">Select Patient</Label>
             <select
               id="upload-patient-select"
+              disabled={Boolean(patientId)}
               aria-label="Select Patient"
               style={selectStyle}
               value={selectedPatient}

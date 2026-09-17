@@ -51,3 +51,7 @@ uploads/
 *.pem
 *.ppk
 *.key
+
+# Isolated, reproducibly built Human Atlas viewer
+frontend/vendor/human-atlas/node_modules/
+frontend/public/human-atlas/

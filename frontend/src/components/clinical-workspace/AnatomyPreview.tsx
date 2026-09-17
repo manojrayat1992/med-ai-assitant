@@ -1,3 +1,4 @@
+import { HumanAtlasLauncher } from '@/components/human-atlas/HumanAtlas';
 import { useEffect, useRef, useState } from 'react';
 import {
   ExternalLink,
@@ -26,6 +27,8 @@ const SIDE_LABEL: Record<ExploredStructure['side'], string> = {
 };
 
 interface AnatomyPreviewProps {
+  reviewId?: string | null;
+  selections?: AnatomySelection[];
   selection: AnatomySelection | null;
   linkedIssueType?: string | null;
   /** Set when the linked issue maps to more than one structure. */
@@ -38,7 +41,7 @@ type ViewMode = '3D' | '2D';
 
 const IMAGE_FILE_TYPES = new Set(['XRAY', 'CT_SCAN', 'ULTRASOUND', 'MRI']);
 
-export function AnatomyPreview({ selection, linkedIssueType, conflictNote, patientId = null }: AnatomyPreviewProps) {
+export function AnatomyPreview({ selection, linkedIssueType, conflictNote, patientId = null, reviewId = null, selections = [] }: AnatomyPreviewProps) {
   // Machine identifier, not clinical content: useful while wiring the viewer, noise for reviewers.
   const showViewerKey = import.meta.env.DEV && Boolean(selection?.viewerKey);
 
@@ -74,7 +77,7 @@ export function AnatomyPreview({ selection, linkedIssueType, conflictNote, patie
       .list(patientId, 0, 10)
       .then((page) => {
         if (cancelled) return;
-        setStudyImage(page.content.find((file) => IMAGE_FILE_TYPES.has(file.fileType)) ?? null);
+        setStudyImage(page.content.find((file) => IMAGE_FILE_TYPES.has(file.fileType) && !file.mimeType?.startsWith('text/')) ?? null);
       })
       .catch(() => {
         if (!cancelled) setStudyImage(null);
@@ -113,6 +116,7 @@ export function AnatomyPreview({ selection, linkedIssueType, conflictNote, patie
 
   return (
     <Card className={cn('h-full min-w-0 overflow-hidden', isFullscreen && 'bg-slate-950')}>
+      <div className="px-4 pt-4"><HumanAtlasLauncher selection={selection} selections={selections} reviewId={reviewId} conflictNote={conflictNote}/></div>
       <CardHeader className="border-b" style={{ borderColor: 'var(--clr-border, #1e2d45)' }}>
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">

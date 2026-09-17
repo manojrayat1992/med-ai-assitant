@@ -28,7 +28,7 @@ public class QaController {
 
     @PostMapping("/{reviewId}/qa")
     @PreAuthorize("hasAnyRole('DOCTOR','HOSPITAL_ADMIN','LAB_TECH')")
-    @Operation(summary = "Run deterministic QA checks for a report review",
+    @Operation(summary = "Run report consistency and workspace-reference QA checks",
                description = "Returns potential issues and supporting evidence. The report is not modified.")
     public ResponseEntity<ApiResponse<QaResult>> evaluateReport(
             @PathVariable UUID reviewId,

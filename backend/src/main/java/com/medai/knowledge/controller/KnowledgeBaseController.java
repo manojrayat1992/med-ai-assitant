@@ -38,7 +38,7 @@ public class KnowledgeBaseController {
     private final RateLimitService rateLimitService;
 
     @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    @PreAuthorize("hasAnyRole('HOSPITAL_ADMIN', 'DOCTOR')")
+    @PreAuthorize("hasRole('HOSPITAL_ADMIN')")
     public ResponseEntity<ApiResponse<KnowledgeDocumentResponse>> uploadDocument(
             @RequestParam("file") MultipartFile file,
             @RequestParam("title") String title,

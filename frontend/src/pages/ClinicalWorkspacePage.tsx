@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { AlertTriangle, Loader2 } from 'lucide-react';
 import { Link, useParams, useSearchParams } from 'react-router-dom';
-import { AnatomyPreview } from '@/components/clinical-workspace/AnatomyPreview';
+import { HumanAtlasLauncher } from '@/components/human-atlas/HumanAtlas';
 import { ClinicalContextSidebar } from '@/components/clinical-workspace/ClinicalContextSidebar';
 import { ClinicalContextTabs } from '@/components/clinical-workspace/ClinicalContextTabs';
 import { ClinicalHeader } from '@/components/clinical-workspace/ClinicalHeader';
@@ -49,6 +49,7 @@ export function ClinicalWorkspacePage() {
   const [reportStatus, setReportStatus] = useState<ClinicalReportStatus>(
     demoClinicalWorkspace.study.reportStatus
   );
+  const [atlasOpen, setAtlasOpen] = useState(false);
   const [qaRunId, setQaRunId] = useState<string | null>(null);
   const [qaIssues, setQaIssues] = useState<QaIssue[]>(demoClinicalWorkspace.qaIssues);
   const [qaRequestStatus, setQaRequestStatus] = useState<QaRequestStatus>('SUCCESS');
@@ -200,6 +201,7 @@ export function ClinicalWorkspacePage() {
     if (!target) return;
     setSelectedQaIssueId(issue.id);
     setSelectedAnatomy({ ...target, sourceKind: 'QA' });
+    setAtlasOpen(true);
     setActionNotice(
       target.sourceLabel
         ? `Anatomy updated to the mapped structure from the ${target.sourceLabel} evidence.`
@@ -207,10 +209,10 @@ export function ClinicalWorkspacePage() {
     );
   }
 
-  // Longitudinal comparisons feed the same AnatomyPreview as QA. The QA issue selection is left
-  // alone; the preview simply stops showing QA-specific context while a comparison target is shown.
+  // QA and prior-study evidence open the same atlas with their own mapped anatomy.
   function viewLongitudinalAnatomy(selection: AnatomySelection) {
     setSelectedAnatomy(selection);
+    setAtlasOpen(true);
     setActionNotice(
       `Anatomy updated to the mapped structure from the ${selection.sourceLabel ?? 'comparison'}.`
     );
@@ -321,9 +323,15 @@ export function ClinicalWorkspacePage() {
         visibleQaIssues={visibleQaIssues}
       />
 
+      <p className="text-sm text-slate-400">Review the report, run QA, then open a flagged finding in the 3D Atlas to locate its anatomy.</p>
+
       <WorkspaceTabBar activeTab={activeContextTab} onTabChange={setActiveContextTab} />
 
       <WorkspaceActions
+        anatomyAction={<HumanAtlasLauncher key={reviewId ?? "demo-atlas"} open={atlasOpen} onOpenChange={setAtlasOpen}
+          reviewId={reviewId} selection={selectedAnatomy}
+          selections={qaIssues.flatMap(issue => issue.anatomyCandidates ?? (issue.anatomySelection ? [issue.anatomySelection] : []))}
+          conflictNote={selectedAnatomy && isQaAnatomySelection ? anatomyConflictNote(selectedIssue) : null} />}
         reportStatus={reportStatus}
         qaStatus={qaRequestStatus}
         notice={actionNotice}
@@ -354,7 +362,7 @@ export function ClinicalWorkspacePage() {
         comparison already selected on the Prior Studies tab survives a trip back to the QA view.
       */}
       <div className={activeContextTab === 'clinical-workspace' ? undefined : 'hidden'}>
-        <div className="grid gap-5 xl:grid-cols-[minmax(0,0.65fr)_minmax(36rem,1.9fr)_minmax(20rem,0.8fr)]">
+        <div className="grid gap-5 xl:grid-cols-[minmax(0,1.4fr)_minmax(22rem,1fr)]">
           <div>
           <ReportPanel
             report={currentReport}
@@ -363,12 +371,6 @@ export function ClinicalWorkspacePage() {
             saving={savingDraft}
           />
           </div>
-          <AnatomyPreview
-            selection={selectedAnatomy}
-            linkedIssueType={selectedAnatomy && isQaAnatomySelection && selectedIssue?.anatomySelection ? selectedIssue.type : null}
-            conflictNote={selectedAnatomy && isQaAnatomySelection ? anatomyConflictNote(selectedIssue) : null}
-            patientId={contextPatientId}
-          />
           <div>
           {qaRunId && selectedIssue && ['DOCTOR','HOSPITAL_ADMIN'].includes(feedbackRole || '') && <QaUsefulnessRating key={`${qaRunId}:${selectedIssue.id}`} runId={qaRunId} issue={selectedIssue} />}
           <QaPanel

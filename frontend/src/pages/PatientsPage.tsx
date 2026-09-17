@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import { useEffect, useState, useCallback } from 'react';
 import { patientService } from '@/services/patientService';
 import { Button } from '@/components/ui/Button';
@@ -612,6 +613,7 @@ export function PatientsPage() {
               {/* Name & Contact */}
               <div className="min-w-0">
                 <p className="text-sm font-semibold text-white truncate">{patient.fullName}</p>
+                <Link className="block text-xs text-blue-300 hover:underline mt-1" to={`/patients/${patient.id}/upload`}>Upload reports</Link>
                 {patient.email ? (
                   <p className="text-xs truncate" style={{ color: 'var(--clr-text-3)' }}>
                     {patient.email}

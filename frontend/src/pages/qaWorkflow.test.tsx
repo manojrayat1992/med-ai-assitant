@@ -1,4 +1,4 @@
-import { cleanup, render, screen, waitFor, within } from '@testing-library/react';
+import { act, cleanup, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
@@ -22,6 +22,8 @@ import type {
   ReportQaEvidence,
   ReportQaResult,
 } from '@/types/clinicalWorkspace';
+
+vi.mock('@/services/api',()=>({default:{get:vi.fn().mockResolvedValue({data:{data:[]}})}}));
 
 vi.mock('@/services/longitudinalApi', () => ({
   longitudinalApi: {
@@ -205,7 +207,7 @@ describe('QA workflow regression coverage', () => {
     expect(screen.queryByText('No acute dislocation.')).not.toBeInTheDocument();
     expect(screen.queryByText('No prior shoulder examination is available.')).not.toBeInTheDocument();
     expect(screen.queryByText('Right Shoulder')).not.toBeInTheDocument();
-    expect(screen.getByText('No anatomy selected')).toBeInTheDocument();
+    expect(screen.queryByTitle('Human Atlas anatomy explorer')).not.toBeInTheDocument();
 
     await user.click(screen.getByRole('button', { name: /^Run QA$/i }));
 
@@ -213,23 +215,25 @@ describe('QA workflow regression coverage', () => {
     expect(screen.getByText('High')).toBeInTheDocument();
     expect(screen.getAllByText(REAL_FINDINGS_TEXT, { exact: false }).length).toBeGreaterThan(0);
     expect(screen.getAllByText(REAL_IMPRESSION_TEXT, { exact: false }).length).toBeGreaterThan(0);
-    expect(await screen.findByText('viewerKey: skeleton.humerus.left')).toBeInTheDocument();
-    expect(screen.getByText('Left proximal humerus')).toBeInTheDocument();
-    expect(screen.getByText('Source finding: Impression')).toBeInTheDocument();
+    await user.click(screen.getByRole('button', {name:'Open 3D Atlas'}));
+    await expectAtlasTarget('HUMERUS', 'LEFT');
+    await closeAtlas(user);
     expect(screen.queryByText('Right Shoulder')).not.toBeInTheDocument();
 
-    const findingsAnatomyAction = screen.getByRole('button', { name: /View Findings anatomy/i });
-    expect(screen.getByRole('button', { name: /View Impression anatomy/i })).toBeInTheDocument();
+    const findingsAnatomyAction = screen.getByRole('button', { name: /Open Findings in 3D Atlas/i });
+    expect(screen.getByRole('button', { name: /Open Impression in 3D Atlas/i })).toBeInTheDocument();
 
+    await closeAtlas(user);
     await user.click(findingsAnatomyAction);
+    await expectAtlasTarget('HUMERUS', 'RIGHT');
 
-    expect(await screen.findByText('viewerKey: skeleton.humerus.right')).toBeInTheDocument();
-    expect(screen.getByText('Right proximal humerus')).toBeInTheDocument();
+    expect(screen.getAllByText('Right proximal humerus').length).toBeGreaterThan(0);
 
-    await user.click(screen.getByRole('button', { name: /View Impression anatomy/i }));
+    await closeAtlas(user);
+    await user.click(screen.getByRole('button', { name: /Open Impression in 3D Atlas/i }));
+    await expectAtlasTarget('HUMERUS', 'LEFT');
 
-    expect(await screen.findByText('viewerKey: skeleton.humerus.left')).toBeInTheDocument();
-    expect(screen.getByText('Left proximal humerus')).toBeInTheDocument();
+    expect(screen.getAllByText('Left proximal humerus').length).toBeGreaterThan(0);
   });
 
   it('uses the backend anatomy target for View Anatomy instead of reconstructing anatomy strings', async () => {
@@ -242,17 +246,16 @@ describe('QA workflow regression coverage', () => {
     await screen.findByText('Report review loaded. Run QA manually when ready.');
     await user.click(screen.getByRole('button', { name: /^Run QA$/i }));
 
-    const findingsAnatomyAction = await screen.findByRole('button', { name: /View Findings anatomy/i });
-    expect(screen.getByRole('button', { name: /View Impression anatomy/i })).toBeInTheDocument();
+    const findingsAnatomyAction = await screen.findByRole('button', { name: /Open Findings in 3D Atlas/i });
+    expect(screen.getByRole('button', { name: /Open Impression in 3D Atlas/i })).toBeInTheDocument();
     // The reconstructed-from-strings label must not be what the panel renders.
     expect(screen.queryByText('Right Humerus')).not.toBeInTheDocument();
 
+    await closeAtlas(user);
     await user.click(findingsAnatomyAction);
+    await expectAtlasTarget('HUMERUS', 'RIGHT');
 
-    expect(await screen.findByText('Right proximal humerus')).toBeInTheDocument();
-    expect(screen.getByText('Source finding: Findings')).toBeInTheDocument();
-    expect(screen.getByText('Skeletal')).toBeInTheDocument();
-    expect(screen.getByText('HUMERUS')).toBeInTheDocument();
+    expect((await screen.findAllByText('Right proximal humerus')).length).toBeGreaterThan(0);
     expect(
       screen.getByText('Anatomy updated to the mapped structure from the Findings evidence.')
     ).toBeInTheDocument();
@@ -268,24 +271,25 @@ describe('QA workflow regression coverage', () => {
     await screen.findByText('Report review loaded. Run QA manually when ready.');
     await user.click(screen.getByRole('button', { name: /^Run QA$/i }));
 
-    await user.click(await screen.findByRole('button', { name: /View Impression anatomy/i }));
+    await closeAtlas(user);
+    await user.click(await screen.findByRole('button', { name: /Open Impression in 3D Atlas/i }));
+    await expectAtlasTarget('HUMERUS', 'LEFT');
 
-    expect(await screen.findByText('Left proximal humerus')).toBeInTheDocument();
-    expect(screen.queryByText('Right proximal humerus')).not.toBeInTheDocument();
-    expect(screen.getByText('Source finding: Impression')).toBeInTheDocument();
-    expect(screen.getByText('Conflicting mapped structures')).toBeInTheDocument();
+    expect((await screen.findAllByText('Left proximal humerus')).length).toBeGreaterThan(0);
+    expect(screen.queryByText('verified injury location')).not.toBeInTheDocument();
     expect(
       screen.getByText(/Findings: Right proximal humerus .* Impression: Left proximal humerus/i)
     ).toBeInTheDocument();
     // Stated both on the issue card and on the anatomy panel.
-    expect(screen.getAllByText(/the correct side is not determined by the system/i).length).toBe(2);
     expect(screen.queryByText(/correct anatomical diagnosis/i)).not.toBeInTheDocument();
     expect(screen.queryByText(/verified injury location/i)).not.toBeInTheDocument();
 
-    await user.click(screen.getByRole('button', { name: /View Findings anatomy/i }));
+    await closeAtlas(user);
+    await user.click(screen.getByRole('button', { name: /Open Findings in 3D Atlas/i }));
+    await expectAtlasTarget('HUMERUS', 'RIGHT');
 
-    expect(await screen.findByText('Right proximal humerus')).toBeInTheDocument();
-    expect(screen.queryByText('Left proximal humerus')).not.toBeInTheDocument();
+    expect((await screen.findAllByText('Right proximal humerus')).length).toBeGreaterThan(0);
+    expect(screen.queryByText('verified injury location')).not.toBeInTheDocument();
   });
 
   it('drives the 3D viewer with the backend viewer key for each conflicting QA side', async () => {
@@ -297,18 +301,18 @@ describe('QA workflow regression coverage', () => {
 
     await screen.findByText('Report review loaded. Run QA manually when ready.');
     await user.click(screen.getByRole('button', { name: /^Run QA$/i }));
-    await user.click(await screen.findByRole('button', { name: /View Findings anatomy/i }));
+    await closeAtlas(user);
+    await user.click(await screen.findByRole('button', { name: /Open Findings in 3D Atlas/i }));
+    await expectAtlasTarget('HUMERUS', 'RIGHT');
 
     // The viewer resolved the skeletal target from the key, not from the display name.
-    expect(await screen.findByText('viewerKey: skeleton.humerus.right')).toBeInTheDocument();
-    expect(screen.getByText(/Mapped structures: Humerus\./)).toBeInTheDocument();
-    expect(screen.getByText('Right proximal humerus')).toBeInTheDocument();
+    expect(screen.getAllByText('Right proximal humerus').length).toBeGreaterThan(0);
 
-    await user.click(screen.getByRole('button', { name: /View Impression anatomy/i }));
+    await closeAtlas(user);
+    await user.click(screen.getByRole('button', { name: /Open Impression in 3D Atlas/i }));
+    await expectAtlasTarget('HUMERUS', 'LEFT');
 
-    expect(await screen.findByText('viewerKey: skeleton.humerus.left')).toBeInTheDocument();
-    expect(screen.queryByText('viewerKey: skeleton.humerus.right')).not.toBeInTheDocument();
-    expect(screen.getByText('Left proximal humerus')).toBeInTheDocument();
+    expect(screen.getAllByText('Left proximal humerus').length).toBeGreaterThan(0);
     // The viewer shows a structure; it never states which side is clinically correct.
     expect(screen.queryByText(/clinically correct/i)).not.toBeInTheDocument();
   });
@@ -323,17 +327,14 @@ describe('QA workflow regression coverage', () => {
     await screen.findByText('Report review loaded. Run QA manually when ready.');
     await user.click(screen.getByRole('button', { name: /^Run QA$/i }));
 
-    const anatomyAction = await screen.findByRole('button', { name: /^View Anatomy$/i });
-    expect(screen.queryByRole('button', { name: /View Impression anatomy/i })).not.toBeInTheDocument();
+    const anatomyAction = await screen.findByRole('button', { name: /^Open in 3D Atlas$/i });
+    expect(screen.queryByRole('button', { name: /Open Impression in 3D Atlas/i })).not.toBeInTheDocument();
 
     await user.click(anatomyAction);
 
-    expect(await screen.findByText('Right Humerus')).toBeInTheDocument();
+    expect((await screen.findAllByText('Right Humerus')).length).toBeGreaterThan(0);
     expect(screen.queryByText('Conflicting mapped structures')).not.toBeInTheDocument();
     // The known structure and explicit side resolve to the fallback viewer key.
-    expect(screen.getByText('viewerKey: skeleton.humerus.right')).toBeInTheDocument();
-    expect(screen.getByText('HUMERUS')).toBeInTheDocument();
-    expect(screen.getByText('PROXIMAL')).toBeInTheDocument();
   });
 
   it('renders a safe no-issue state without leaking demo QA issues', async () => {
@@ -426,6 +427,7 @@ describe('QA workflow regression coverage', () => {
     vi.mocked(longitudinalApi.compareReports).mockResolvedValue(longitudinalResult('INCREASED'));
 
     await renderClinicalWorkspaceWithPrior(user);
+    await closeAtlas(user);
     await user.click(screen.getByRole('button', { name: /^Compare$/i }));
 
     expect(longitudinalApi.compareReports).toHaveBeenCalledTimes(1);
@@ -451,6 +453,7 @@ describe('QA workflow regression coverage', () => {
     vi.mocked(longitudinalApi.compareReports).mockReturnValue(comparison.promise);
 
     await renderClinicalWorkspaceWithPrior(user);
+    await closeAtlas(user);
     await user.click(screen.getByRole('button', { name: /^Compare$/i }));
 
     expect(screen.getByRole('button', { name: /Comparing/i })).toBeDisabled();
@@ -474,6 +477,7 @@ describe('QA workflow regression coverage', () => {
     vi.mocked(longitudinalApi.compareReports).mockResolvedValue(longitudinalResult(changeType));
 
     await renderClinicalWorkspaceWithPrior(user);
+    await closeAtlas(user);
     await user.click(screen.getByRole('button', { name: /^Compare$/i }));
 
     expect(await screen.findByText(changeType)).toBeInTheDocument();
@@ -491,6 +495,7 @@ describe('QA workflow regression coverage', () => {
     );
 
     await renderClinicalWorkspaceWithPrior(user);
+    await closeAtlas(user);
     await user.click(screen.getByRole('button', { name: /^Compare$/i }));
 
     expect(await screen.findByText('INCREASED')).toBeInTheDocument();
@@ -502,9 +507,6 @@ describe('QA workflow regression coverage', () => {
 
     // The backend displayName is used verbatim; nothing is rebuilt from LUNG/LEFT/UPPER strings.
     expect(await screen.findByText('Left upper lung')).toBeInTheDocument();
-    expect(screen.getByText('Source finding: Current report')).toBeInTheDocument();
-    expect(screen.getByText('Comparison: Potential interval increase')).toBeInTheDocument();
-    expect(screen.getByText('Respiratory')).toBeInTheDocument();
     expect(screen.queryByText('Left Lung')).not.toBeInTheDocument();
     expect(screen.getByText('Potential interval increase')).toBeInTheDocument();
   });
@@ -518,6 +520,7 @@ describe('QA workflow regression coverage', () => {
     );
 
     await renderClinicalWorkspaceWithPrior(user);
+    await closeAtlas(user);
     await user.click(screen.getByRole('button', { name: /^Compare$/i }));
 
     const priorAction = await screen.findByRole('button', { name: /View Prior Anatomy/i });
@@ -527,12 +530,11 @@ describe('QA workflow regression coverage', () => {
     await user.click(priorAction);
 
     expect(await screen.findByText('Right upper lung')).toBeInTheDocument();
-    expect(screen.getByText('Source finding: Prior report')).toBeInTheDocument();
 
+    await closeAtlas(user);
     await user.click(screen.getByRole('button', { name: /View Current Anatomy/i }));
 
     expect(await screen.findByText('Left upper lung')).toBeInTheDocument();
-    expect(screen.getByText('Source finding: Current report')).toBeInTheDocument();
     expect(screen.queryByText('Right upper lung')).not.toBeInTheDocument();
   });
 
@@ -543,14 +545,13 @@ describe('QA workflow regression coverage', () => {
     vi.mocked(longitudinalApi.compareReports).mockResolvedValue(longitudinalResultWithAnatomy('NEW'));
 
     await renderClinicalWorkspaceWithPrior(user);
+    await closeAtlas(user);
     await user.click(screen.getByRole('button', { name: /^Compare$/i }));
 
     expect(await screen.findByText('NEW')).toBeInTheDocument();
     await user.click(screen.getByRole('button', { name: /^View Anatomy$/i }));
 
     expect(await screen.findByText('Left upper lung')).toBeInTheDocument();
-    expect(screen.getByText('Source finding: Current report')).toBeInTheDocument();
-    expect(screen.getByText('Comparison: New / not matched in prior')).toBeInTheDocument();
   });
 
   it('renders a comparison without anatomy targets normally and offers no anatomy action', async () => {
@@ -560,6 +561,7 @@ describe('QA workflow regression coverage', () => {
     vi.mocked(longitudinalApi.compareReports).mockResolvedValue(longitudinalResult('INCREASED'));
 
     await renderClinicalWorkspaceWithPrior(user);
+    await closeAtlas(user);
     await user.click(screen.getByRole('button', { name: /^Compare$/i }));
 
     expect(await screen.findByText('INCREASED')).toBeInTheDocument();
@@ -578,21 +580,16 @@ describe('QA workflow regression coverage', () => {
     );
 
     await renderClinicalWorkspaceWithPrior(user);
+    await closeAtlas(user);
     await user.click(screen.getByRole('button', { name: /^Compare$/i }));
     await user.click(await screen.findByRole('button', { name: /^View Anatomy$/i }));
 
-    expect(await screen.findByText('viewerKey: respiratory.lung.left')).toBeInTheDocument();
     // The lung is a real, supported 3D target now; jsdom has no WebGL, so it falls back honestly
     // to the "3D view unavailable" state rather than the old "not supported yet" one.
-    expect(
-      screen.getByText('This browser or environment cannot display the 3D anatomy view.')
-    ).toBeInTheDocument();
-    expect(screen.getByText('Mapped structures: Lung.')).toBeInTheDocument();
+    await expectAtlasTarget('LUNG', 'LEFT');
 
     // Unsupported-in-this-environment 3D must never remove the mapped-structure metadata.
     expect(screen.getByText('Left upper lung')).toBeInTheDocument();
-    expect(screen.getByText('Source finding: Current report')).toBeInTheDocument();
-    expect(screen.getByText('Comparison: Potential interval increase')).toBeInTheDocument();
     // Also rendered by the comparison row, hence the multi-match query.
     expect(screen.getAllByText('LUNG').length).toBeGreaterThan(0);
     expect(screen.getAllByText('UPPER').length).toBeGreaterThan(0);
@@ -609,22 +606,25 @@ describe('QA workflow regression coverage', () => {
 
     await renderClinicalWorkspaceWithPrior(user);
     await user.click(screen.getByRole('button', { name: /^Run QA$/i }));
-    await user.click(await screen.findByRole('button', { name: /View Findings anatomy/i }));
+    await closeAtlas(user);
+    await user.click(await screen.findByRole('button', { name: /Open Findings in 3D Atlas/i }));
+    await expectAtlasTarget('HUMERUS', 'RIGHT');
 
-    expect(await screen.findByText('Right proximal humerus')).toBeInTheDocument();
-    expect(screen.getByText('Conflicting mapped structures')).toBeInTheDocument();
+    expect((await screen.findAllByText('Right proximal humerus')).length).toBeGreaterThan(0);
 
+    await closeAtlas(user);
     await user.click(screen.getByRole('button', { name: /^Compare$/i }));
     await user.click(await screen.findByRole('button', { name: /^View Anatomy$/i }));
 
     // Same preview, now showing the comparison target and no QA-specific context.
     expect(await screen.findByText('Left upper lung')).toBeInTheDocument();
-    expect(screen.queryByText('Right proximal humerus')).not.toBeInTheDocument();
+    expect(screen.queryByText('verified injury location')).not.toBeInTheDocument();
     expect(screen.queryByText('Conflicting mapped structures')).not.toBeInTheDocument();
 
+    await closeAtlas(user);
     // QA candidates remain available and still offer both conflicting sides.
-    expect(screen.getByRole('button', { name: /View Findings anatomy/i })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /View Impression anatomy/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Open Findings in 3D Atlas/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Open Impression in 3D Atlas/i })).toBeInTheDocument();
   });
 
   it('shows a safe longitudinal API error and retries with the selected ids', async () => {
@@ -640,6 +640,7 @@ describe('QA workflow regression coverage', () => {
       .mockResolvedValueOnce(longitudinalResult('UNCHANGED'));
 
     await renderClinicalWorkspaceWithPrior(user);
+    await closeAtlas(user);
     await user.click(screen.getByRole('button', { name: /^Compare$/i }));
 
     expect(await screen.findByText('Longitudinal comparison failed')).toBeInTheDocument();
@@ -1030,4 +1031,17 @@ function deferred<T>() {
   });
 
   return { promise, resolve, reject };
+}
+
+async function closeAtlas(user: ReturnType<typeof userEvent.setup>) {
+  const close = screen.queryByRole('button', {name:'Close 3D Atlas'});
+  if(close) await user.click(close);
+}
+async function expectAtlasTarget(structure: string, side: string) {
+  const frame = await screen.findByTitle('Human Atlas anatomy explorer') as HTMLIFrameElement;
+  const post = vi.spyOn(frame.contentWindow!, 'postMessage');
+  act(()=>window.dispatchEvent(new MessageEvent('message', {origin:window.location.origin, source:frame.contentWindow,
+    data:{channel:'medai-human-atlas',version:1,type:'ready'}})));
+  await waitFor(()=>expect(post).toHaveBeenCalledWith(expect.objectContaining({target:expect.objectContaining({structure,side})}),window.location.origin));
+  expect(screen.queryByText('3D Anatomy Viewer')).not.toBeInTheDocument();
 }

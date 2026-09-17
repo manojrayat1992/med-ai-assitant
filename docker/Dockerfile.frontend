@@ -3,7 +3,7 @@
 # This previously ran `vite dev` — the development server — as the production image. That ships
 # unminified source with sourcemaps, keeps an HMR websocket open, and holds a Node process using
 # roughly 200MB where nginx uses 10. On a 2GB instance that difference is most of your headroom.
-FROM node:20-alpine AS build
+FROM node:22-alpine AS build
 WORKDIR /app
 
 COPY package*.json ./
@@ -34,6 +34,11 @@ RUN printf 'server {\n\
 \n\
     location = /index.html {\n\
         add_header Cache-Control "no-store, must-revalidate";\n\
+    }\n\
+\n\
+    location /human-atlas/ {\n\
+        try_files $uri $uri/ =404;\n\
+        add_header Cache-Control "no-cache";\n\
     }\n\
 \n\
     location / {\n\

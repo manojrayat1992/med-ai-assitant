@@ -5,5 +5,7 @@ public enum DocumentType {
     GUIDELINE,
     DRUG_FORMULARY,
     SOP,
+    GUARDRAIL,
+    REFERENCE_STUDY,
     JOURNAL
 }

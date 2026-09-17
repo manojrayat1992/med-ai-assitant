@@ -1,6 +1,7 @@
 package com.medai.qa.model;
 
 public enum QaIssueType {
+    PROTOCOL_DEVIATION,
     LATERALITY_CONFLICT,
     UNREPORTED_IMAGE_FINDING,
     MEASUREMENT_DISCREPANCY,

@@ -37,6 +37,7 @@ import java.util.UUID;
 @Slf4j
 public class BloodReportAnalysisService {
 
+    private final com.medai.knowledge.service.ClinicalKnowledgeService clinicalKnowledge;
     private final TenantAiSettingsService aiSettingsService;
     private final AnalysisRequestRepository analysisRequestRepository;
     private final MedicalFileRepository medicalFileRepository;
@@ -139,6 +140,8 @@ public class BloodReportAnalysisService {
                         medicalFile.getOriginalFileName(), prepared.text()));
             }
             prompt.append(reasoningSuppressionDirective(modelName));
+            prompt.append(clinicalKnowledge.context(request.getTenantId(),
+                    "Laboratory report interpretation " + clinicalNotes + " " + (prepared.isVision() ? "" : prepared.text())));
 
             OpenAiChatOptions jsonOptions = OpenAiChatOptions.builder()
                     .withModel(modelName)
@@ -151,6 +154,7 @@ public class BloodReportAnalysisService {
                     .toArray(Media[]::new);
 
             ChatResponse response = chatClient.prompt()
+                    .system(com.medai.knowledge.service.ClinicalKnowledgeService.REFERENCE_POLICY)
                     .options(jsonOptions)
                     .user(u -> {
                         u.text(prompt.toString());

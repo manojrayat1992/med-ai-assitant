@@ -1,8 +1,10 @@
+import type { ReactNode } from 'react';
 import { CheckCircle2, Loader2, RotateCcw, Save } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import type { ClinicalReportStatus, QaRequestStatus } from '@/types/clinicalWorkspace';
 
 interface WorkspaceActionsProps {
+  anatomyAction?: ReactNode;
   reportStatus: ClinicalReportStatus;
   qaStatus: QaRequestStatus;
   notice: string | null;
@@ -13,6 +15,7 @@ interface WorkspaceActionsProps {
 }
 
 export function WorkspaceActions({
+  anatomyAction,
   reportStatus,
   qaStatus,
   notice,
@@ -37,6 +40,7 @@ export function WorkspaceActions({
       </div>
 
       <div className="flex flex-wrap gap-2">
+        {anatomyAction}
         <Button type="button" variant="outline" size="sm" onClick={onSaveDraft}>
           <Save className="h-3.5 w-3.5" />
           Save Draft

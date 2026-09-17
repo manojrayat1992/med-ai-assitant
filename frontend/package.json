@@ -8,7 +8,10 @@
     "build": "tsc -b && vite build",
     "test": "vitest run",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "build:atlas": "npm --prefix vendor/human-atlas ci --ignore-scripts --cache node_modules/.cache/atlas-npm && npm --prefix vendor/human-atlas run build",
+    "prebuild": "npm run build:atlas",
+    "predev": "npm run build:atlas"
   },
   "dependencies": {
     "@radix-ui/react-avatar": "^1.1.1",

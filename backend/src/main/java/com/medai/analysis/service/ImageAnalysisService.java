@@ -37,6 +37,7 @@ import java.util.UUID;
 @Slf4j
 public class ImageAnalysisService {
 
+    private final com.medai.knowledge.service.ClinicalKnowledgeService clinicalKnowledge;
     private final TenantAiSettingsService aiSettingsService;
     private final AnalysisRequestRepository analysisRequestRepository;
     private final MedicalFileRepository medicalFileRepository;
@@ -149,7 +150,8 @@ public class ImageAnalysisService {
             String modelName = aiConfig.chatModel();
 
             String prompt = String.format(IMAGE_ANALYSIS_PROMPT, clinicalNotes)
-                    + reasoningSuppressionDirective(modelName);
+                    + reasoningSuppressionDirective(modelName)
+                    + clinicalKnowledge.context(request.getTenantId(), medicalFile.getFileType() + " imaging reporting " + clinicalNotes);
 
             // Force JSON-object output so the (reasoning) model returns structured JSON as its
             // content rather than a free-form <think> chain-of-thought.
@@ -164,6 +166,7 @@ public class ImageAnalysisService {
                     .toArray(Media[]::new);
 
             ChatResponse response = chatClient.prompt()
+                    .system(com.medai.knowledge.service.ClinicalKnowledgeService.REFERENCE_POLICY)
                     .options(jsonOptions)
                     .user(u -> u.text(prompt).media(media))
                     .call()

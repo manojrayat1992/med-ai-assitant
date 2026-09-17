@@ -44,6 +44,12 @@ public class DocumentIngestionService {
             String source,
             UserPrincipal principal
     ) {
+        String name = file.getOriginalFilename() == null ? "" : file.getOriginalFilename().toLowerCase(java.util.Locale.ROOT);
+        if (file.isEmpty() || file.getSize() > 20L * 1024 * 1024
+                || !(name.endsWith(".pdf") || name.endsWith(".txt") || name.endsWith(".md"))) {
+            throw new com.medai.common.exception.BadRequestException(
+                    "Upload a searchable PDF, TXT or Markdown reference document up to 20 MB.");
+        }
         log.info("Ingesting knowledge document '{}' (type: {}) for tenant {}",
                 title, documentType, principal.tenantId());
 
@@ -93,7 +99,8 @@ public class DocumentIngestionService {
                 chunk.setContent(chunkContent);
                 chunk.setEmbedding(vectorStr);
                 chunk.setEmbeddingModel(embeddingService.modelId());
-                chunk.setMetadata(String.format("{\"chunk\":%d,\"doc_title\":\"%s\"}", i, doc.getTitle()));
+                chunk.setMetadata(new com.fasterxml.jackson.databind.ObjectMapper().writeValueAsString(
+                        java.util.Map.of("chunk", i, "doc_title", doc.getTitle())));
 
                 chunkRepository.save(chunk);
             }
@@ -134,28 +141,16 @@ public class DocumentIngestionService {
         List<String> chunks = new ArrayList<>();
         if (text == null || text.isBlank()) return chunks;
 
-        String[] paragraphs = text.split("\n\n+");
-        StringBuilder currentChunk = new StringBuilder();
-
-        for (String paragraph : paragraphs) {
-            String trimmed = paragraph.trim();
-            if (trimmed.isEmpty()) continue;
-
-            if (currentChunk.length() + trimmed.length() > targetChunkSize && currentChunk.length() > 0) {
-                chunks.add(currentChunk.toString().trim());
-
-                // Create overlap from end of current chunk
-                String currentStr = currentChunk.toString();
-                int overlapStart = Math.max(0, currentStr.length() - overlap);
-                currentChunk = new StringBuilder(currentStr.substring(overlapStart));
-                currentChunk.append("\n");
-            }
-
-            currentChunk.append(trimmed).append("\n\n");
+        if (targetChunkSize < 1 || overlap < 0 || overlap >= targetChunkSize) {
+            throw new IllegalArgumentException("Chunk size must be positive and overlap smaller than size");
         }
-
-        if (currentChunk.length() > 0 && !currentChunk.toString().trim().isEmpty()) {
-            chunks.add(currentChunk.toString().trim());
+        // Bound even a PDF extracted as one long paragraph; preserve overlap for boundary context.
+        for (int start = 0; start < text.length();) {
+            int end = Math.min(start + targetChunkSize, text.length());
+            String chunk = text.substring(start, end).trim();
+            if (!chunk.isEmpty()) chunks.add(chunk);
+            if (end == text.length()) break;
+            start = end - overlap;
         }
 
         return chunks;

@@ -23,9 +23,11 @@ public class DocumentChunk extends TenantAwareEntity {
     @Column(name = "content", nullable = false, columnDefinition = "TEXT")
     private String content;
 
+    @org.hibernate.annotations.ColumnTransformer(write = "cast(? as jsonb)")
     @Column(name = "metadata", columnDefinition = "JSONB")
     private String metadata;
 
+    @org.hibernate.annotations.ColumnTransformer(write = "cast(? as vector)")
     @Column(name = "embedding", columnDefinition = "vector(384)")
     private String embedding;
 
