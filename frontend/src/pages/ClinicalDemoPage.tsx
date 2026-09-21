@@ -69,7 +69,7 @@ function ClinicalDemoExercise({caseId, onSelect}: {caseId: string; onSelect: (id
         </section>
       </div>
       <div role="status" aria-live="polite" className="mt-4 min-h-6 text-sm text-cyan-200">{notice}</div>
-      <footer className="mt-6 flex flex-wrap items-center justify-between gap-4 border-t border-slate-800 py-6"><div><h2 className="font-semibold">Bring the case to your next discussion.</h2><p className="mt-1 text-sm text-slate-400">Share the exercise. Each visitor starts with the original synthetic draft.</p></div><div className="flex flex-wrap gap-3"><button onClick={() => void share()} className={button + ' border border-slate-600'}><Share2 className="h-4 w-4" />Share case</button><Link to="/pilot" className={button + ' bg-blue-600 text-white'}>Apply for a pilot <ArrowRight className="h-4 w-4" /></Link></div></footer>
+      <footer className="mt-6 flex flex-wrap items-center justify-between gap-4 border-t border-slate-800 py-6"><div><h2 className="font-semibold">Bring the case to your next discussion.</h2><p className="mt-1 text-sm text-slate-400">Share the exercise. Each visitor starts with the original synthetic draft.</p></div><div className="flex flex-wrap gap-3"><button onClick={() => void share()} className={button + ' border border-slate-600'}><Share2 className="h-4 w-4" />Share case</button><Link to="/pilot" className={button + ' bg-blue-600 text-white'}>Get free access <ArrowRight className="h-4 w-4" /></Link></div></footer>
       {shareUrl && <label className="block pb-5 text-sm text-slate-300">Shareable case link<input readOnly className="mt-2 w-full rounded-lg border border-slate-600 bg-slate-900 p-3" value={shareUrl} onFocus={e => e.target.select()} /></label>}
     </div>
   </main>;

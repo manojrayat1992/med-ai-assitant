@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { CheckCircle2, Loader2, RotateCcw, Save } from 'lucide-react';
+import { CheckCircle2, Loader2, RotateCcw, Save, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import type { ClinicalReportStatus, QaRequestStatus } from '@/types/clinicalWorkspace';
 
@@ -12,6 +12,8 @@ interface WorkspaceActionsProps {
   onRunQa: () => void;
   onMarkReady: () => void;
   runQaDisabled?: boolean;
+  onOpenSmartView?: () => void;
+  hasQaIssues?: boolean;
 }
 
 export function WorkspaceActions({
@@ -23,6 +25,8 @@ export function WorkspaceActions({
   onRunQa,
   onMarkReady,
   runQaDisabled = false,
+  onOpenSmartView,
+  hasQaIssues = false,
 }: WorkspaceActionsProps) {
   const qaIsLoading = qaStatus === 'LOADING';
 
@@ -41,6 +45,22 @@ export function WorkspaceActions({
 
       <div className="flex flex-wrap gap-2">
         {anatomyAction}
+        {onOpenSmartView && (
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={onOpenSmartView}
+            className={`border-cyan-500/40 bg-cyan-950/40 text-cyan-200 hover:bg-cyan-900/60 hover:text-white shadow-sm transition-all ${
+              hasQaIssues ? 'ring-1 ring-cyan-400/50 shadow-cyan-950/80' : ''
+            }`}
+            data-testid="smart-qa-view-button"
+            title="Open side-by-side smart QA clinical reconciliation"
+          >
+            <Sparkles className="h-3.5 w-3.5 text-cyan-400" />
+            Compare with Smart View
+          </Button>
+        )}
         <Button type="button" variant="outline" size="sm" onClick={onSaveDraft}>
           <Save className="h-3.5 w-3.5" />
           Save Draft

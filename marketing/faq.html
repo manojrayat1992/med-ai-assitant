@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Frequently Asked Questions | Med-AI Clinical</title><meta name="description" content="Answers about free early access, report QA, supported workflows, integrations, data storage, training and clinician review."><link rel="canonical" href="https://medaiclinical.com/faq.html"><link rel="icon" type="image/svg+xml" href="/favicon.svg"><link rel="manifest" href="/site.webmanifest"><link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header">
+    <div class="wrap">
+      <div class="nav-inner">
+        <a class="brand" href="/"><span class="brand-mark" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 2v20M7 6.5h10M6 12h12M7 17.5h10"/></svg></span><span class="brand-name"><strong>Med-AI Clinical</strong><span>Report QA Platform</span></span></a>
+        <nav class="nav-links" aria-label="Primary navigation"><a href="/">Home</a><a href="/product.html">Product</a><a href="/demo.html">Demo</a><a href="/screenshots.html">Screens</a><a href="/security.html">Security</a><a href="/validation.html">Validation</a><a href="/pricing.html">Free access</a>
+</nav>
+        <div class="nav-actions"><a class="button button-secondary" href="/demo.html">Try demo</a><a class="button button-primary" href="https://app.medaiclinical.com/pilot">Get free access</a>
+</div>
+        <button class="menu-toggle" type="button" aria-label="Open navigation" aria-expanded="false" data-menu-button><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
+      </div>
+      <nav class="mobile-panel" aria-label="Mobile navigation"><a href="/">Home</a><a href="/product.html">Product</a><a href="/demo.html">Demo</a><a href="/screenshots.html">Screens</a><a href="/security.html">Security</a><a href="/validation.html">Validation</a><a href="/pricing.html">Free access</a><a href="https://app.medaiclinical.com/pilot">Get free access</a>
+</nav>
+    </div>
+  </header>
+<main id="main">
+<section class="page-hero">
+<div class="wrap"><span class="section-kicker">Questions before you start</span>
+<h1>Know what you’re evaluating.</h1>
+<p>Practical answers for clinicians, administrators and IT teams considering free early access.</p>
+</div>
+</section>
+<section class="section">
+<div class="wrap faq-list">
+<details>
+<summary>Is Med-AI Clinical free?</summary>
+<div>
+<p>Yes. Product use has no subscription fee during early access, and no credit card is required to request access. There is no announced end date. We’ll communicate future pricing in advance. <a href="/pricing.html">Read the full offer and scope.</a>
+</p>
+</div>
+</details>
+<details>
+<summary>Can I start without booking a sales call?</summary>
+<div>
+<p>You can <a href="https://app.medaiclinical.com/demo">try the synthetic demo immediately</a>, with no sign-in. To evaluate the workspace with your team, <a href="https://app.medaiclinical.com/pilot">request free access</a>. We review your workflow and confirm onboarding rather than promise instant provisioning.</p>
+</div>
+</details>
+<details>
+<summary>What does the product check?</summary>
+<div>
+<p>The report QA workflow surfaces potential issues such as inconsistent laterality, discrepancies between report sections and missing comparison context. Findings include source evidence for review. Available checks depend on the report and configuration; a clean QA result does not establish clinical correctness.</p>
+</div>
+</details>
+<details>
+<summary>Does it replace a radiologist or interpret every scan?</summary>
+<div>
+<p>No. Med-AI Clinical supports report review. A clinician remains responsible for checking source material, correcting the report and signing the final version. The 3D Atlas shows reference anatomy, not a patient-specific reconstruction or the extent of disease.</p>
+</div>
+</details>
+<details>
+<summary>Which reports can we evaluate?</summary>
+<div>
+<p>Radiology report QA is the main early-access workflow. The public demo also includes a synthetic laboratory case. During onboarding, agree the modalities, report language, file formats and volume your team needs; demo coverage is not a guarantee of support for every clinical report.</p>
+</div>
+</details>
+<details>
+<summary>Do we need a PACS or EHR integration first?</summary>
+<div>
+<p>You can explore the demo without an integration. A workspace can receive patient report uploads and pasted report text. PACS/RIS/LIS/EHR connections require checking your vendor, interface, credentials and deployment. FHIR-oriented interfaces do not imply compatibility with every EHR. <a href="/contact.html">Discuss your system.</a>
+</p>
+</div>
+</details>
+<details>
+<summary>What if a suggestion is wrong?</summary>
+<div>
+<p>Review the source evidence, edit the report and submit feedback inside the report workspace. Clinicians can rate whether a QA alert was useful. A suggestion is not applied as a final clinical decision; the reviewer controls sign-off.</p>
+</div>
+</details>
+<details>
+<summary>Where are reports stored and who can access them?</summary>
+<div>
+<p>Uploaded source files use the configured S3 bucket. Report text, workflow state and related metadata are also stored in the application database. Workspace tenancy and role checks restrict access. The actual storage region, backups, provider settings and access arrangements need to be confirmed for your deployment. <a href="/security.html">Read the data-flow overview.</a>
+</p>
+</div>
+</details>
+<details>
+<summary>Is customer data used to train AI?</summary>
+<div>
+<p>The current application sends selected content to the configured model provider for inference and can retrieve workspace reference documents. That is different from training a model. The application also has administrator-controlled export tools for creating training datasets from reviewed reports. Export is a separate action; it does not itself train a model. Agree whether these tools may be used and how exported data is handled before onboarding. Provider retention and training terms must be verified for the chosen provider and account before patient data is processed.</p>
+</div>
+</details>
+<details>
+<summary>How long is information retained?</summary>
+<div>
+<p>There is no single published retention period covering all early-access deployments. Confirm retention and deletion procedures for the database, S3 objects, audit records, backups and model provider before uploading patient information. Contact the team to arrange a data-handling review.</p>
+</div>
+</details>
+<details>
+<summary>Is the product clinically validated or independently certified?</summary>
+<div>
+<p>We are not publishing validated accuracy, time-saving percentages, customer outcome claims or independent security certifications here. Early access is for supervised evaluation. <a href="/validation.html">See the measurement plan and its limitations.</a>
+</p>
+</div>
+</details>
+<details>
+<summary>Can we use our own protocols?</summary>
+<div>
+<p>Workspace administrators can upload reference documents such as protocols, guardrails and studies to the Knowledge Base. Relevant retrieved content can inform supported AI workflows. It does not replace clinician judgment or guarantee that every document will be retrieved for every report.</p>
+</div>
+</details>
+<details>
+<summary>How do we know whether it helps our team?</summary>
+<div>
+<p>Review useful-alert ratings, report edits, creation-to-signature time and active participants in the workspace results dashboard. Define a baseline and inspect missed issues separately before drawing conclusions. <a href="/validation.html">Read how these measures should be interpreted.</a>
+</p>
+</div>
+</details>
+<div class="demo-actions"><a class="button button-primary" href="https://app.medaiclinical.com/pilot">Get free access</a><a class="button button-secondary" href="https://app.medaiclinical.com/demo">Try the synthetic demo</a>
+</div>
+</div>
+</section>
+</main>
+  <footer class="footer">
+<div class="wrap">
+<div class="resource-links" aria-label="More information"><a href="/pricing.html">Free early access</a><a href="/faq.html" aria-current="page">FAQs</a><a href="/compare.html">How we fit</a><a href="/security.html">Security &amp; data</a><a href="/validation.html">Evidence &amp; evaluation</a><a href="/contact.html">Contact</a>
+</div>
+<div class="footer-bottom"><small>&copy; <span id="year">2026</span> Med-AI Clinical.</small><small class="legal">For supervised evaluation by healthcare professionals. Clinicians review and sign final reports.</small>
+</div>
+</div>
+</footer><script src="/app.js" defer></script>
+</body></html>

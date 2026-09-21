@@ -14,16 +14,16 @@ it('submits centre workflow details and shows the persisted reference',async()=>
  await user.type(screen.getByLabelText('Reporting team size'),'5');await user.type(screen.getByLabelText('Main workflow problem'),'Manual entry');
  await user.click(screen.getByRole('checkbox'));
  vi.mocked(pilotApplicationApi.submit).mockRejectedValueOnce(new Error('offline'));
- await user.click(screen.getByRole('button',{name:'Submit pilot application'}));
+ await user.click(screen.getByRole('button',{name:'Request free access'}));
  expect(await screen.findByRole('alert')).toHaveTextContent('not confirmed as saved');
  expect(screen.getByLabelText('Centre name')).toHaveValue('Test Centre');
  const payload=vi.mocked(pilotApplicationApi.submit).mock.calls[0][0];
  expect(payload).toMatchObject({monthlyReportVolume:2000,teamSize:5,contactConsent:true,reportingSoftware:'Test RIS'});
  vi.mocked(pilotApplicationApi.submit).mockResolvedValue({reference:payload.submissionId,message:'Application received.'});
- await user.click(screen.getByRole('button',{name:'Submit pilot application'}));
+ await user.click(screen.getByRole('button',{name:'Request free access'}));
  await waitFor(()=>expect(pilotApplicationApi.submit).toHaveBeenLastCalledWith(payload));
  expect(await screen.findByRole('status')).toHaveTextContent(payload.submissionId);
- expect(screen.queryByRole('button',{name:'Submit pilot application'})).not.toBeInTheDocument();
+ expect(screen.queryByRole('button',{name:'Request free access'})).not.toBeInTheDocument();
 });
 it('requires contact consent and does not offer uploads',()=>{
  render(<MemoryRouter><PilotApplicationPage/></MemoryRouter>);

@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Med-AI Clinical | Radiology Report QA Before Clinician Sign-Off</title>
   <meta name="description"
-    content="Med-AI Clinical helps imaging teams prepare structured radiology report QA, review queues, critical result workflows, and audit-ready sign-off. Built for supervised validation pilots.">
+    content="Med-AI Clinical helps imaging teams prepare structured radiology report QA, review queues, critical result workflows, and audit-ready sign-off. Free early access for supervised evaluation.">
   <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
   <meta name="author" content="Med-AI Clinical">
   <meta name="theme-color" content="#0d7c66">
@@ -18,7 +18,7 @@
   <meta property="og:locale" content="en_IN">
   <meta property="og:title" content="Med-AI Clinical | AI drafts. Clinicians sign.">
   <meta property="og:description"
-    content="Radiology report QA and clinical documentation workflows for supervised hospital validation pilots.">
+    content="Radiology report QA and clinical documentation workflows with free early access.">
   <meta property="og:image" content="https://medaiclinical.com/og-image.jpg">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Med-AI Clinical | Radiology report QA">
@@ -29,25 +29,32 @@
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
   <link rel="manifest" href="/site.webmanifest">
   <link rel="stylesheet" href="/styles.css">
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "SoftwareApplication",
+  <script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "Med-AI Clinical",
+  "applicationCategory": "HealthApplication",
+  "operatingSystem": "Web",
+  "url": "https://medaiclinical.com/",
+  "description": "Radiology report quality assurance and clinician sign-off workflow software with free early access.",
+  "publisher": {
+    "@type": "Organization",
     "name": "Med-AI Clinical",
-    "applicationCategory": "HealthApplication",
-    "operatingSystem": "Web",
-    "url": "https://medaiclinical.com/",
-    "description": "Radiology report quality assurance and clinician sign-off workflow software for supervised validation pilots.",
-    "publisher": {
-      "@type": "Organization",
-      "name": "Med-AI Clinical",
-      "url": "https://medaiclinical.com/"
-    }
+    "url": "https://medaiclinical.com/"
+  },
+  "isAccessibleForFree": true,
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "USD",
+    "url": "https://medaiclinical.com/pricing.html",
+    "description": "Free early access. Workspace access and capacity confirmed during onboarding."
   }
-  </script>
+}</script>
 </head>
 
 <body>
+<a class="skip-link" href="#main">Skip to content</a>
   <header class="site-header">
     <div class="wrap">
       <div class="nav-inner">
@@ -68,11 +75,11 @@
           <a href="/screenshots.html">Screens</a>
           <a href="/security.html">Security</a>
           <a href="/validation.html">Validation</a>
-          <a href="/pricing.html">Pricing</a>
+          <a href="/pricing.html">Free access</a>
         </nav>
         <div class="nav-actions">
           <a class="button button-secondary" href="/demo.html">Try demo</a>
-          <a class="button button-primary" href="/contact.html">Request pilot</a>
+          <a class="button button-primary" href="https://app.medaiclinical.com/pilot">Get free access</a>
         </div>
         <button class="menu-toggle" type="button" aria-label="Open navigation" aria-expanded="false" data-menu-button>
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
@@ -88,25 +95,26 @@
         <a href="/screenshots.html">Screens</a>
         <a href="/security.html">Security</a>
         <a href="/validation.html">Validation</a>
-        <a href="/pricing.html">Pricing</a>
-        <a href="/contact.html">Request pilot</a>
+        <a href="/pricing.html">Free access</a>
+        <a href="https://app.medaiclinical.com/pilot">Get free access</a>
       </nav>
     </div>
   </header>
 
-  <main>
+  <main id="main">
     <section class="hero">
       <div class="wrap hero-inner">
-        <span class="eyebrow">For imaging teams running supervised AI validation</span>
-        <h1>Med-AI Clinical</h1>
+        <span class="eyebrow">Free early access · For imaging teams</span>
+        <h1>Review the report.<br>Keep the final say.</h1>
         <p>AI-assisted radiology report QA for the stage before clinician sign-off: draft review, issue flags,
           prior-study context, critical result escalation, and audit-ready governance.</p>
         <div class="hero-actions">
-          <a class="button button-primary" href="/contact.html">Request design-partner pilot</a>
+          <a class="button button-primary" href="https://app.medaiclinical.com/pilot">Get free access</a>
           <a class="button button-secondary" href="/demo.html">Try interactive demo</a>
         </div>
+        <p class="free-access-note">$0 subscription fee during early access · No credit card required · <a href="/pricing.html">See access details</a></p>
         <div class="hero-badges" aria-label="Featured on platforms">
-          <span class="hero-badges-label">Featured & Reviewed on</span>
+          <span class="hero-badges-label">Find us on</span>
           <div class="badge-group">
             <a href="https://launchbuff.com/products/med-ai-clinical-intelligence-qpfuib" target="_blank"
               rel="noopener noreferrer" class="badge-link" title="Featured on LaunchBuff">
@@ -139,8 +147,8 @@
       <div class="wrap problem-layout">
         <div>
           <span class="section-kicker">The clinical problem</span>
-          <h2>Radiology AI tools produce drafts. Clinicians need safer report QA before sign-off.</h2>
-          <p class="lead">Hospitals are cautious about GenAI in diagnostic imaging. The gap is not creating draft text; it is proving consistency, tracking quality, checking prior comparisons, and maintaining an audit trail when clinicians review and edit.</p>
+          <h2>Give every draft a structured review before sign-off.</h2>
+          <p class="lead">A report can contain conflicting sides, missing comparison context or inconsistent findings and impressions. Med-AI brings potential issues and their source evidence into the clinician’s review workflow.</p>
         </div>
         <div class="feature-list">
           <div class="feature-row">
@@ -149,9 +157,8 @@
               <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
             </svg>
             <div>
-              <h3>It gives radiologists a review surface, not another chatbot.</h3>
-              <p>The product is strongest when framed as a QA workbench for draft reports, evidence, laterality checks,
-                comparison gaps, and sign-off decisions.</p>
+              <h3>See the report and the evidence together.</h3>
+              <p>Review draft sections, inspect potential laterality conflicts and comparison gaps, then decide what to correct before signing.</p>
             </div>
           </div>
           <div class="feature-row">
@@ -162,9 +169,8 @@
               <path d="M7 2h10a2 2 0 0 1 2 2v16a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2z" />
             </svg>
             <div>
-              <h3>It creates operational proof for the buyer.</h3>
-              <p>Accepted, edited, and rejected drafts become measurable signals. That helps a medical director decide
-                whether AI is improving throughput and report consistency.</p>
+              <h3>Learn from clinician feedback.</h3>
+              <p>Rate useful alerts and record report edits. Use those observations to evaluate your team’s experience rather than assume that every suggestion helps.</p>
             </div>
           </div>
           <div class="feature-row">
@@ -173,7 +179,7 @@
               <path d="M9 12l2 2 4-4" />
             </svg>
             <div>
-              <h3>It has the governance pieces hospitals ask for.</h3>
+              <h3>Keep review actions attributable.</h3>
               <p>Audit trails, clinician attribution, critical result workflows, consent models, and FHIR-oriented
                 export are already part of the product architecture.</p>
             </div>
@@ -186,10 +192,8 @@
       <div class="wrap">
         <div class="section-head center">
           <span class="section-kicker">Product story</span>
-          <h2>The workflow buyers can understand in one meeting.</h2>
-          <p class="lead">Med-AI Clinical should be sold as a narrow, accountable report QA system for imaging
-            operations. The buyer is not purchasing a model. They are purchasing review discipline, throughput
-            visibility, and safer adoption of GenAI.</p>
+          <h2>From draft to reviewed report.</h2>
+          <p class="lead">Review report sections, check evidence-linked alerts and record a clinician’s decision. Explore the workflow with synthetic cases before requesting a team workspace.</p>
         </div>
         <div class="grid-3">
           <article class="card">
@@ -231,11 +235,9 @@
     <section class="section">
       <div class="wrap">
         <div class="section-head">
-          <span class="section-kicker">Current app screenshots</span>
+          <span class="section-kicker">Workflow examples</span>
           <h2>A real product surface, not a slide deck.</h2>
-          <p class="lead">The screenshots below are captured from the current local application using synthetic demo
-            data. They are included to show the buyer-facing workflow and where the product still needs implementation
-            discipline.</p>
+          <p class="lead">The screenshots below illustrate the application using synthetic demo data. They show representative workflow states. Any sample metrics are illustrative, not measured customer outcomes.</p>
         </div>
         <div class="screen-block">
           <figure class="screen-stage">
@@ -247,25 +249,23 @@
           <div class="screen-copy">
             <span class="tag blue">Primary screen</span>
             <h3>Clinical Workspace</h3>
-            <p>This is the strongest product moment. A reviewer sees the draft report, evidence-backed issues, and the
-              actions needed before the report becomes final.</p>
+            <p>Review the draft and QA evidence side by side. Open mapped findings in the 3D Atlas to locate reference anatomy, then return to the report.</p>
             <ul>
-              <li>Best buyer: head of radiology, medical director, or quality lead.</li>
-              <li>Best promise: fewer report QA misses and better review traceability.</li>
+              <li>Built for radiologists, quality reviewers and clinical leads.</li>
+              <li>Clinician review and sign-off remain essential.</li>
             </ul>
           </div>
         </div>
       </div>
     </section>
 
+    <section class="section section-alt"><div class="wrap"><div class="section-head"><span class="section-kicker">Before you begin</span><h2>Clear answers. Something useful to try.</h2></div><div class="grid-3"><article class="card"><h3>See a report correction</h3><p>Follow a synthetic report from conflicting statements to an illustrative revision.</p><a class="text-link" href="/demo.html">Explore the demo →</a></article><article class="card"><h3>See where Med-AI fits</h3><p>Understand its role alongside reporting software, PACS and other AI tools.</p><a class="text-link" href="/compare.html">Compare workflow roles →</a></article><article class="card"><h3>Get practical answers</h3><p>Read about free access, integrations, data handling and the limits of report QA.</p><a class="text-link" href="/faq.html">Read the FAQs →</a></article></div></div></section>
     <section class="section section-dark">
       <div class="wrap">
         <div class="section-head">
           <span class="section-kicker">Honest readiness</span>
-          <h2>Strong enough for a supervised pilot. Not finished for unsupervised production.</h2>
-          <p class="lead">The website now positions the product at the correct stage: credible infrastructure, real
-            workflow screens, and a design-partner path, while avoiding claims that require external validation or
-            certification.</p>
+          <h2>Explore the product. Evaluate the evidence.</h2>
+          <p class="lead">Inspect the demo, workflow screens and data-handling details. Early access is for supervised evaluation; customer outcomes and independent certifications are not claimed.</p>
         </div>
         <div class="grid-3">
           <article class="card">
@@ -274,14 +274,12 @@
               visible and explainable.</p>
           </article>
           <article class="card">
-            <h3>Needs pilot proof</h3>
-            <p>Clinical quality, acceptance rate, correction rate, and operational impact need retrospective validation
-              with real partner data.</p>
+            <h3>Measure with your team</h3>
+            <p>Evaluate alert usefulness, editing activity and elapsed reporting time using recorded workspace events. Publish outcomes only after measurement and review.</p>
           </article>
           <article class="card">
-            <h3>Needs enterprise hardening</h3>
-            <p>SSO, provider agreements, deployment controls, and integration work must be completed before broad
-              hospital production use.</p>
+            <h3>Scope your deployment</h3>
+            <p>Confirm identity requirements, provider agreements, data handling and system integrations before planning a hospital deployment.</p>
           </article>
         </div>
       </div>
@@ -291,17 +289,16 @@
       <div class="wrap">
         <div class="cta-band">
           <div>
-            <h2>Use the site to sell a focused pilot, not the whole future roadmap.</h2>
-            <p>Invite imaging groups to validate report QA on retrospective studies. That is the clearest route to
-              customer requirements, product vision, and evidence that somebody will pay.</p>
+            <h2>Your next step costs $0.</h2>
+            <p>Try a synthetic case now, or request free early access for your team. We’ll confirm your workflow, usage capacity and onboarding scope with you.</p>
           </div>
-          <a class="button button-primary" href="/contact.html">Start pilot conversation</a>
+          <a class="button button-primary" href="https://app.medaiclinical.com/pilot">Get free access</a>
         </div>
       </div>
     </section>
   </main>
 
-  <footer class="footer">
+  <footer class="footer"><div class="wrap resource-links" aria-label="More information"><a href="/pricing.html">Free early access</a><a href="/faq.html">FAQs</a><a href="/compare.html">How we fit</a><a href="/validation.html">Evidence &amp; evaluation</a></div>
     <div class="wrap">
       <div class="footer-grid">
         <div>
@@ -315,7 +312,7 @@
           <p style="margin-top:14px">AI-assisted clinical documentation infrastructure for supervised imaging report QA
             pilots.</p>
           <div class="footer-badges" aria-label="Featured badges">
-            <span class="footer-badges-title">Featured & Reviewed On</span>
+            <span class="footer-badges-title">Find us on</span>
             <div class="footer-badge-group">
               <a href="https://launchbuff.com/products/med-ai-clinical-intelligence-qpfuib" target="_blank"
                 rel="noopener noreferrer" class="footer-badge-link" title="Featured on LaunchBuff">
@@ -334,7 +331,7 @@
             href="/screenshots.html">Screens</a><a href="/validation.html">Validation</a>
         </div>
         <div>
-          <h4>Trust</h4><a href="/security.html">Security</a><a href="/pricing.html">Pricing</a><a
+          <h4>Trust</h4><a href="/security.html">Security</a><a href="/pricing.html">Free access</a><a
             href="/contact.html">Contact</a>
         </div>
         <div>

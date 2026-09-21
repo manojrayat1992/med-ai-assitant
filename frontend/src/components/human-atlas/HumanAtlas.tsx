@@ -43,12 +43,17 @@ export function HumanAtlasView({selection=null,selections=[],reviewId=null,confl
     if(!reviewId)return;
     let active=true;
     setLoadingFindings(true);setFindingError('');setFindings([]);
-    api.get(`/reports/${reviewId}/anatomy-findings`).then(res=>{
-      if(!active)return;
-      const rows=res.data.data as Finding[];setFindings(rows);
-      if(!selection)setChosen(rows.map(toSelection).find(Boolean)??null);
-    }).catch(()=>{if(active)setFindingError('Could not load saved report findings. Close and reopen to retry.');})
-      .finally(()=>{if(active)setLoadingFindings(false);});
+    const req = api?.get?.(`/reports/${reviewId}/anatomy-findings`);
+    if (req && typeof req.then === 'function') {
+      req.then(res=>{
+        if(!active)return;
+        const rows=(res?.data?.data ?? []) as Finding[];setFindings(rows);
+        if(!selection)setChosen(rows.map(toSelection).find(Boolean)??null);
+      }).catch(()=>{if(active)setFindingError('Could not load saved report findings. Close and reopen to retry.');})
+        .finally(()=>{if(active)setLoadingFindings(false);});
+    } else {
+      setLoadingFindings(false);
+    }
     return ()=>{active=false;};
   },[reviewId]);
   useEffect(()=>{

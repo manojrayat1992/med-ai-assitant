@@ -665,6 +665,40 @@ describe('QA workflow regression coverage', () => {
     expect(longitudinalApi.compareReports).not.toHaveBeenCalled();
     expect(screen.getByText(DEMO_COMPARISON_ISSUE)).toBeInTheDocument();
   });
+
+  it('opens Smart QA comparison modal, displays side-by-side reconciliation, and applies smart fixes to draft', async () => {
+    const user = userEvent.setup();
+    renderDemoClinicalWorkspace();
+
+    const compareBtn = screen.getByRole('button', { name: /compare with smart view/i });
+    expect(compareBtn).toBeInTheDocument();
+
+    await user.click(compareBtn);
+
+    // Modal is open
+    expect(screen.getByRole('dialog', { name: /smart qa clinical reconciliation & comparison/i })).toBeInTheDocument();
+    expect(screen.getByText('Side-by-Side Smart Compare')).toBeInTheDocument();
+    expect(screen.getByText('Unified Clinical Diff')).toBeInTheDocument();
+    expect(screen.getByText(/Clinical Evidence & Guidance/i)).toBeInTheDocument();
+
+    // Check that smart reconciliation shows the proposed improvements
+    expect(screen.getByText('Smart Reconciled Draft (AI Proposed)')).toBeInTheDocument();
+    expect(screen.getAllByText(/Laterality Reconciled/i).length).toBeGreaterThan(0);
+
+    // Switch to Unified Diff tab
+    await user.click(screen.getByRole('button', { name: /unified clinical diff/i }));
+    expect(screen.getByText('Unified Clinical Diff View')).toBeInTheDocument();
+
+    // Apply smart changes to draft report
+    const applyBtn = screen.getByRole('button', { name: /apply smart changes to draft report/i });
+    await user.click(applyBtn);
+
+    // Modal closes and action notice appears
+    await waitFor(() => {
+      expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    });
+    expect(screen.getByText('Smart reconciled findings applied to draft report.')).toBeInTheDocument();
+  });
 });
 
 function renderClinicalWorkspace(reviewId: string) {

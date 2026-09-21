@@ -17,7 +17,7 @@ if (menuButton) {
 }
 
 function buildContactMailto(payload) {
-  const subject = encodeURIComponent("Design Partner Inquiry - Med-AI Clinical");
+  const subject = encodeURIComponent("Early Access Inquiry - Med-AI Clinical");
   const body = encodeURIComponent(
     [
       `Name: ${payload.name || ""}`,

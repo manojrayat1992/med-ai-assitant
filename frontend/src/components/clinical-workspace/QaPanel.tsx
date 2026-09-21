@@ -1,4 +1,4 @@
-import { AlertTriangle, CheckCircle2, Loader2, RotateCcw, ShieldAlert } from 'lucide-react';
+import { AlertTriangle, CheckCircle2, Loader2, RotateCcw, ShieldAlert, Sparkles } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { QaIssueCard } from './QaIssueCard';
@@ -15,6 +15,7 @@ interface QaPanelProps {
   onReviewIssue: (issue: QaIssue) => void;
   onDismissIssue: (issue: QaIssue) => void;
   onViewAnatomy: (issue: QaIssue, selection: AnatomySelection) => void;
+  onOpenSmartView?: () => void;
 }
 
 const severityOrder: QaSeverity[] = ['CRITICAL', 'HIGH', 'MEDIUM', 'LOW', 'INFO'];
@@ -38,6 +39,7 @@ export function QaPanel({
   onReviewIssue,
   onDismissIssue,
   onViewAnatomy,
+  onOpenSmartView,
 }: QaPanelProps) {
   const visibleIssues = issues.filter((issue) => !dismissedIssueIds.includes(issue.id));
   const summary = summarizeIssues(visibleIssues);
@@ -63,6 +65,19 @@ export function QaPanel({
                 <AlertTriangle className="h-3 w-3" />
                 {visibleIssues.length} {visibleIssues.length === 1 ? 'Issue' : 'Issues'}
               </span>
+            )}
+            {requestStatus === 'SUCCESS' && onOpenSmartView && (
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={onOpenSmartView}
+                className="h-7 border-cyan-500/40 bg-cyan-950/30 px-2.5 text-[11px] font-medium text-cyan-200 hover:bg-cyan-900/50 hover:text-white"
+                title="Open Smart QA Comparison"
+              >
+                <Sparkles className="mr-1 h-3 w-3 text-cyan-400" />
+                Smart View
+              </Button>
             )}
           </div>
         </div>
