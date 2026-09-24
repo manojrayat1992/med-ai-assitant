@@ -23,6 +23,7 @@ import { ClinicalWorkspacePage } from '@/pages/ClinicalWorkspacePage';
 import { AnatomyPage } from '@/pages/AnatomyPage';
 import { QaAnalyticsPage } from '@/pages/QaAnalyticsPage';
 import { IntegrationsPage } from '@/pages/IntegrationsPage';
+import { PlatformAdminPage } from '@/pages/PlatformAdminPage';
 
 import { EducationalCasesPage } from '@/pages/EducationalCasesPage';
 import { EducationalCaseEditorPage } from '@/pages/EducationalCaseEditorPage';
@@ -76,6 +77,7 @@ export default function App() {
         <Route path="/compliance" element={<CompliancePage />} />
         <Route path="/finetuning" element={<FineTuningPage />} />
         <Route path="/observability" element={<ObservabilityPage />} />
+        <Route path="/platform-admin" element={<PlatformAdminPage />} />
         <Route path="/settings" element={<SettingsPage />} />
       </Route>
 

@@ -6,7 +6,8 @@ import { logout } from '@/services/api';
 import {
   LayoutDashboard, Users, Settings, LogOut,
   Brain, FileText, Zap, BookOpen,
-  Shield, Cpu, ClipboardCheck, Scan, BarChart2
+  Shield, Cpu, ClipboardCheck, Scan, BarChart2,
+  Globe, Building2
 } from 'lucide-react';
 import { cn } from '@/utils/cn';
 
@@ -49,6 +50,7 @@ const navGroups: NavGroup[] = [
   {
     label: 'Admin',
     items: [
+      { to: '/platform-admin', label: 'Platform Hub', icon: Globe },
       { to: '/upload', label: 'Knowledge Base', icon: BookOpen },
       { to: '/integrations', label: 'Integrations', icon: Cpu },
       { to: '/compliance', label: 'Compliance', icon: Shield },
@@ -88,27 +90,43 @@ export function Sidebar() {
         borderRight: '1px solid var(--clr-border, #1e2d45)',
       }}
     >
-      {/* ── Brand ── */}
+      {/* ── Brand & Active Tenant ── */}
       <div
-        className="flex items-center gap-3 px-4 py-5"
+        className="px-4 py-4 space-y-2.5"
         style={{ borderBottom: '1px solid var(--clr-border, #1e2d45)' }}
       >
-        <div
-          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl"
-          style={{
-            background: 'linear-gradient(135deg, #3b82f6, #06b6d4)',
-            boxShadow: '0 0 20px rgba(59,130,246,0.35)',
-          }}
-        >
-          <Brain className="h-5 w-5 text-white" />
+        <div className="flex items-center gap-3">
+          <div
+            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl"
+            style={{
+              background: 'linear-gradient(135deg, #3b82f6, #06b6d4)',
+              boxShadow: '0 0 20px rgba(59,130,246,0.35)',
+            }}
+          >
+            <Brain className="h-5 w-5 text-white" />
+          </div>
+          <div className="overflow-hidden min-w-0">
+            <p className="text-sm font-bold truncate" style={{ fontFamily: 'Plus Jakarta Sans', color: 'var(--clr-text)' }}>
+              Med-AI
+            </p>
+            <p className="text-xs truncate" style={{ color: 'var(--clr-text-3, #64748b)' }}>
+              Clinical Intelligence
+            </p>
+          </div>
         </div>
-        <div className="overflow-hidden min-w-0">
-          <p className="text-sm font-bold truncate" style={{ fontFamily: 'Plus Jakarta Sans', color: 'var(--clr-text)' }}>
-            Med-AI
-          </p>
-          <p className="text-xs truncate" style={{ color: 'var(--clr-text-3, #64748b)' }}>
-            Clinical Intelligence
-          </p>
+
+        {/* Tenant context indicator */}
+        <div
+          className="flex items-center gap-1.5 px-2 py-1 rounded-lg text-[11px] font-medium truncate"
+          style={{
+            background: 'rgba(59,130,246,0.08)',
+            border: '1px solid rgba(59,130,246,0.2)',
+            color: '#93c5fd',
+          }}
+          title={`Hospital Workspace: ${tenantName || 'Main Hospital'}`}
+        >
+          <Building2 className="h-3 w-3 shrink-0 text-blue-400" />
+          <span className="truncate">{tenantName || 'Main Hospital'}</span>
         </div>
       </div>
 
@@ -118,7 +136,14 @@ export function Sidebar() {
           <div key={group.label ?? 'primary'}>
             {group.label && <p className="section-label mb-2">{group.label}</p>}
             <div className="space-y-0.5">
-              {group.items.filter(item => item.to !== '/upload' || role === 'HOSPITAL_ADMIN').map((item) => (
+              {group.items
+                .filter(item => {
+                  if (item.to === '/upload' || item.to === '/platform-admin') {
+                    return role === 'HOSPITAL_ADMIN';
+                  }
+                  return true;
+                })
+                .map((item) => (
                 <NavLink
                   key={item.to}
                   to={item.to}

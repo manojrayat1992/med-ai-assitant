@@ -1,7 +1,7 @@
 import { Outlet, Navigate, Link, NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '@/stores/authStore';
 import { Sidebar } from './Sidebar';
-import { Shield, Clock, Search, X, Brain, LogOut, ClipboardCheck, Users, ChevronDown } from 'lucide-react';
+import { Shield, Clock, Search, X, Brain, LogOut, ClipboardCheck, Users, ChevronDown, Building2, Globe } from 'lucide-react';
 import { useState, useEffect, useRef } from 'react';
 import { NotificationCenter } from '@/components/notification/NotificationCenter';
 import { patientService } from '@/services/patientService';
@@ -38,6 +38,7 @@ const pageMeta: Record<string, { title: string; sub: string }> = {
   compliance:   { title: 'Compliance & Consent',       sub: 'HIPAA Safe Harbor, GDPR consent & data retention' },
   finetuning:   { title: 'Fine-Tuning & Model Registry', sub: 'LoRA adapters, training pipelines & A/B testing' },
   observability: { title: 'System Observability',       sub: 'Prometheus metrics, latency percentiles & JVM telemetry' },
+  'platform-admin': { title: 'Platform Operations Hub', sub: 'Cross-tenant analytics, user registrations, logins & global audit logs' },
   settings:     { title: 'Settings',                   sub: 'Security & system configuration' },
 };
 
@@ -52,7 +53,7 @@ function useDebounce<T>(value: T, delay: number): T {
 }
 
 export function DashboardLayout() {
-  const { isAuthenticated, isBootstrapped, fullName, role } = useAuthStore();
+  const { isAuthenticated, isBootstrapped, fullName, role, tenantName } = useAuthStore();
   const location   = useLocation();
   const navigate   = useNavigate();
   const searchRef  = useRef<HTMLDivElement>(null);
@@ -300,6 +301,23 @@ export function DashboardLayout() {
               </nav>
             ) : (
               <>
+                {/* Active Tenant Workspace Context Badge */}
+                <div
+                  className="hidden md:flex items-center gap-2 h-8 px-2.5 rounded-lg text-xs"
+                  style={{
+                    background: 'rgba(59,130,246,0.08)',
+                    border: '1px solid rgba(59,130,246,0.22)',
+                    color: 'var(--clr-text)',
+                  }}
+                  title={`Active Hospital Workspace: ${tenantName || 'Main Hospital'}`}
+                >
+                  <Building2 className="h-3.5 w-3.5 text-blue-400 shrink-0" />
+                  <span className="font-semibold text-white max-w-[130px] lg:max-w-[170px] truncate">
+                    {tenantName || 'Main Workspace'}
+                  </span>
+                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 shrink-0 animate-pulse" title="Workspace Active" />
+                </div>
+
                 {/* Clock */}
                 <div
                   className="hidden sm:flex items-center gap-1.5 h-8 px-3 rounded-lg text-xs font-mono"
@@ -353,7 +371,7 @@ export function DashboardLayout() {
 
               {userMenuOpen && (
                 <div
-                  className="absolute right-0 top-[calc(100%+8px)] w-52 overflow-hidden rounded-xl border shadow-2xl"
+                  className="absolute right-0 top-[calc(100%+8px)] w-56 overflow-hidden rounded-xl border shadow-2xl"
                   style={{
                     background: 'var(--surface, #111827)',
                     borderColor: 'var(--clr-border, #1e2d45)',
@@ -364,7 +382,21 @@ export function DashboardLayout() {
                   <div className="px-3.5 py-3 border-b" style={{ borderColor: 'var(--clr-border, #1e2d45)', background: 'var(--surface-2, #1a2235)' }}>
                     <p className="text-xs font-bold truncate" style={{ color: 'var(--clr-text)' }}>{fullName ?? 'Clinical User'}</p>
                     <p className="text-[11px] text-blue-400 capitalize truncate">{role ? role.replace(/_/g, ' ').toLowerCase() : 'Practitioner'}</p>
+                    <p className="text-[10px] text-slate-400 truncate mt-0.5 flex items-center gap-1">
+                      <Building2 className="h-2.5 w-2.5 text-blue-400" />
+                      {tenantName || 'Main Hospital'}
+                    </p>
                   </div>
+                  {role === 'HOSPITAL_ADMIN' && (
+                    <Link
+                      to="/platform-admin"
+                      onClick={() => setUserMenuOpen(false)}
+                      className="flex items-center gap-2 px-3.5 py-2.5 text-xs font-semibold transition-colors hover:bg-blue-600/10 text-blue-400 border-b border-slate-800"
+                    >
+                      <Globe className="h-3.5 w-3.5" />
+                      Platform Operations Hub
+                    </Link>
+                  )}
                   <Link
                     to="/settings"
                     onClick={() => setUserMenuOpen(false)}
