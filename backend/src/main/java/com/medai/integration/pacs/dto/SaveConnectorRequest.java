@@ -35,6 +35,7 @@ public class SaveConnectorRequest {
     private String localAet;
     @jakarta.validation.constraints.Size(max = 512)
     private String endpointUrl;
+    private String viewerUrl;
     @jakarta.validation.constraints.Size(max = 500)
     private String description;
     @jakarta.validation.constraints.Pattern(regexp = "[A-Za-z0-9_-]{0,64}")

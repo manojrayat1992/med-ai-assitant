@@ -96,13 +96,17 @@ DB_APP_PASSWORD=$(openssl rand -base64 24)
 JWT_SECRET=$(openssl rand -base64 64)
 APP_CRYPTO_SECRET=$(openssl rand -base64 32)
 GROQ_API_KEY=<your key>
+STORAGE_S3_BUCKET=<your-s3-bucket-name>
+STORAGE_S3_REGION=ap-south-1
+# If not using an EC2 IAM instance profile, provide static AWS credentials:
+# STORAGE_S3_ACCESS_KEY=<your-access-key>
+# STORAGE_S3_SECRET_KEY=<your-secret-key>
 BASE_DOMAIN=medaiclinical.com
 CLOUDFLARE_API_TOKEN=<Zone:DNS:Edit token for this zone>
 ECR_REGISTRY=<account>.dkr.ecr.ap-south-1.amazonaws.com
 IMAGE_TAG=<commit-sha>
 ```
-`JWT_SECRET` and `APP_CRYPTO_SECRET` have no safe defaults — the app refuses to start without the
-first, and the second still falls back to a value committed in this repository (finding F-16).
+`JWT_SECRET`, `APP_CRYPTO_SECRET`, and `STORAGE_S3_BUCKET` are required for startup.
 
 **6. Start it**
 ```bash

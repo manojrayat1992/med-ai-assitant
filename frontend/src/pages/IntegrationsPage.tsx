@@ -84,6 +84,7 @@ export function IntegrationsPage() {
           <label>Name<input required maxLength={120} className={inputClass} value={form.name} onChange={e => field('name', e.target.value)} /></label>
           <label>Connector type<select className={inputClass} value={form.type} onChange={e => field('type',e.target.value)}>{types.map(t => <option key={t}>{t}</option>)}</select></label>
           <label>Endpoint base URL<input className={inputClass} maxLength={512} value={form.endpointUrl || ''} placeholder="http://orthanc:8042" onChange={e => field('endpointUrl',e.target.value)} /></label>
+          <label>OHIF viewer URL<input className={inputClass} maxLength={512} value={form.viewerUrl || ''} placeholder="https://pacs.example.com/ohif/viewer" onChange={e => field('viewerUrl', e.target.value)} /><span className="text-xs text-slate-400">Browser-accessible viewer route. For your SSH tunnel: http://localhost:8042/ohif/viewer. Viewer login is separate.</span></label>
           <label>Orthanc modality ID (optional C-ECHO)<input className={inputClass} pattern="[A-Za-z0-9_-]{0,64}" value={form.orthancModality || ''} placeholder="loopback" onChange={e => field('orthancModality',e.target.value)} /></label>
           <label>HTTP username<input className={inputClass} autoComplete="off" value={form.username || ''} onChange={e => field('username',e.target.value)} /></label>
           <label>HTTP password<input type="password" autoComplete="new-password" className={inputClass} value={form.password || ''} onChange={e => field('password',e.target.value)} /></label>
@@ -102,7 +103,7 @@ export function IntegrationsPage() {
         <p className="break-all text-sm">{c.endpointUrl || 'Endpoint not configured'}</p>
         <p className="text-xs text-slate-400">Last checked: {c.lastPingAt ? new Date(c.lastPingAt).toLocaleString() : 'Never'} · Credentials: {c.credentialsConfigured ? 'Stored' : 'None'}</p>
         <div className="flex gap-2"><button className={buttonClass} disabled={busy} onClick={() => void ping(c)}>Test connection</button>
-        <button className={buttonClass} disabled={busy} onClick={() => setForm({id:c.id, name:c.name, type:c.type, endpointUrl:c.endpointUrl || '', orthancModality:c.orthancModality || ''})}>Edit</button></div>
+        <button className={buttonClass} disabled={busy} onClick={() => setForm({id:c.id, name:c.name, type:c.type, endpointUrl:c.endpointUrl || '', viewerUrl:c.viewerUrl || '', orthancModality:c.orthancModality || ''})}>Edit</button></div>
       </article>)}</div>
     </>}
     {tab === 'studies' && <OrthancStudies connectors={connectors} />}

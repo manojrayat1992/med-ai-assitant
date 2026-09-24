@@ -3,31 +3,31 @@ import api from '@/services/api';
 import type { ApiResponse } from '@/types';
 import type { PacsConnector } from '@/types/integration';
 
-type Study = { id: string; studyInstanceUid: string; accessionNumber: string; studyDate: string; description: string; patientId: string; patientName: string; seriesCount: number };
+export type Study = { id: string; studyInstanceUid: string; accessionNumber: string; studyDate: string; description: string; patientId: string; patientName: string; seriesCount: number };
 type Series = { id: string; seriesInstanceUid: string; modality: string; description: string; seriesNumber: string; instanceCount: number };
 type Page = { content: Study[]; offset: number; limit: number; hasMore: boolean };
 const button = 'rounded bg-blue-700 px-4 py-2 text-sm text-white disabled:opacity-50';
 function errorText(e: unknown) {
   return (e as { response?: { data?: { message?: string } } }).response?.data?.message || 'Could not load Orthanc data. Check the connection and retry.';
 }
-export function OrthancStudies({ connectors }: { connectors: PacsConnector[] }) {
+export function OrthancStudies({ connectors, onSelect }: { connectors: PacsConnector[]; onSelect?: (connectorId: string, study: Study) => void }) {
   const orthanc = connectors.filter(c => c.type === 'ORTHANC');
   const [chosen, setChosen] = useState('');
   const connectorId = orthanc.some(c => c.id === chosen) ? chosen : orthanc[0]?.id || '';
   return <section className="space-y-4">
     <h2 className="text-lg font-semibold">Browse Orthanc studies</h2>
-    <p className="text-sm text-slate-400">Browse imaging study metadata from your archive. Studies are not yet linked to Med-AI patient reports.</p>
+    <p className="text-sm text-slate-400">Browse imaging study metadata from your archive. To link a study, open the patient report in the clinical workspace and choose Open in PACS.</p>
     {!orthanc.length ? <p>No Orthanc connectors configured. Add one in the Connectors tab first.</p> : <>
       <label className="block text-sm">Orthanc connector
         <select className="mt-1 w-full rounded border border-slate-600 bg-slate-900 p-2" value={connectorId} onChange={e => setChosen(e.target.value)}>
           {orthanc.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
         </select>
       </label>
-      <StudyList key={connectorId} connectorId={connectorId} />
+      <StudyList key={connectorId} connectorId={connectorId} onSelect={onSelect} />
     </>}
   </section>;
 }
-function StudyList({ connectorId }: { connectorId: string }) {
+function StudyList({ connectorId, onSelect }: { connectorId: string; onSelect?: (connectorId: string, study: Study) => void }) {
   const [offset, setOffset] = useState(0);
   const [refresh, setRefresh] = useState(0);
   const [page, setPage] = useState<Page | null>(null);
@@ -52,7 +52,7 @@ function StudyList({ connectorId }: { connectorId: string }) {
           <td className="p-3">{study.description || 'Untitled study'}</td>
           <td className="p-3">{study.studyDate || '—'}<div>{study.accessionNumber || 'No accession'}</div></td>
           <td className="p-3">{study.seriesCount}</td>
-          <td className="p-3"><button className={button} onClick={() => setSelected(study)} aria-label={`View study ${study.description || study.id}`}>View details</button></td>
+          <td className="p-3"><button className={button} onClick={() => setSelected(study)} aria-label={`View study ${study.description || study.id}`}>View details</button>{onSelect && <button className={button + " mt-2"} onClick={() => onSelect(connectorId, study)} aria-label={`Select study ${study.description || study.id}`}>Select for report</button>}</td>
         </tr>)}</tbody></table>
       </div>}
     </>}

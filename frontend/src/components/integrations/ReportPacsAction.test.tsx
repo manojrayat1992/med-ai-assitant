@@ -1,0 +1,51 @@
+import { cleanup, render, screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { afterEach, beforeEach, expect, it, vi } from 'vitest';
+import { MemoryRouter } from 'react-router-dom';
+import api from '@/services/api';
+import { useAuthStore } from '@/stores/authStore';
+import type { ReportReview } from '@/services/reportService';
+import { ReportPacsAction } from './ReportPacsAction';
+vi.mock('@/services/api', () => ({ default: { get: vi.fn(), put: vi.fn(), post: vi.fn(), delete: vi.fn() } }));
+const report = { id: 'report-1', patientId: 'patient-1', patientName: 'Synthetic Patient' } as ReportReview;
+const study = { id: 'study-1', description: 'Synthetic chest', patientName: 'Synthetic Patient', patientId: 'P1', studyInstanceUid: '1.2.3' };
+const link = { connectorId: 'connector-1', studyId: 'study-1', studyInstanceUid: '1.2.3', viewerUrl: 'https://pacs.example.test/ohif/viewer?StudyInstanceUIDs=1.2.3' };
+beforeEach(() => { vi.resetAllMocks(); useAuthStore.setState({ role: 'HOSPITAL_ADMIN' }); });
+afterEach(() => { cleanup(); vi.restoreAllMocks(); useAuthStore.getState().clear(); });
+function renderAction() { render(<MemoryRouter><ReportPacsAction report={report} /></MemoryRouter>); }
+it('requires patient confirmation before saving a selected study', async () => {
+  vi.mocked(api.get).mockImplementation(async url => ({ data: { data: url.endsWith('/pacs') ? null : url.endsWith('/connectors') ? [{ id: 'connector-1', type: 'ORTHANC', name: 'Archive' }] : { content: [study], hasMore: false } } }));
+  vi.mocked(api.put).mockResolvedValue({ data: { data: link } });
+  const user = userEvent.setup(); renderAction();
+  await user.click(screen.getByRole('button', { name: 'Open in PACS' }));
+  await user.click(await screen.findByRole('button', { name: 'Select study Synthetic chest' }));
+  expect(screen.getByRole('button', { name: 'Link study to report' })).toBeDisabled();
+  await user.click(screen.getByRole('checkbox'));
+  await user.click(screen.getByRole('button', { name: 'Link study to report' }));
+  expect(api.put).toHaveBeenCalledWith('/reports/report-1/pacs', { connectorId: 'connector-1', studyId: 'study-1', patientConfirmed: true });
+  expect(await screen.findByText('Linked study UID: 1.2.3')).toBeVisible();
+});
+it('launches a saved study after server validation without sending a token', async () => {
+  useAuthStore.setState({ role: 'DOCTOR' });
+  vi.mocked(api.get).mockResolvedValue({ data: { data: link } });
+  vi.mocked(api.post).mockResolvedValue({ data: { data: link } });
+  const replace = vi.fn();
+  vi.spyOn(window, 'open').mockReturnValue({ opener: null, location: { replace }, close: vi.fn() } as unknown as Window);
+  const user = userEvent.setup(); renderAction();
+  await waitFor(() => expect(api.get).toHaveBeenCalled());
+  await user.click(screen.getByRole('button', { name: 'Open in PACS' }));
+  await waitFor(() => expect(replace).toHaveBeenCalledWith(link.viewerUrl));
+  expect(api.post).toHaveBeenCalledWith('/reports/report-1/pacs/launch');
+});
+it('shows a useful failure and closes the empty tab when launch fails', async () => {
+  useAuthStore.setState({ role: 'DOCTOR' });
+  vi.mocked(api.get).mockResolvedValue({ data: { data: link } });
+  vi.mocked(api.post).mockRejectedValue({ response: { data: { message: 'Study missing' } } });
+  const close = vi.fn();
+  vi.spyOn(window, 'open').mockReturnValue({ opener: null, location: { replace: vi.fn() }, close } as unknown as Window);
+  const user = userEvent.setup(); renderAction();
+  await waitFor(() => expect(api.get).toHaveBeenCalled());
+  await user.click(screen.getByRole('button', { name: 'Open in PACS' }));
+  expect(await screen.findByRole('alert')).toHaveTextContent('Study missing');
+  expect(close).toHaveBeenCalled();
+});

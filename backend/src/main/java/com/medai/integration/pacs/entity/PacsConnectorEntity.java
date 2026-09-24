@@ -51,6 +51,8 @@ public class PacsConnectorEntity {
 
     @Column(name = "endpoint_url", length = 512)
     private String endpointUrl;
+    @Column(name = "viewer_url", length = 512)
+    private String viewerUrl;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false, length = 32)

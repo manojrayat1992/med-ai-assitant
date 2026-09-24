@@ -24,6 +24,7 @@ public class PacsConnectorDto {
     private String aetTitle;
     private String localAet;
     private String endpointUrl;
+    private String viewerUrl;
     private ConnectorStatus status;
     private Instant lastPingAt;
     private Integer latencyMs;

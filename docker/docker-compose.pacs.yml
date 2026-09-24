@@ -7,6 +7,9 @@ services:
       - "127.0.0.1:8042:8042"
       - "127.0.0.1:4242:4242"
     environment:
+      OHIF_PLUGIN_ENABLED: "true"
+      DICOM_WEB_PLUGIN_ENABLED: "true"
+      ORTHANC__OHIF__DATA_SOURCE: dicom-web
       ORTHANC__NAME: MedAI-Test-PACS
       ORTHANC__DICOM_AET: ORTHANC
       ORTHANC__REMOTE_ACCESS_ALLOWED: "true"

@@ -1,4 +1,5 @@
-import { AlertTriangle, CheckCircle2, ExternalLink, MoreVertical, User2 } from 'lucide-react';
+import type { ReactNode } from 'react';
+import { AlertTriangle, CheckCircle2, MoreVertical, User2 } from 'lucide-react';
 import type { ClinicalReportStatus, ClinicalWorkspaceStudy, QaIssue } from '@/types/clinicalWorkspace';
 
 const reportStatusMeta: Record<ClinicalReportStatus, { label: string; badge: string }> = {
@@ -9,13 +10,14 @@ const reportStatusMeta: Record<ClinicalReportStatus, { label: string; badge: str
 };
 
 interface ClinicalHeaderProps {
+  pacsAction?: ReactNode;
   study: ClinicalWorkspaceStudy;
   reportStatus: ClinicalReportStatus;
   contextLabel?: string;
   visibleQaIssues: QaIssue[];
 }
 
-export function ClinicalHeader({ study, reportStatus, contextLabel = 'Demo case', visibleQaIssues }: ClinicalHeaderProps) {
+export function ClinicalHeader({ pacsAction, study, reportStatus, contextLabel = 'Demo case', visibleQaIssues }: ClinicalHeaderProps) {
   const status = reportStatusMeta[reportStatus];
   const hasHighSeverityIssues = visibleQaIssues.some((issue) => issue.severity === 'CRITICAL' || issue.severity === 'HIGH');
   const facts = [
@@ -79,16 +81,7 @@ export function ClinicalHeader({ study, reportStatus, contextLabel = 'Demo case'
             </div>
           )}
 
-          <button
-            type="button"
-            disabled
-            title="No PACS integration is connected for this workspace yet."
-            className="inline-flex h-9 items-center gap-1.5 rounded-lg border px-3 text-xs font-semibold text-slate-500 opacity-60"
-            style={{ borderColor: 'var(--clr-border-2, #243250)', background: 'rgba(255,255,255,0.03)' }}
-          >
-            Open in PACS
-            <ExternalLink className="h-3.5 w-3.5" />
-          </button>
+          {pacsAction ?? <span className="text-xs text-slate-400">PACS is available for saved reports.</span>}
 
           <button
             type="button"

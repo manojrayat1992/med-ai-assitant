@@ -22,6 +22,7 @@ export interface PacsConnector {
   aetTitle?: string;
   localAet?: string;
   endpointUrl?: string;
+  viewerUrl?: string;
   status: ConnectorStatus;
   lastPingAt?: string;
   latencyMs?: number | null;
@@ -45,6 +46,7 @@ export interface SaveConnectorPayload {
   aetTitle?: string;
   localAet?: string;
   endpointUrl?: string;
+  viewerUrl?: string;
   description?: string;
   orthancModality?: string;
   credentialsConfigured?: boolean;

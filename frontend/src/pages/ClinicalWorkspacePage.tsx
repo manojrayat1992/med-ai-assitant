@@ -1,3 +1,4 @@
+import { ReportPacsAction } from '@/components/integrations/ReportPacsAction';
 import { DownloadSignedReport } from '@/components/reports/DownloadSignedReport';
 import { useEffect, useMemo, useState } from 'react';
 import {
@@ -339,6 +340,7 @@ export function ClinicalWorkspacePage() {
       )}
 
       <ClinicalHeader
+        pacsAction={review ? <ReportPacsAction key={review.id} report={review} /> : undefined}
         study={currentStudy}
         reportStatus={reportStatus}
         contextLabel={isDemoMode ? 'Demo case' : 'Report review'}

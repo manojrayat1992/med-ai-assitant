@@ -71,6 +71,13 @@ public class ReportReview {
     @Column(name = "amends_review_id")
     private UUID amendsReviewId;
 
+    @Column(name = "pacs_connector_id", insertable = false, updatable = false)
+    private UUID pacsConnectorId;
+    @Column(name = "pacs_study_id", insertable = false, updatable = false)
+    private String pacsStudyId;
+    @Column(name = "pacs_study_uid", insertable = false, updatable = false)
+    private String pacsStudyUid;
+
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt;

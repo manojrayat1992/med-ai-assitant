@@ -68,6 +68,7 @@ public class PacsIntegrationService {
             entity.setEncryptedAuth(encryption.encrypt("Basic " + Base64.getEncoder().encodeToString(
                 (request.getUsername() + ":" + request.getPassword()).getBytes(java.nio.charset.StandardCharsets.UTF_8))));
         }
+        entity.setViewerUrl(PacsViewerUrl.validate(request.getViewerUrl()));
         entity.setOrthancModality(request.getOrthancModality());
         entity.setStatus(ConnectorStatus.DISCONNECTED);
         entity.setLatencyMs(null); entity.setLastPingAt(null);
@@ -129,6 +130,7 @@ public class PacsIntegrationService {
                 .aetTitle(e.getAetTitle())
                 .localAet(e.getLocalAet())
                 .endpointUrl(e.getEndpointUrl())
+                .viewerUrl(e.getViewerUrl())
                 .status(e.getStatus())
                 .lastPingAt(e.getLastPingAt())
                 .latencyMs(e.getLatencyMs())

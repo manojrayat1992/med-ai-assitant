@@ -1,3 +1,4 @@
+import api from '@/services/api';
 import { signedReportText } from '@/components/reports/DownloadSignedReport';
 import { act, cleanup, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -91,6 +92,7 @@ const SAFE_NO_ISSUES_COPY = 'No potential QA issues detected by the current chec
 describe('QA workflow regression coverage', () => {
   beforeEach(() => {
     vi.resetAllMocks();
+    vi.mocked(api.get).mockImplementation(async url => ({ data: { data: url.endsWith('/pacs') ? null : url.endsWith('/files') ? { content: [] } : [] } }));
     useAuthStore.getState().setAuth({
       accessToken: 'test-access-token',
       userId: 'doctor-user-id',
