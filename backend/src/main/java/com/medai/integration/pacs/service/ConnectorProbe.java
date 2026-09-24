@@ -69,7 +69,7 @@ public class ConnectorProbe {
         };
     }
 
-    private JsonNode request(PacsConnectorEntity e, String path, boolean post, String accept) throws Exception {
+    JsonNode request(PacsConnectorEntity e, String path, boolean post, String accept) throws Exception {
         String base = validateEndpoint(e.getEndpointUrl()).toString().replaceAll("/+$", "");
         HttpURLConnection connection = (HttpURLConnection) URI.create(base + path).toURL().openConnection();
         connection.setInstanceFollowRedirects(false);
