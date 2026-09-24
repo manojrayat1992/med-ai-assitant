@@ -1,3 +1,4 @@
+import { OrthancStudies } from '@/components/integrations/OrthancStudies';
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuthStore } from '@/stores/authStore';
@@ -73,7 +74,7 @@ export function IntegrationsPage() {
   if (!admin) return <p role="alert">Hospital administrator access is required to manage integration endpoints and run the HL7 sandbox.</p>;
   return <div className="max-w-6xl space-y-5">
     <header><h1 className="text-2xl font-bold">PACS & EHR integrations</h1><p className="mt-2 text-sm text-slate-400">Configure endpoints, inspect real connection checks and validate HL7 messages. Status shows the last test result, not continuous monitoring.</p></header>
-    <nav className="flex flex-wrap gap-2">{[['connectors','Connectors'],['hl7','HL7 sandbox'],['docker','Docker test setup'],['imports','Report import lookup']].map(([id,label]) =>
+    <nav className="flex flex-wrap gap-2">{[['connectors','Connectors'],['studies','Browse studies'],['hl7','HL7 sandbox'],['docker','Docker test setup'],['imports','Report import lookup']].map(([id,label]) =>
       <button key={id} className={buttonClass} disabled={busy} aria-pressed={tab === id} onClick={() => {setTab(id); setError(''); setNotice('');}}>{label}</button>)}</nav>
     {error && <p role="alert" className="text-red-300">{error}</p>}{notice && <p role="status" className="text-cyan-300">{notice}</p>}
     {tab === 'connectors' && <>
@@ -104,6 +105,7 @@ export function IntegrationsPage() {
         <button className={buttonClass} disabled={busy} onClick={() => setForm({id:c.id, name:c.name, type:c.type, endpointUrl:c.endpointUrl || '', orthancModality:c.orthancModality || ''})}>Edit</button></div>
       </article>)}</div>
     </>}
+    {tab === 'studies' && <OrthancStudies connectors={connectors} />}
     {tab === 'hl7' && <section className="space-y-3">
       <h2 className="font-semibold">HL7 text-report validation sandbox</h2><p className="text-sm text-slate-400">Synthetic sample. Authenticated HTTP parsing only; no message is sent over MLLP and no clinical record is saved. One patient and one order per message.</p>
       <label className="block">Raw HL7 message<textarea className={inputClass + ' font-mono'} rows={12} maxLength={262144} disabled={busy} value={raw} onChange={e => {setRaw(e.target.value); setParsed(null);}} /></label>
