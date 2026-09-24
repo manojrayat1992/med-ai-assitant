@@ -1,16 +1,107 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9
-          http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
-  <url><loc>https://medaiclinical.com/</loc><lastmod>2026-09-21</lastmod><changefreq>weekly</changefreq><priority>1.0</priority></url>
-  <url><loc>https://medaiclinical.com/product.html</loc><lastmod>2026-09-21</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://medaiclinical.com/demo.html</loc><lastmod>2026-09-21</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://medaiclinical.com/screenshots.html</loc><lastmod>2026-09-21</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://medaiclinical.com/security.html</loc><lastmod>2026-09-21</lastmod><changefreq>weekly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://medaiclinical.com/validation.html</loc><lastmod>2026-09-21</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://medaiclinical.com/pricing.html</loc><lastmod>2026-09-21</lastmod><changefreq>weekly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://medaiclinical.com/contact.html</loc><lastmod>2026-09-21</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://medaiclinical.com/faq.html</loc><lastmod>2026-09-21</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://medaiclinical.com/compare.html</loc><lastmod>2026-09-21</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+          http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd
+          http://www.google.com/schemas/sitemap-image/1.1
+          http://www.google.com/schemas/sitemap-image/1.1/sitemap-image.xsd">
+  <url>
+    <loc>https://medaiclinical.com/</loc>
+    <lastmod>2026-09-24</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+    <image:image>
+      <image:loc>https://medaiclinical.com/og-image.jpg</image:loc>
+      <image:title>Med-AI Clinical - AI Radiology Report QA Platform</image:title>
+      <image:caption>Med-AI Clinical platform for radiology report QA and clinician sign-off</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://medaiclinical.com/screenshots/app-clinical-workspace.png</image:loc>
+      <image:title>Clinical Workspace Interface</image:title>
+      <image:caption>Report text and QA issue list with source evidence side by side</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://medaiclinical.com/product.html</loc>
+    <lastmod>2026-09-24</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+    <image:image>
+      <image:loc>https://medaiclinical.com/screenshots/app-clinical-workspace.png</image:loc>
+      <image:title>Med-AI Clinical Product Architecture</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://medaiclinical.com/demo.html</loc>
+    <lastmod>2026-09-24</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://medaiclinical.com/screenshots.html</loc>
+    <lastmod>2026-09-24</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+    <image:image>
+      <image:loc>https://medaiclinical.com/screenshots/app-clinical-workspace.png</image:loc>
+      <image:title>Med-AI Clinical Workspace</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://medaiclinical.com/screenshots/app-human-atlas.png</image:loc>
+      <image:title>3D Human Anatomy Atlas Context</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://medaiclinical.com/screenshots/app-worklist.png</image:loc>
+      <image:title>Radiology Review Worklist Queue</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://medaiclinical.com/screenshots/app-dashboard.png</image:loc>
+      <image:title>Clinical Overview Dashboard</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://medaiclinical.com/screenshots/app-qa-analytics.png</image:loc>
+      <image:title>QA Metrics and Alert Analytics</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://medaiclinical.com/screenshots/app-integrations.png</image:loc>
+      <image:title>PACS and RIS Integrations Setup</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://medaiclinical.com/compare.html</loc>
+    <lastmod>2026-09-24</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://medaiclinical.com/security.html</loc>
+    <lastmod>2026-09-24</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://medaiclinical.com/validation.html</loc>
+    <lastmod>2026-09-24</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://medaiclinical.com/pricing.html</loc>
+    <lastmod>2026-09-24</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+  </url>
+  <url>
+    <loc>https://medaiclinical.com/faq.html</loc>
+    <lastmod>2026-09-24</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+  </url>
+  <url>
+    <loc>https://medaiclinical.com/contact.html</loc>
+    <lastmod>2026-09-24</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
 </urlset>

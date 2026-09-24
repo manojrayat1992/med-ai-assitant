@@ -1,7 +1,25 @@
 User-agent: *
 Allow: /
 
-# Block internal/draft assets if any
+# Private worker endpoints and build metadata
+Disallow: /api/
 Disallow: /_headers
 
+# Search engine crawler image & asset directives
+User-agent: Googlebot
+Allow: /
+Allow: /screenshots/
+Allow: /*.png$
+Allow: /*.jpg$
+Allow: /*.svg$
+
+User-agent: Bingbot
+Allow: /
+Allow: /screenshots/
+Allow: /*.png$
+Allow: /*.jpg$
+Allow: /*.svg$
+
+# Sitemaps & Host specification
 Sitemap: https://medaiclinical.com/sitemap.xml
+Host: https://medaiclinical.com

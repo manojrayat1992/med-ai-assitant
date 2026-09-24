@@ -268,6 +268,21 @@ async function handleContact(request, env) {
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
+
+    // SEO canonicalization: 301 redirect www to apex domain and enforce HTTPS
+    const hostname = url.hostname.toLowerCase();
+    const isWww = hostname === "www.medaiclinical.com";
+    const isHttp = url.protocol === "http:" || request.headers.get("x-forwarded-proto") === "http";
+
+    if (isWww || (isHttp && hostname === "medaiclinical.com")) {
+      const canonicalUrl = new URL(request.url);
+      canonicalUrl.protocol = "https:";
+      if (isWww) {
+        canonicalUrl.hostname = "medaiclinical.com";
+      }
+      return Response.redirect(canonicalUrl.toString(), 301);
+    }
+
     if (url.pathname === "/api/contact") {
       return handleContact(request, env);
     }

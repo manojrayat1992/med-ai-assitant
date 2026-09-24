@@ -1,7 +1,176 @@
 <!doctype html>
 <html lang="en">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Frequently Asked Questions | Med-AI Clinical</title><meta name="description" content="Answers about free early access, report QA, supported workflows, integrations, data storage, training and clinician review."><link rel="canonical" href="https://medaiclinical.com/faq.html"><link rel="icon" type="image/svg+xml" href="/favicon.svg"><link rel="manifest" href="/site.webmanifest"><link rel="stylesheet" href="/styles.css?v=20260923-contrast">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Radiology Report QA & Clinical AI FAQs | Med-AI Clinical</title>
+  <meta name="description" content="Frequently asked questions about Med-AI Clinical: free early access, supported modalities, PACS/EHR connections, AI model data privacy, and clinician sign-off workflow.">
+  <meta name="keywords" content="radiology AI FAQ, medical report QA questions, PACS integration questions, HIPAA medical AI questions, clinician sign-off AI">
+  <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+  <meta name="googlebot" content="index, follow">
+  <meta name="author" content="Med-AI Clinical">
+  <meta name="theme-color" content="#0d7c66">
+  <link rel="canonical" href="https://medaiclinical.com/faq.html">
+  <meta name="google-site-verification" content="6fcaf84656f5cf34">
+  <meta name="msvalidate.01" content="298A008016D25F2280327AADFCBA8AC3">
+
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://medaiclinical.com/faq.html">
+  <meta property="og:site_name" content="Med-AI Clinical">
+  <meta property="og:locale" content="en_US">
+  <meta property="og:title" content="Radiology Report QA & Clinical AI FAQs | Med-AI Clinical">
+  <meta property="og:description" content="Practical answers for clinicians, administrators, and IT teams evaluating free early access to Med-AI Clinical.">
+  <meta property="og:image" content="https://medaiclinical.com/og-image.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+
+  <!-- Twitter / X -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:url" content="https://medaiclinical.com/faq.html">
+  <meta name="twitter:title" content="Radiology Report QA FAQs | Med-AI Clinical">
+  <meta name="twitter:description" content="Practical answers for clinicians, administrators, and IT teams evaluating free early access to Med-AI Clinical.">
+  <meta name="twitter:image" content="https://medaiclinical.com/og-image.jpg">
+
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="manifest" href="/site.webmanifest">
+  <link rel="stylesheet" href="/styles.css?v=20260923-contrast">
   <link rel="stylesheet" href="/design.css?v=20260923-contrast">
+
+  <!-- Schema.org FAQPage & BreadcrumbList Structured Data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          {
+            "@type": "ListItem",
+            "position": 1,
+            "name": "Home",
+            "item": "https://medaiclinical.com/"
+          },
+          {
+            "@type": "ListItem",
+            "position": 2,
+            "name": "FAQs",
+            "item": "https://medaiclinical.com/faq.html"
+          }
+        ]
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "Is Med-AI Clinical free?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Yes. Product use has no subscription fee during early access, and no credit card is required to request access. There is no announced end date. Future pricing will be communicated in advance."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Can I start without booking a sales call?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "You can try the synthetic demo immediately with no sign-in. To evaluate the workspace with your team, request free access. We review your workflow and confirm onboarding rather than promise instant provisioning."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "What does the product check?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "The report QA workflow surfaces potential issues such as inconsistent laterality, discrepancies between report sections, and missing comparison context. Findings include source evidence for review."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Does it replace a radiologist or interpret every scan?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "No. Med-AI Clinical supports report review. A clinician remains responsible for checking source material, correcting the report, and signing the final version."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Which reports can we evaluate?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Radiology report QA is the main early-access workflow. The public demo also includes a synthetic laboratory case. Agree modalities, languages, and volume during onboarding."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Do we need a PACS or EHR integration first?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "You can explore the demo without an integration. A workspace can receive patient report uploads and pasted report text. PACS/RIS/LIS/EHR connections require checking your vendor, interface, credentials, and deployment."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "What if a suggestion is wrong?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Review the source evidence, edit the report, and submit feedback inside the report workspace. Clinicians can rate whether a QA alert was useful. Suggestions are not applied as final clinical decisions; the reviewer controls sign-off."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Where are reports stored and who can access them?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Uploaded source files use the configured S3 bucket. Report text, workflow state, and metadata are stored in the application database. Workspace tenancy and role checks restrict access."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Is customer data used to train AI?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "The application sends selected content to the configured model provider for inference and can retrieve workspace reference documents. That is different from training a model. Administrator-controlled export tools allow exporting data only if explicitly authorized."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How long is information retained?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Retention and deletion procedures for the database, S3 objects, audit records, backups, and model provider are agreed upon for your deployment before uploading patient information."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Is the product clinically validated or independently certified?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Early access is for supervised evaluation. We do not publish validated accuracy, time-saving percentages, or independent security certifications here."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Can we use our own protocols?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Workspace administrators can upload reference documents such as protocols, guardrails, and studies to the Knowledge Base to inform supported AI workflows."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How do we know whether it helps our team?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Review useful-alert ratings, report edits, creation-to-signature time, and active participants in the workspace results dashboard."
+            }
+          }
+        ]
+      }
+    ]
+  }
+  </script>
 </head>
 <body>
 <a class="skip-link" href="#main">Skip to content</a>
