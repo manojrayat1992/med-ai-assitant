@@ -577,11 +577,12 @@ p { margin: 0; }
   gap: 24px;
   align-items: center;
   border-radius: var(--radius);
-  background: var(--dark);
-  color: var(--white);
+  background: #eaf2ee;
+  color: var(--ink);
   padding: clamp(28px, 5vw, 48px);
 }
-.cta-band p { max-width: 740px; margin-top: 10px; color: rgba(255, 255, 255, 0.75); }
+.cta-band p { max-width: 740px; margin-top: 10px; color: var(--ink-2); }
+.cta-band h2 { color: var(--ink); }
 .page-hero {
   border-bottom: 1px solid var(--line);
   background: linear-gradient(135deg, rgba(13, 124, 102, 0.09), rgba(47, 108, 179, 0.09)), var(--paper);

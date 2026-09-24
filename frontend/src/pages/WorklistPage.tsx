@@ -1,3 +1,4 @@
+import { DownloadSignedReport } from '@/components/reports/DownloadSignedReport';
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import {
@@ -90,6 +91,7 @@ export function WorklistPage() {
         if (!current) {
           return activeTab === 'pending' ? list.content[0] ?? null : signedList.content[0] ?? null;
         }
+        if (current.status === 'SIGNED') return signedList.content.find(r => r.id === current.id) ?? current;
         const found = (activeTab === 'pending' ? list.content : signedList.content).find((r) => r.id === current.id);
         return found ?? (activeTab === 'pending' ? list.content[0] ?? null : signedList.content[0] ?? null);
       });
@@ -131,12 +133,17 @@ export function WorklistPage() {
 
   const sign = (action: ReviewAction) => {
     if (!selected) return;
-    void run(() =>
-      reportService.sign(selected.id, action, {
+    void run(async () => {
+      const signed = await reportService.sign(selected.id, action, {
         finalContent: action === 'EDITED' ? narrative : undefined,
         rejectionReason: action === 'REJECTED' ? rejectionReason : undefined,
-      })
-    );
+      });
+      if (signed.status === 'SIGNED') {
+        setSignedReports(previous => [signed, ...previous.filter(r => r.id !== signed.id)]);
+        setActiveTab('signed');
+        setSelected(signed);
+      }
+    });
   };
 
   if (loading) {
@@ -351,6 +358,7 @@ export function WorklistPage() {
               </div>
 
               <div className="flex flex-wrap gap-2 border-t pt-4" style={{ borderColor: 'var(--clr-border, #1e2d45)' }}>
+                <DownloadSignedReport reportId={selected.id} />
                 <Button asChild variant="secondary" size="sm">
                   <Link to={`/clinical-workspace/${selected.id}`}>
                     <ShieldAlert className="h-3.5 w-3.5" />

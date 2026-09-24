@@ -55,6 +55,10 @@ services:
 
       # Uploaded objects use the S3 bucket configured in the env file.
       STORAGE_TYPE: s3
+      STORAGE_S3_BUCKET: ${STORAGE_S3_BUCKET:?STORAGE_S3_BUCKET is required}
+      STORAGE_S3_REGION: ${STORAGE_S3_REGION:?STORAGE_S3_REGION is required}
+      STORAGE_S3_ACCESS_KEY: ${STORAGE_S3_ACCESS_KEY:?STORAGE_S3_ACCESS_KEY is required}
+      STORAGE_S3_SECRET_KEY: ${STORAGE_S3_SECRET_KEY:?STORAGE_S3_SECRET_KEY is required}
 
       # Same reasoning: the per-minute rate window is per-instance, and there is one instance,
       # so it is exactly correct without Redis.

@@ -1,3 +1,4 @@
+import { DownloadSignedReport } from '@/components/reports/DownloadSignedReport';
 import { useEffect, useMemo, useState } from 'react';
 import {
   AlertTriangle,
@@ -347,6 +348,8 @@ export function ClinicalWorkspacePage() {
       <p className="text-sm text-slate-400">Review the report, run QA, then open a flagged finding in the 3D Atlas to locate its anatomy.</p>
 
       <WorkspaceTabBar activeTab={activeContextTab} onTabChange={setActiveContextTab} />
+
+      {review?.status === 'SIGNED' && <DownloadSignedReport key={review.id} reportId={review.id} />}
 
       <WorkspaceActions
         anatomyAction={<HumanAtlasLauncher key={reviewId ?? "demo-atlas"} open={atlasOpen} onOpenChange={setAtlasOpen}

@@ -1,3 +1,4 @@
+import { signedReportText } from '@/components/reports/DownloadSignedReport';
 import { act, cleanup, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
@@ -108,6 +109,58 @@ describe('QA workflow regression coverage', () => {
   afterEach(() => {
     cleanup();
     useAuthStore.getState().clear();
+  });
+
+  it('offers the signed report download immediately after accepting a report', async () => {
+    const user = userEvent.setup();
+    const review = makeReview({ status: 'IN_REVIEW', claimedBy: 'doctor-user-id' });
+    const signed = makeSignedPriorReview({ id: review.id });
+    vi.mocked(reportService.worklist).mockResolvedValue(pagedReviews([review]));
+    vi.mocked(reportService.sign).mockImplementation(async () => {
+      vi.mocked(reportService.worklist).mockResolvedValue(pagedReviews([]));
+      vi.mocked(reportService.signedWorklist).mockResolvedValue(pagedReviews([signed]));
+      return signed;
+    });
+    render(<MemoryRouter><WorklistPage /></MemoryRouter>);
+    await user.click(await screen.findByRole('button', { name: /Accept & sign/i }));
+    expect(await screen.findByRole('button', { name: /Download signed report/i })).toBeVisible();
+    expect(reportService.sign).toHaveBeenCalledWith(review.id, 'ACCEPTED', expect.any(Object));
+  });
+
+  it('exports final signed content and signature metadata without draft content', () => {
+    const signed = makeSignedPriorReview({ finalContent: 'Final findings: café — normal.', draftContent: 'Superseded draft', amendsReviewId: 'previous-review' });
+    const text = signedReportText(signed);
+    expect(text).toContain('Final findings: café — normal.');
+    expect(text).toContain(signed.signedAt!);
+    expect(text).toContain(signed.signedBy!);
+    expect(text).toContain('Amends report: previous-review');
+    expect(text).not.toContain('Superseded draft');
+    expect(() => signedReportText(makeReview())).toThrow(/complete sign-off/);
+    expect(() => signedReportText({ ...signed, finalContent: null })).toThrow(/complete sign-off/);
+  });
+
+  it('downloads through the report API and displays retrieval failures', async () => {
+    const user = userEvent.setup();
+    const signed = makeSignedPriorReview();
+    vi.mocked(reportService.get).mockResolvedValue(signed);
+    renderClinicalWorkspace(signed.id);
+    const button = await screen.findByRole('button', { name: /Download signed report/i });
+    const createUrl = vi.fn().mockReturnValue('blob:signed-report');
+    vi.stubGlobal('URL', Object.assign(URL, { createObjectURL: createUrl, revokeObjectURL: vi.fn() }));
+    const click = vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(() => {});
+    try {
+      await user.click(button);
+      expect(createUrl).toHaveBeenCalledWith(expect.any(Blob));
+      expect(click).toHaveBeenCalledOnce();
+      expect(reportService.get).toHaveBeenCalledTimes(2);
+      vi.mocked(reportService.get).mockRejectedValue({ response: { status: 403 } });
+      await user.click(button);
+      expect(await screen.findByRole('alert')).toHaveTextContent('Could not download');
+      expect(click).toHaveBeenCalledOnce();
+    } finally {
+      click.mockRestore();
+      vi.unstubAllGlobals();
+    }
   });
 
   it('shows the feedback entry and worklist guidance in the sidebar demo workspace', () => {
